@@ -1,0 +1,143 @@
+# Project Draft: Elastic Deformation of a 2D Plate
+
+Nov 6, 2026 · Ernesto Corral
+
+> **⚠️ Provenance: not yet reproducible.** Every number, table and figure in this draft was computed in Ernesto's claude.ai session, **not by code in this repo**. The script has not been exported yet, and nobody in the group has reproduced these results. Treat them as provisional until the code lands in the repo and reruns cleanly.
+>
+> Not stated in the draft: the exact MINRES stopping implementation, the GMRES restart parameter (described only as "full, no restart") and the dependency versions.
+>
+> The two figures (convergence plot, deformed plate ×200) exist only in the PDF export and are not in `figures/` yet.
+
+**Case.** This draft is **force-driven**: uniform traction p on the right edge, so f_f ≠ 0 and d_p = 0. Darius's draft is **displacement-driven** (prescribed grip motion). See `solvers/comparison-plan.md` for the grip benchmark. Meshes here count **cells**: n×n cells means (n+1)×(n+1) nodes. For example, 20×20 cells = 21×21 nodes.
+
+## 1. Problem definition
+
+**Objectives.** First, compute how a thin square plate deforms when its left edge is clamped and its right edge is pulled. Second, and more important for this course, turn that problem into a linear system K u = f and compare how direct and iterative methods solve it.
+
+**Model.** A square steel plate, side L = 1 m, thickness t = 1 cm, with E = 200 GPa and ν = 0.3. We assume small deformations, a linear elastic and homogeneous material, plane stress (thin plate, in-plane loads), a static load and no gravity. The unknowns are the displacements u(x, y) (horizontal) and v(x, y) (vertical), governed by equilibrium and Hooke's law:
+
+```math
+\frac{\partial\sigma_{xx}}{\partial x} + \frac{\partial\sigma_{xy}}{\partial y} = 0, \quad \frac{\partial\sigma_{xy}}{\partial x} + \frac{\partial\sigma_{yy}}{\partial y} = 0, \qquad \boldsymbol{\sigma} = D\,\boldsymbol{\varepsilon}, \quad D = \frac{E}{1-\nu^2}\begin{bmatrix}1 & \nu & 0\\ \nu & 1 & 0\\ 0 & 0 & \frac{1-\nu}{2}\end{bmatrix}
+```
+
+Here the strain is ε = (∂u/∂x, ∂v/∂y, ∂u/∂y + ∂v/∂x) and the stress is σ = (σ_xx, σ_yy, σ_xy).
+
+**Boundary conditions.**
+
+| Edge | Condition | Meaning |
+| --- | --- | --- |
+| Left, x = 0 | u = 0, v = 0 | clamped, cannot move |
+| Right, x = L | σ_xx = p, σ_xy = 0 | pulled with uniform traction p = 100 MPa |
+| Top and bottom | σ_yy = 0, σ_xy = 0 | free, no force |
+
+**Matrix and unknowns.** We use the finite element method: the plate is cut into n × n small squares, each split into two linear triangles. Each node has two unknowns (its horizontal and vertical displacement), collected in the vector u. After removing the clamped left-edge nodes there are 2n(n + 1) unknowns.
+
+Each triangle contributes a 6 × 6 element matrix K_e = t · Area · Bᵀ D B, where B turns the triangle's nodal displacements into its (constant) strain. Adding all K_e together gives the stiffness matrix K. The force vector f holds the pull p spread over the right-edge nodes.
+
+K has three properties that decide which methods we can use. It is **symmetric** (D is symmetric), **positive definite** (the clamp prevents rigid motions, so every nonzero displacement stores positive energy) and **sparse** (each node only interacts with its neighbours, at most 14 nonzeros per row).
+
+## 2. Small example: direct methods
+
+All three direct methods give the same solution of the 12-unknown system to machine precision. We used a 2 × 2 mesh (9 nodes, 8 triangles); after clamping the 3 left-edge nodes, 12 unknowns remain. The 12 × 12 matrix K is exactly symmetric, its eigenvalues run from 1.07 × 10⁸ to 1.03 × 10¹⁰ (all positive, so it is positive definite) and its condition number is κ = 95.8.
+
+| Method | How it solves K u = f | Relative residual ‖f − Ku‖ / ‖f‖ |
+| --- | --- | --- |
+| PA = LU | factor with partial pivoting, then two triangular solves | 6.1 × 10⁻¹⁶ |
+| u = K⁻¹f | form the inverse explicitly, then multiply | 6.0 × 10⁻¹⁶ |
+| Cholesky, K = CCᵀ | factor (no pivoting needed, since K is SPD), then two triangular solves | 5.3 × 10⁻¹⁶ |
+
+The three solutions differ by about 2.5 × 10⁻¹⁶ relative to each other. Cholesky is the natural choice for our matrix: it needs K to be symmetric positive definite, which it is, and costs about half as much as LU. Forming K⁻¹ works here only because the system is tiny; for large sparse K the inverse is dense and expensive, so we never use it there.
+
+**Physical result.** The right edge moves about 0.47 to 0.51 mm to the right, close to the quick estimate pL/E = 0.5 mm. The bottom-right corner moves up 0.10 mm and the top-right corner moves down 0.05 mm, so the plate narrows as expected (the asymmetry comes from the very coarse mesh; see section 5).
+
+**Checks.** The reaction forces at the clamp add up to −1.000 × 10⁶ N, exactly minus the applied force F = p · L · t. As a code test we also solved the roller version of the problem (left edge free to slide vertically), which has the exact solution u = px/E, v = −νpy/E; our solution matches it to a relative error of 1.1 × 10⁻¹⁵.
+
+## 3. Iterative methods on a larger system
+
+For the large test we use a 20 × 20 mesh: 840 unknowns, with only 11,112 nonzeros in K (1.6% of the entries). The condition number is κ ≈ 9,100, about 95 times larger than in the small example, because a finer mesh makes K worse conditioned.
+
+Every method starts from u₀ = 0 and stops when the relative residual ‖f − Ku‖ / ‖f‖ drops below 10⁻⁸, with a limit of 20,000 iterations. We wrote Jacobi, Gauss-Seidel and Steepest Descent ourselves; CG, GMRES (full, no restart) and MINRES come from SciPy.
+
+Before running anything we checked whether each method fits our matrix:
+
+| Method | What it needs to converge | Does our K qualify? |
+| --- | --- | --- |
+| Jacobi | spectral radius of I − D⁻¹K below 1 (D = diagonal of K) | **No.** The spectral radius is 1.96, so it diverges |
+| Damped Jacobi (ω = 0.5) | ω below 2 / λ_max(D⁻¹K) ≈ 0.68 | Yes, but slow |
+| Gauss-Seidel | guaranteed for any SPD matrix | Yes |
+| Steepest Descent | SPD | Yes, but its speed depends directly on κ |
+| CG | SPD | Yes, the natural fit |
+| GMRES | any nonsingular matrix | Yes, but it ignores symmetry and stores every search direction |
+| MINRES | symmetric (may be indefinite) | Yes |
+
+The Jacobi row is the key lesson: being symmetric positive definite is enough for Gauss-Seidel but not for Jacobi.
+
+One implementation detail: SciPy's MINRES stops on its own scaled error estimate, which ended it early at a true residual of 3 × 10⁻⁵. To compare fairly, we stop MINRES on the same true relative residual as every other method.
+
+## 4. Initial results
+
+The Krylov methods win clearly: CG, GMRES and MINRES reach the tolerance in 228 to 242 iterations, while Gauss-Seidel needs 19,136 and Jacobi diverges. CG is also the fastest, at 7 ms.
+
+| Method | Iterations | Final relative residual | Error vs direct solve | Time (ms) |
+| --- | --- | --- | --- | --- |
+| Jacobi | diverges (stopped at 49) | 1.3 × 10¹⁰ | 3.4 × 10⁷ | 1.3 |
+| Damped Jacobi, ω = 0.5 | 20,000, limit reached | 4.8 × 10⁻⁶ | 8.7 × 10⁻⁵ | 542 |
+| Gauss-Seidel | 19,136 | 1.0 × 10⁻⁸ | 1.7 × 10⁻⁷ | 7,806 |
+| Steepest Descent | 20,000, limit reached | 3.1 × 10⁻⁶ | 4.2 × 10⁻⁵ | 300 |
+| CG | 242 | 9.2 × 10⁻⁹ | 9.7 × 10⁻¹⁰ | 7.1 |
+| GMRES (full) | 228 | 9.5 × 10⁻⁹ | 6.0 × 10⁻⁹ | 149 |
+| MINRES | 236 | 9.4 × 10⁻⁹ | 5.9 × 10⁻⁹ | 15.0 |
+
+Times are the best of 3 runs and include computing the residual at every iteration. Gauss-Seidel's time is inflated by our implementation (one SciPy triangular solve per sweep, called from Python), so its iteration count is the fairer comparison.
+
+[figure, not exported: Relative residual against iteration for all seven methods on the 840-unknown system]
+
+**What the results show.**
+
+- **Jacobi diverges**, exactly as the spectral radius 1.96 predicted. Damping with ω = 0.5 stops the divergence, but convergence becomes very slow.
+- **Gauss-Seidel and Steepest Descent converge, but slowly.** Both improve the solution using only local information, and their speed is limited by the condition number κ ≈ 9,100.
+- **CG, GMRES and MINRES need about 80 times fewer iterations.** Each step uses the information of all previous steps (a Krylov subspace), so they adapt to the whole spectrum of K.
+- **CG is the best overall.** It needs one matrix-vector product per iteration and very little memory. Its residual zigzags (see the plot) because CG minimizes the error in the energy norm, not the residual, yet it has the smallest final error, 9.7 × 10⁻¹⁰.
+- **MINRES has the smoothest curve** because it minimizes the residual at every step. It costs about twice CG's time here.
+- **GMRES matches MINRES in iterations but is 20 times slower than CG.** It does not use the symmetry of K, so each step must be orthogonalized against all previous directions, and that cost keeps growing.
+
+**Effect of mesh size.** Refining the mesh makes K both larger and worse conditioned, and this decides how each method scales:
+
+| Mesh | Unknowns | Condition number κ | CG iterations | Steepest Descent iterations |
+| --- | --- | --- | --- | --- |
+| 10 × 10 | 220 | 2,469 | 120 | 14,202 |
+| 20 × 20 | 840 | 9,104 | 242 | 46,030 |
+| 40 × 40 | 3,280 | 34,548 | 469 | 149,816 |
+
+Each time the mesh is refined by a factor 2, κ grows about 4 times. CG's iterations roughly double (they grow like √κ), while Steepest Descent's grow about 3 times (closer to κ itself). So the gap between CG and the simple methods widens as the problem gets bigger.
+
+**Physical result.** On the 20 × 20 mesh the right edge moves up to 0.50 mm to the right, and the top and bottom edges move inward by up to 0.08 mm. The plate stretches and narrows toward the pulled edge, as the model predicts.
+
+[figure, not exported: Deformed plate on the 20 by 20 mesh, displacements exaggerated 200 times, dashed outline is the original plate]
+
+## 5. Questions and problems encountered
+
+- **Jacobi diverges on an SPD matrix.** Should we keep plain Jacobi in the comparison as a negative result, or only report damped Jacobi with a well-chosen ω?
+- **Different stopping rules.** SciPy's MINRES stops on its own error estimate, so we forced one common rule (true relative residual below 10⁻⁸). Is that the right criterion to compare all methods?
+- **Timing depends on implementation.** Our hand-written loops and SciPy's routines are not equally optimized, so we treat iteration counts as the main metric and times as secondary. Is that acceptable?
+- **Mesh bias.** All triangles are cut along the same diagonal, which makes coarse results slightly asymmetric (in the 2 × 2 example the two right corners move 0.10 mm and 0.05 mm). Alternating the diagonal direction should fix this.
+- **Corner stresses.** Where the clamped edge meets a free edge, linear elasticity predicts unbounded stress, so stress values there will not settle as the mesh is refined. We plan to report displacements and avoid stress values at those corners.
+- **Possible extension.** Should we add preconditioned CG (for example with an incomplete Cholesky preconditioner) to show how to reduce the effect of κ?
+
+## 6. Plan for the next two weeks
+
+The goal is a finished report and slides before the presentation on Nov 27, 2026.
+
+**Week 1 (Nov 9 to 13): more experiments**
+
+- [ ] Run larger meshes (80 × 80 and 160 × 160) with CG, MINRES, GMRES and Gauss-Seidel.
+- [ ] Plot condition number and iteration counts against mesh size.
+- [ ] Try damped Jacobi with a better ω, and alternating triangle diagonals.
+- [ ] Optional: add preconditioned CG and compare it with plain CG.
+
+**Week 2 (Nov 16 to 20): write-up and slides**
+
+- [ ] Finalize plots and tables, with answers to the questions in section 5.
+- [ ] Write the final report: model, methods, results, conclusions.
+- [ ] Build the slides and split the presentation between the five of us.
+- [ ] Do a full rehearsal before the final week.
