@@ -23,14 +23,14 @@ Physical traction has units Pa; line load q = t(p,0) has units N/m. On a boundar
 
 ## Stage 2 — Mesh, assembly and small direct solve
 
-**Mesh and interface.** Start with structured square grids, each cell split into two counter-clockwise linear triangles. Always distinguish n_cells per side from n_nodes = n_cells + 1. Geometry extensions use ordered outer/hole boundaries and constrained triangulation, subject to confirming the brief. Export nodes (N,2), triangles (T,3), labelled boundary edges, material/unit metadata and displacement order [ux0,uy0,ux1,uy1,…]. The ≤14-nonzeros-per-row description belongs to the reported structured mesh; it is not a bound for arbitrary triangulations.
+**Mesh and interface.** Start with structured square grids, each cell split into two counter-clockwise linear triangles. Case G uses bottom-left–to–top-right diagonals, as specified in its comparison contract; case F's exact diagonal convention remains to be checked against its generating script. Always distinguish n_cells per side from n_nodes = n_cells + 1. Geometry extensions use ordered outer/hole boundaries and constrained triangulation, subject to confirming the brief. Export nodes (N,2), triangles (T,3), labelled boundary edges, material/unit metadata and displacement order [ux0,uy0,ux1,uy1,…]. The ≤14-nonzeros-per-row description belongs to the reported structured mesh; it is not a bound for arbitrary triangulations.
 
 For a triangle of area a_e, assemble K_e = t a_e B_eᵀ D B_e into the full sparse K. Retain the full applied load f and prescribed values d_c. If free indices are f_idx, eliminate constraints symmetrically:
 
     A = K[free,free];  b = f[free] − K[free,c] d_c;  A x = b.
     Recover d[free] = x, d[c] = d_c;  reactions = (K d − f)[c].
 
-The full unconstrained K is positive semidefinite and, for a connected nondegenerate 2D elastic mesh, has three rigid-body modes. Positive definiteness belongs to A **after sufficient supports remove those modes**. For case F, d_c = 0 and b = f[free]. For case G, f = 0 and b = −K[free,c]d_c. Replacing only constrained rows by identity can destroy symmetry and invalidate solver assumptions.
+The full unconstrained K is positive semidefinite and has exactly three rigid-body modes for a conforming, nondegenerate triangulation of a connected elastic domain without point-connected mechanisms. Positive definiteness belongs to A **after sufficient supports remove those modes**. For case F, d_c = 0 and b = f[free]. For case G, f = 0 and b = −K[free,c]d_c. Replacing only constrained rows by identity can destroy symmetry and invalidate solver assumptions.
 
 **Introductory hand example.** Darius's two-triangle square uses E = t = 1, ν = 0, both left nodes fixed, lower-right displacement (0.02,0) prescribed and only the upper-right node free. Its reduced equations are A = diag(0.75,0.75), b = (0.005,0). Cholesky gives x = (1/150,0). This is an explanatory, uncoupled example with different parameters—not the steel benchmark or an iterative-method performance test.
 
