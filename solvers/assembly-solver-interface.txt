@@ -1,0 +1,72 @@
+Proposed assembly and solver handoff — 6 November 2026
+Working specification, not a final report or measured result.
+
+Inputs
+- nodes: float array (N, 2), coordinates in metres.
+- triangles: integer array (M, 3), zero-based, counter-clockwise.
+- boundary_edges: named integer arrays (B, 2), each physical edge once.
+  Boundary node sets may additionally be supplied for selecting supports.
+- DOF ordering: [ux0, uy0, ux1, uy1, ...].
+- Material metadata: E (Pa), nu, plane stress/strain, thickness t (m).
+  Values remain unconfirmed; do not silently insert material defaults.
+- Constraints: unique DOF indices c and matching prescribed values d_c (m).
+
+Assembly contract
+assemble(nodes, triangles, E, nu, *, plane, thickness) -> CSR K (2N, 2N)
+An adapter may be needed for the provided routine's actual signature.
+Retain the original K and f for reaction recovery.
+
+Loading convention
+Use line load q in N/m along the 2D boundary, with global x/y components.
+For constant q on a straight edge of length L, add L*q/2 to each endpoint.
+If input instead specifies physical traction tau in Pa, use q = t*tau.
+Do not apply thickness twice. Record whether loads are total or per thickness.
+Keep q and the loaded physical boundary fixed during mesh refinement.
+
+Clarifications for model integration
+- Keep applied loads at constrained DOFs in the original f. Prescribing d_c
+  removes those equations from the solve, not those loads from bookkeeping.
+  The reaction is r_c = K[c,:] d - f_c. Deleting f_c corrupts reactions.
+- Plane strain specifies the constitutive assumption, not a mandatory depth.
+  For constant out-of-plane depth t, K_e = t*A_e*B.T*D_strain*B and
+  q = t*tau are consistent. Unit depth is a reporting convention; do not
+  reject other positive depths solely because plane="strain".
+  Label total forces versus forces per unit depth explicitly.
+- Plane stress remains a proposed baseline assumption pending the supplied
+  routine/material data, rather than a confirmed course requirement.
+
+Reduction and recovery
+Let free be the complement of c; A = K[free, free].
+b = f[free] - K[free, c] d_c.
+Solve A d_free = b, then reconstruct the full displacement d.
+r = K d - f: r[c] gives support reactions; r[free] is solver residual.
+Check total applied force plus support reactions, and their total moment.
+
+Solver comparison proposal for Monday
+Small case: LU and Cholesky; larger case: CG and diagonal-PCG.
+Use the same reduced system, initial guess and stopping threshold for CG/PCG.
+Diagonal-PCG applies z_i = r_i/A_ii; verify positive diagonal and SPD assumptions.
+Check convergence status and the true residual independently of solver reports.
+Report absolute residual; relative residual is undefined when ||b||_2 = 0.
+Separate factorization/preconditioner setup from solve time.
+Collect residual histories separately from timing runs to avoid diagnostic overhead.
+Dense Cholesky is acceptable only for the explicitly small example.
+
+Outstanding dependency
+The three supplied briefs do not include the assembly routine or numerical material
+properties. This interface is a proposal to prepare integration, not evidence that
+an elastic deformation experiment has been run.
+
+Baseline integration checks (latest geometry proposal)
+- Use the 2 by 1 rectangle from Frambuesa's latest mesh specification;
+  this supersedes the earlier 1 by 1 suggestion. Left edge clamped.
+- With coordinates in metres, the right edge has length 1 m. Constant
+  line load q must assemble to total force (1 m)*q, independent of mesh.
+- For horizontal q=(Q,0), the applied moment about (0,0) is
+  -Q*(1 m)^2/2; reactions must cancel both total force and moment.
+- Compare the sum of loaded edge lengths against 1 m to catch duplicated
+  or missing edges before solving.
+- For zero prescribed displacements and fixed K, doubling f must double d
+  and the support reactions to solver tolerance. This checks the linear
+  implementation, not the physical validity of large deformations.
+- These are proposed acceptance checks, not measured results.
