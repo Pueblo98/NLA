@@ -1,0 +1,15 @@
+system: 12 unknowns, 96 stored nonzeros
+symmetry: max |A - A^T| = 0.0e+00
+eigenvalues: min 1.073e+08, max 1.028e+10  -> positive definite: True
+condition number kappa_2 = 95.8
+
+method      relative residual ||b - A x|| / ||b||
+PA = LU     5.8e-16
+inverse     7.4e-16
+Cholesky    7.4e-16
+max relative difference between the three solutions: 3.6e-16
+
+right edge (bottom, middle, top):
+  u [mm] = [0.5112 0.4822 0.4678]   estimate pL/E = 0.5 mm
+  v [mm] = [ 0.1045  0.0294 -0.0461]
+sum of clamp reactions: x -1.0000e+06 N, y -1.7e-10 N  (applied F = 1.0e+06 N)

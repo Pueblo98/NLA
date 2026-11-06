@@ -1,0 +1,8 @@
+Ernesto's force-driven plate (1 x 1 m steel, t = 1 cm, nu = 0.3, p = 100 MPa)
+cells  unknowns  stored_nnz  numeric_nnz  kappa      rho_Jacobi  2/lmax(D^-1A)  CG   SD
+10x10       220        2752         2390     2469.5      1.9513         0.6777   120  14202
+20x20       840       11112         9590     9103.9      1.9601         0.6757   242  46030
+40x40      3280       44632        38390    34547.7      1.9622         0.6752   469 149816
+
+Darius's grip case (17 x 17 nodes, E = 1, nu = 0.34, grip (0.01, 0) on 3 nodes)
+unknowns 538, stored nnz 7004, numeric nnz 6054
