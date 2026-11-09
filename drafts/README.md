@@ -84,3 +84,10 @@ contributions are labelled honestly for confirmation in the final report.
 Lucas's request to finish the progress draft authorizes this as the finished
 version of the progress document for the drafts channel. It does not imply
 that every member has already reviewed it or that the final report is done.
+
+## Recovery audit
+
+After the interrupted Slack response, all eight iterative results and the
+existing FEM/constraint checks were rerun successfully. See
+`recovery-handoff.md` and `results/recovery-checks.txt`. The saved PDF and UTF-8
+Markdown sources are intact; the original timing measurements were preserved.

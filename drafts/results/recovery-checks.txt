@@ -1,0 +1,14 @@
+Recovery audit: 9 November 2026
+PASS: known-answer and zero-RHS checks for all eight solvers; GMRES one-step budget.
+PASS: Jacobi: 49 iterations, residual 1.32423796e+10, saved acceptance and status reproduced.
+PASS: Damped Jacobi: 20000 iterations, residual 4.75793523e-06, saved acceptance and status reproduced.
+PASS: Gauss-Seidel: 19136 iterations, residual 9.99630025e-09, saved acceptance and status reproduced.
+PASS: SD: 20000 iterations, residual 3.08143698e-06, saved acceptance and status reproduced.
+PASS: CG: 242 iterations, residual 9.40527165e-09, saved acceptance and status reproduced.
+PASS: GMRES (full): 228 iterations, residual 9.47610006e-09, saved acceptance and status reproduced.
+PASS: MINRES: 236 iterations, residual 9.44512152e-09, saved acceptance and status reproduced.
+PASS: PCG (diagonal): 226 iterations, residual 8.01187566e-09, saved acceptance and status reproduced.
+PASS: saved small matrix and load exactly match fresh FEM assembly.
+PASS: canonical source and drafts-channel copy match after figure-link normalization; both decode as UTF-8.
+PASS: PDF has nine readable pages, required sections and text within the page margins.
+Historical timing measurements were preserved; this audit does not replace them with new timings.
