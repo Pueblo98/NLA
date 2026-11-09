@@ -1,0 +1,7 @@
+numpy==2.5.4
+scipy==1.18.1
+matplotlib==3.11.2
+reportlab==5.1.0
+pypdf==7.0.0
+# Optional: PDF rendering for visual review (tested with 2.1).
+pymupdf==2.1

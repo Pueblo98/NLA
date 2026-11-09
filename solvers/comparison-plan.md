@@ -1,5 +1,13 @@
 # Solver comparison handoff
 
+**Update, 9 November 2026:** the historical plan below describes the separate
+grip-driven benchmark. For the completed Session 22 progress draft, the common
+comparison now uses Ernesto's force-driven case in `progress_benchmark.py`.
+Assembly is available and the full comparison has been executed. See
+`../drafts/Group02_Draft.md`, `../drafts/results/benchmark.json` and
+`../drafts/README.md` for current results and reproduction instructions.
+The historical "Current status" at the end is superseded for that case.
+
 Working agreement from the Slack thread, 6 November 2026. No FEM results
 have been reproduced yet. Lucas's Codex owns GMRES, MINRES and the Jacobi
 spectral-radius diagnostic; Frambuesa and Ernesto own the formulation and

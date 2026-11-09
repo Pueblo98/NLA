@@ -1,0 +1,23 @@
+Validation run: 9 November 2026
+Environment: Python 3.13.16, NumPy 2.5.4, SciPy 1.18.1, macOS ARM64.
+
+python fem/check_fem.py
+PASS: D, rigid-body null space, hand example, patch test, SPD, force/moment balance, linearity
+
+python solvers/check_system_tools.py
+PASS: load refinement, moment, nonzero constraints, support loads, duplicate rejection
+
+python solvers/check_sparse_system_tools.py
+PASS: CSR reduction, sparse solve, reactions, unchanged inputs, dense agreement
+
+python solvers/progress_benchmark.py
+PASS: known-answer checks for all eight iterative methods; zero RHS for each;
+one-step GMRES iteration-budget accounting; SPD Jacobi counterexample;
+three repeat runs agree in status, iterations and solution with the history run.
+PASS: 20x20-cell clamp equilibrium and fixed supports; exact roller patch test.
+Unrounded values are saved in benchmark.json; original stdout is in run.log.
+
+python drafts/build_draft.py
+PASS: nine-page PDF generated and all nine pages rendered to PNG.
+PASS: required sections found by independent PDF text extraction; page content
+bounding boxes lie within page margins. Final page images visually inspected.

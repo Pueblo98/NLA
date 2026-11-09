@@ -1,0 +1,186 @@
+{
+  "environment": {
+    "python": "3.13.16",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "platform": "macOS-26.6-arm64-arm-64bit-Mach-O",
+    "machine": "arm64"
+  },
+  "tolerance": 1e-08,
+  "iteration_cap": 20000,
+  "small": {
+    "unknowns": 12,
+    "stored_nnz": 96,
+    "lambda_min": 107306409.69746608,
+    "lambda_max": 10279870032.00637,
+    "condition": 95.79921703641827,
+    "relative_residuals": {
+      "PA=LU": 5.808626837067113e-16,
+      "Inverse": 6.850485718679744e-16,
+      "Cholesky": 7.41529200319122e-16
+    }
+  },
+  "solvers": [
+    {
+      "method": "Jacobi",
+      "iterations": 49,
+      "relative_residual": 13242379570.656487,
+      "relative_error": 33780965.64416548,
+      "accepted": false,
+      "status": "divergence_guard",
+      "best_seconds": 0.00036154198460280895,
+      "timing_runs_seconds": [
+        0.00036154198460280895,
+        0.00044933310709893703,
+        0.00043208315037190914
+      ]
+    },
+    {
+      "method": "Damped Jacobi",
+      "iterations": 20000,
+      "relative_residual": 4.757935226341186e-06,
+      "relative_error": 8.726718511190786e-05,
+      "accepted": false,
+      "status": "iteration_limit",
+      "best_seconds": 0.20315525005571544,
+      "timing_runs_seconds": [
+        0.20585641590878367,
+        0.21097620809450746,
+        0.20315525005571544
+      ]
+    },
+    {
+      "method": "Gauss-Seidel",
+      "iterations": 19136,
+      "relative_residual": 9.996300254056796e-09,
+      "relative_error": 1.7398524645678332e-07,
+      "accepted": true,
+      "status": "target",
+      "best_seconds": 3.6286912080831826,
+      "timing_runs_seconds": [
+        3.764743125066161,
+        3.9215429169125855,
+        3.6286912080831826
+      ]
+    },
+    {
+      "method": "SD",
+      "iterations": 20000,
+      "relative_residual": 3.08143697734764e-06,
+      "relative_error": 4.2213053086403245e-05,
+      "accepted": false,
+      "status": "iteration_limit",
+      "best_seconds": 0.32356454082764685,
+      "timing_runs_seconds": [
+        0.33083366695791483,
+        0.3389885830692947,
+        0.32356454082764685
+      ]
+    },
+    {
+      "method": "CG",
+      "iterations": 242,
+      "relative_residual": 9.405271653468407e-09,
+      "relative_error": 9.768750756641956e-10,
+      "accepted": true,
+      "status": "native_info=0",
+      "best_seconds": 0.0035182081628590822,
+      "timing_runs_seconds": [
+        0.0035182081628590822,
+        0.0035553749185055494,
+        0.003596415976062417
+      ]
+    },
+    {
+      "method": "GMRES (full)",
+      "iterations": 228,
+      "relative_residual": 9.476100063866582e-09,
+      "relative_error": 5.9652711138211015e-09,
+      "accepted": true,
+      "status": "native_info=0",
+      "best_seconds": 0.07465624995529652,
+      "timing_runs_seconds": [
+        0.0752378748729825,
+        0.07465624995529652,
+        0.07631154102273285
+      ]
+    },
+    {
+      "method": "MINRES",
+      "iterations": 236,
+      "relative_residual": 9.44512152171695e-09,
+      "relative_error": 5.938248420504384e-09,
+      "accepted": true,
+      "status": "callback_target",
+      "best_seconds": 0.005897999973967671,
+      "timing_runs_seconds": [
+        0.006867790827527642,
+        0.005897999973967671,
+        0.0062086249236017466
+      ]
+    },
+    {
+      "method": "PCG (diagonal)",
+      "iterations": 226,
+      "relative_residual": 8.011875657944732e-09,
+      "relative_error": 4.807116951417104e-10,
+      "accepted": true,
+      "status": "native_info=0",
+      "best_seconds": 0.003366250079125166,
+      "timing_runs_seconds": [
+        0.003366250079125166,
+        0.003751999931409955,
+        0.0036056670360267162
+      ]
+    }
+  ],
+  "refinement": [
+    {
+      "cells": 10,
+      "unknowns": 220,
+      "stored_nnz": 2752,
+      "numeric_nnz": 2390,
+      "condition": 2469.475807105183,
+      "jacobi_radius": 1.9513266281445243,
+      "omega_upper": 0.6776613543643538,
+      "cg_iterations": 120,
+      "top_right_u_mm": 0.49384856335262745
+    },
+    {
+      "cells": 20,
+      "unknowns": 840,
+      "stored_nnz": 11112,
+      "numeric_nnz": 9590,
+      "condition": 9103.940945296004,
+      "jacobi_radius": 1.9600502426261563,
+      "omega_upper": 0.6756642070458913,
+      "cg_iterations": 242,
+      "top_right_u_mm": 0.4955087450705637
+    },
+    {
+      "cells": 40,
+      "unknowns": 3280,
+      "stored_nnz": 44632,
+      "numeric_nnz": 38390,
+      "condition": 34547.658939570705,
+      "jacobi_radius": 1.9622345797722112,
+      "omega_upper": 0.6751659755973125,
+      "cg_iterations": 469,
+      "top_right_u_mm": 0.4960729842293496
+    }
+  ],
+  "validation": {
+    "force_imbalance_N": [
+      -1.204170985147357e-09,
+      -1.6443664208054543e-09
+    ],
+    "moment_imbalance_Nm": 3.3396645449101925e-09,
+    "maximum_support_displacement_m": 0.0,
+    "sparse_lu_relative_residual": 3.377081647704961e-14,
+    "roller_patch_relative_error": 2.4991270950658854e-15,
+    "load_perturbation_relative": 1e-06,
+    "displacement_perturbation_relative": 4.51246954134587e-07,
+    "load_perturbation_seed": 2026,
+    "maximum_right_u_mm": 0.496683176571387
+  }
+}
