@@ -14,7 +14,7 @@ This describes the current eight-method implementation, not the historical 3,000
 
 ## Remaining review decisions
 
-- Codex/team paragraph-level review is pending. The existing review file audits implementation and saved results, not this new prose.
+- Lucas's Codex reviewed the initial prose/PDF at 81cbef4 and found no major blocker; see paragraph-review-81cbef4.md. Both requested accuracy-paragraph corrections have been applied and the revised PDF rebuilt and inspected by Hermes. Final team approval remains pending.
 - Confirm that all eight iterative methods remain in the final report; this draft explains those currently implemented rather than silently changing the method set.
 - Section 2 is evolving. Recheck the transition after any newer Section 2 revision; this draft leaves earlier sections unchanged.
 - Separate setup/solve timings are not available in the existing benchmark. Any future split-cost comparison requires fresh measurements.
