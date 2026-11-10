@@ -308,7 +308,7 @@ def figures(small_s, s20, d20, hists, rows):
     plt.rcParams.update({"font.size": 8, "axes.titlesize": 8.5, "pdf.fonttype": 42})
 
     # ---- Figure: setup, 2 x 2 mesh numbering and deformed 20 x 20 plate ----
-    fig, axes = plt.subplots(1, 3, figsize=(6.5, 2.25), constrained_layout=True,
+    fig, axes = plt.subplots(1, 3, figsize=(6.5, 2.2), constrained_layout=True,
                              gridspec_kw=dict(width_ratios=[1.0, 1.0, 1.15]))
     ax = axes[0]
     ax.add_patch(Rectangle((0, 0), 1, 1, fc="#e8eef5", ec="black", lw=1))
@@ -382,7 +382,7 @@ def figures(small_s, s20, d20, hists, rows):
     save(fig, "square_setup")
 
     # ---- Figure: residual histories ----
-    fig, axes = plt.subplots(1, 2, figsize=(6.5, 2.05), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(6.5, 1.85), constrained_layout=True)
     styles = {"Jacobi": ("#999999", "-"), "Damped Jacobi": ("#a6761d", "-"),
               "Gauss-Seidel": ("#1b9e77", "-"), "SD": ("#e6ab02", "-"),
               "CG": ("#d95f02", "-"), "PCG (diagonal)": ("#7570b3", "--"),
