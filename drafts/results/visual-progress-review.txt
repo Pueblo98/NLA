@@ -1,0 +1,10 @@
+PASS: all eight raw CSV/JSON solver rows agree.
+PASS: all eight Markdown rows match saved iterations, acceptance, residual, error and historical time (rounding tolerance 0.5%).
+PASS: all three refinement rows match saved measurements (rounding tolerance 0.001%).
+PASS: small saved matrix is symmetric and saved Cholesky solution residual is below 1e-13.
+PASS: all seven numbered sections and all eight figure files are present.
+PASS: PDF contains 10 pages; extracted text stays within page margins.
+Visual review: all 10 rendered pages inspected; revised refinement axes remove overlapping tick labels.
+PASS: one untimed baseline solve for the redrawn before/after figure matches the saved maximum displacement (relative tolerance 1e-10).
+Scope: no iterative benchmark rerun; historical timings preserved. Standalone review layout, not the final Overleaf template.
+Renderer: ReportLab and PyMuPDF using project .build-deps; system Poppler/Node unavailable. PDF skill marker command could not execute because node is absent.
