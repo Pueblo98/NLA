@@ -44,20 +44,20 @@ This notebook reproduces every number, table and figure in the report from scrat
 
 **Units** throughout: metres, newtons, pascals.
 
-**Run time:** a few minutes on a laptop. Most of it is Gauss–Seidel and the iteration-capped methods in Part 3.
+**Run time:** about 10 minutes on a laptop. Most of it is the full solver protocol on every object case in Part 7. Set `FULL_PROTOCOL = False` in Part 7 for a quick run with CG and PCG only.
 """)
 
 md(r"""
 ## 0. Setup and dependencies
 
-Required: `numpy`, `scipy`, `matplotlib` (standard scientific Python), and `triangle` (a Python interface to J. R. Shewchuk's Triangle mesh generator, used only in Part 6). The next cell installs `triangle` if it is missing.
+Required: `numpy`, `scipy` (version 1.12 or newer), `matplotlib` (standard scientific Python), and `triangle` (a Python interface to J. R. Shewchuk's Triangle mesh generator, used only in Part 6). The next cell installs `triangle` if it is missing.
 """)
 code(r"""
 import importlib.util, subprocess, sys
 if importlib.util.find_spec("triangle") is None:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "triangle"])
 
-import json, platform
+import hashlib, json, platform
 from time import perf_counter
 
 import numpy as np
@@ -67,7 +67,13 @@ import matplotlib.pyplot as plt
 import triangle as tr
 from scipy.linalg import cho_factor, cho_solve, eigvalsh, inv, lu_factor, lu_solve
 from scipy.sparse import coo_matrix, csr_matrix, diags, tril
-from scipy.sparse.linalg import cg, eigsh, gmres, minres, splu, spsolve_triangular
+from scipy.linalg import cholesky, LinAlgError
+from scipy.sparse.linalg import cg, eigsh, gmres, minres, splu, ArpackNoConvergence
+from scipy.sparse.linalg import norm as spnorm
+
+if tuple(int(p) for p in scipy.__version__.split(".")[:2]) < (1, 12):
+    raise RuntimeError(f"SciPy >= 1.12 is required (found {scipy.__version__}): "
+                       "the solvers use the `rtol` keyword. Upgrade with: pip install -U scipy")
 
 np.set_printoptions(precision=4, suppress=False, linewidth=110)
 from pathlib import Path
@@ -300,8 +306,9 @@ md(r"""
 A $20\times20$ mesh gives 840 unknowns. Every method uses the **same protocol**:
 
 * the same $A$ and $\mathbf{b}$, starting guess $\mathbf{x}_0 = 0$;
-* stop when the relative residual $\|\mathbf{b}-A\mathbf{x}_k\|/\|\mathbf{b}\| < 10^{-8}$, checked independently of each method's own stopping test;
+* target: relative residual $\|\mathbf{b}-A\mathbf{x}_k\|/\|\mathbf{b}\| < 10^{-8}$;
 * at most 20,000 iterations;
+* each method's own (native) stopping status is recorded, and **separately** a solve is *accepted* only if the residual recomputed from the returned $\mathbf{x}$ is finite and below $10^{-8}$;
 * timing is the best of 3 runs (timings depend on the machine; iteration counts do not).
 
 | Method | Requirement on $A$ | Expectation here |
@@ -349,26 +356,29 @@ def iterative(A, b, method, *, cap=CAP, tol=TOL, history=True):
     if method in {"CG", "PCG (diagonal)"}:
         M = diags(1 / A.diagonal()) if method.startswith("PCG") else None
         x, info = cg(A, b, rtol=tol, atol=0, maxiter=cap, M=M, callback=monitor)
-        status = "target" if info == 0 else f"info={info}"
+        status = f"native_info={info}"
     elif method == "GMRES (full)":
         x, info = gmres(A, b, rtol=tol, atol=0, restart=A.shape[0], maxiter=cap,
                         callback=arnoldi, callback_type="legacy")
-        status = "target" if info == 0 else f"info={info}"
+        status = f"native_info={info}"
     elif method == "MINRES":
         try:
             x, info = minres(A, b, rtol=0, maxiter=cap, callback=monitor)
-            status = f"info={info}"
+            status = f"native_info={info}"
         except TargetReached:
-            x, status = last, "target"
+            x, status = last, "callback_target"
     else:
         Dg = A.diagonal()
-        L = tril(A, format="csr") if method == "Gauss-Seidel" else None
-        U = (A - L).tocsr() if L is not None else None
+        if method == "Gauss-Seidel":
+            # x_{k+1} = L^{-1} (b - U x_k), L = lower triangle of A (incl. diagonal), U = strict upper triangle.
+            # The triangular factor is prepared once; each step is then one sparse triangular solve.
+            L = tril(A, format="csc"); U = (A - L).tocsr()
+            Lsolve = splu(L, permc_spec="NATURAL", diag_pivot_thresh=0).solve
         r, status = b.copy(), "iteration cap"
         for count in range(1, cap + 1):
             if method == "Jacobi":          x += r / Dg
             elif method == "Damped Jacobi": x += 0.5 * r / Dg
-            elif method == "Gauss-Seidel":  x = spsolve_triangular(L, b - U @ x, lower=True)
+            elif method == "Gauss-Seidel":  x = Lsolve(b - U @ x)
             elif method == "SD":            Ar = A @ r; x += ((r @ r) / (r @ Ar)) * r
             r = b - A @ x
             rr = float(np.linalg.norm(r) / nb)
@@ -376,6 +386,12 @@ def iterative(A, b, method, *, cap=CAP, tol=TOL, history=True):
             if not np.isfinite(rr) or rr > 1e10: status = "diverged"; break
             if rr < tol: status = "target"; break
     return x, count, status, hist
+
+
+def true_check(A, b, x):
+    # Independent acceptance: residual recomputed from the returned x.
+    rr = float(np.linalg.norm(b - A @ x) / np.linalg.norm(b))
+    return rr, bool(np.isfinite(rr) and rr < TOL)
 """)
 md("Sanity check on a $2\\times2$ SPD system with a known answer. Every method must recover $\\mathbf{x} = (1,-2)$.")
 code(r"""
@@ -400,13 +416,13 @@ for m in METHODS:
     times = []
     for _ in range(TIMING_RUNS):
         t0 = perf_counter(); iterative(A, b, m, history=False); times.append(perf_counter() - t0)
-    rr = np.linalg.norm(b - A @ x) / np.linalg.norm(b)
+    rr, accepted = true_check(A, b, x)
     err = np.linalg.norm(x - x_ref) / np.linalg.norm(x_ref)
-    rows.append((m, k, status, rr, err, min(times)))
+    rows.append((m, k, status, rr, accepted, err, min(times)))
 
-print(f"\n{'method':16s} {'iterations':>10s} {'status':>14s} {'rel. residual':>14s} {'rel. error':>11s} {'best time [s]':>14s}")
-for m, k, s, rr, err, tm in rows:
-    print(f"{m:16s} {k:10d} {s:>14s} {rr:14.2e} {err:11.2e} {tm:14.4f}")
+print(f"\n{'method':16s} {'iterations':>10s} {'native status':>16s} {'true rel. residual':>18s} {'accepted':>9s} {'rel. error':>11s} {'best time [s]':>14s}")
+for m, k, s, rr, acc, err, tm in rows:
+    print(f"{m:16s} {k:10d} {s:>16s} {rr:18.2e} {str(acc):>9s} {err:11.2e} {tm:14.4f}")
 """)
 code(r"""
 fig, axes = plt.subplots(1, 2, figsize=(11, 3.8), constrained_layout=True)
@@ -442,10 +458,9 @@ Halving the cell size $h$ should multiply the condition number by about 4 ($\kap
 """)
 code(r"""
 def extreme_eigs(A):
-    # Smallest eigenvalue by shift-invert around 0 (fast with a sparse factorisation), largest directly.
-    lo = eigsh(A.tocsc(), k=1, sigma=0, which="LM", return_eigenvectors=False)[0]
-    hi = eigsh(A, k=1, which="LA", return_eigenvectors=False, tol=1e-10, v0=np.ones(A.shape[0]))[0]
-    return lo, hi
+    # Smallest and largest algebraic eigenvalues (ARPACK, which="SA" / "LA"), as in the group benchmark.
+    kw = dict(k=1, return_eigenvectors=False, tol=1e-10, v0=np.ones(A.shape[0]))
+    return eigsh(A, which="SA", **kw)[0], eigsh(A, which="LA", **kw)[0]
 
 refine = []
 for n in (10, 20, 40):
@@ -647,25 +662,37 @@ def observable_weights(obj, case):
     return {"mean_right_ux": w_mean, "mid_ux": w_ux, "mid_uy": w_uy}
 """)
 md(r"""
-**Acceptance checks** (report §5, `proposed_acceptance`). Each check is recorded separately as `pass`, `FAIL` or `unverified`. A case is used as a validated result only if every check passes:
+**Acceptance checks** (report §5, `proposed_acceptance`). Each check is recorded separately as `pass`, `FAIL` or `unverified`. A case counts as a validated result, and enters plots and conclusions, only if every check passes:
 
 | Check | Metric | Threshold |
 |---|---|---|
 | structure | positive thickness, admissible $E,\nu$, all triangle areas $>0$, edge-connected solid, at least two distinct clamped nodes (removes all three rigid motions) | all true |
 | symmetry | $\|A-A^\top\|_F/\|A\|_F$ | $\le 10^{-12}$ |
-| positive definiteness | ≤ 2000 free unknowns: dense Cholesky succeeds. Otherwise: the smallest eigenpair $(\lambda,v)$ has converged, its defect $\|Av-\lambda v\|/(\|A\|_\infty\|v\|) \le 10^{-8}$, and $\lambda > 10\,\|Av-\lambda v\|/\|v\|$. A failed or non-converged diagnostic means **unverified**. | |
+| positive definiteness | ≤ 2000 free unknowns: dense Cholesky succeeds. Otherwise: the smallest *algebraic* eigenpair (ARPACK `which="SA"`) has converged, its defect $\|Av-\lambda v\|/(\|A\|_\infty\|v\|) \le 10^{-8}$, and $\lambda > 10\,\|Av-\lambda v\|/\|v\|$. A non-converged or inconclusive diagnostic means **unverified**. | |
 | reference residual | $\|b-Ax_{\rm ref}\|/\|b\|$, recomputed independently from the sparse-LU solution | $< 10^{-8}$ |
 | supports | largest prescribed-displacement discrepancy | $\le 10^{-12}$ m |
 | force balance | $\|\sum_i(\mathbf f_i+\mathbf r_i)\| / \sum_i\|\mathbf f_i\|$, reactions only at constrained components | $\le 10^{-8}$ |
 | moment balance | about the origin: $|\sum_i x_i(f+r)_{y,i} - y_i(f+r)_{x,i}| / (L_{\rm char}\sum_i\|\mathbf f_i\|)$, $L_{\rm char}$ = bounding-box diagonal | $\le 10^{-8}$ |
 
-**Algebraic uncertainty estimate.** For an observable $w^\top\mathbf x$ with weights restricted to the free unknowns, we estimate the effect of the algebraic error as $\|w\|_2\,\|b-Ax_{\rm ref}\|_2/\lambda_{\min}$. This is an *estimate, not a certified bound*: $\lambda_{\min}$ is itself an estimate, and assembly and modelling errors are not included. A successive-mesh difference at or below the **sum of both meshes' estimates** is reported as *unresolved*.
+**Algebraic uncertainty estimate.** For an observable $w^\top\mathbf x$ with weights restricted to the free unknowns, we estimate the effect of the algebraic error as $\|w\|_2\,\|b-Ax_{\rm ref}\|_2/\lambda_{\min}$. This is an *estimate, not a certified bound*: $\lambda_{\min}$ is itself an estimate, and assembly and modelling errors are not included. A successive-mesh difference at or below the **sum of both meshes' estimates** is reported as *unresolved*. If $\lambda_{\min}$ is not reliable, the estimate is marked unavailable.
 
-The smallest eigenpair is computed by ARPACK in shift-invert mode around 0. It returns the same eigenpair as `which="SA"`, only faster, and its convergence and defect are checked as above.
+**Solver protocol.** Every distinct linear system in Part 7 is solved with **all eight methods of Part 4 under the same protocol**: $x_0=0$, target $10^{-8}$, cap 20,000, native status recorded, acceptance by the independently recomputed residual, relative error against the sparse-LU reference, and best of 3 timings. Systems that are identical across studies (for example, the baseline case appears in the geometry, mesh, magnitude and support studies) are solved once, and the result is reused.
 """)
 code(r"""
-from scipy.linalg import cholesky, LinAlgError
-from scipy.sparse.linalg import norm as spnorm, ArpackNoConvergence
+FULL_PROTOCOL = True          # False: CG and PCG only (quick run; not the agreed Section 3 protocol)
+PROTOCOL_METHODS = METHODS if FULL_PROTOCOL else ["CG", "PCG (diagonal)"]
+
+
+def eig_end(A, which):
+    # One end of the spectrum (ARPACK), with convergence and defect diagnostics. Never raises.
+    try:
+        lam, v = eigsh(A, k=1, which=which, tol=1e-10, v0=np.ones(A.shape[0]), maxiter=50 * A.shape[0])
+    except ArpackNoConvergence:
+        return dict(value=np.nan, converged=False, defect=np.nan, residual=np.nan)
+    lam, v = float(lam[0]), v[:, 0]
+    res = float(np.linalg.norm(A @ v - lam * v) / np.linalg.norm(v))
+    return dict(value=lam, converged=True, defect=res / spnorm(A, np.inf), residual=res)
+
 
 def acceptance(case, x):
     A, b, nodes, tris = case["A"], case["b"], case["nodes"], case["triangles"]
@@ -676,16 +703,10 @@ def acceptance(case, x):
     st["structure"] = "pass" if struct_ok else "FAIL"
     val["symmetry"] = spnorm(A - A.T, "fro") / spnorm(A, "fro")
     st["symmetry"] = "pass" if val["symmetry"] <= 1e-12 else "FAIL"
-    val["lambda_min"] = np.nan
-    try:
-        lam, v = eigsh(A.tocsc(), k=1, sigma=0, which="LM")
-        lam, v = float(lam[0]), v[:, 0]
-        res = np.linalg.norm(A @ v - lam * v)
-        val["lambda_min"] = lam
-        val["eig_defect"] = res / (spnorm(A, np.inf) * np.linalg.norm(v))
-        eig_ok = val["eig_defect"] <= 1e-8 and lam > 10 * res / np.linalg.norm(v)
-    except ArpackNoConvergence:
-        val["eig_defect"], eig_ok = np.nan, False
+    lo = eig_end(A, "SA")
+    val.update(lambda_min=lo["value"], lambda_min_converged=lo["converged"], lambda_min_defect=lo["defect"])
+    lam_ok = lo["converged"] and lo["defect"] <= 1e-8 and lo["value"] > 10 * lo["residual"]
+    lam_neg = lo["converged"] and lo["defect"] <= 1e-8 and lo["value"] < -10 * lo["residual"]
     if A.shape[0] <= 2000:
         try:
             cholesky(A.toarray()); st["spd"] = "pass"
@@ -693,68 +714,118 @@ def acceptance(case, x):
             st["spd"] = "FAIL"
         val["spd_method"] = "dense Cholesky"
     else:
-        st["spd"] = "pass" if eig_ok else "unverified"
-        val["spd_method"] = "smallest-eigenpair diagnostic"
+        st["spd"] = "pass" if lam_ok else "FAIL" if lam_neg else "unverified"
+        val["spd_method"] = "smallest algebraic eigenpair (SA) diagnostic"
+    val["lambda_min_reliable"] = bool(lam_ok)
     val["residual"] = np.linalg.norm(b - A @ x) / np.linalg.norm(b)
-    st["residual"] = "pass" if val["residual"] < 1e-8 else "FAIL"
+    st["residual"] = "pass" if np.isfinite(val["residual"]) and val["residual"] < 1e-8 else "FAIL"
     d, F_net, M_net = equilibrium(case, x)
     val["supports_m"] = float(np.abs(d[case["constrained"]]).max())
     st["supports"] = "pass" if val["supports_m"] <= 1e-12 else "FAIL"
     f_scale = np.linalg.norm(case["f"].reshape(-1, 2), axis=1).sum()
-    lo, hi = nodes.min(axis=0), nodes.max(axis=0)
+    lo_xy, hi_xy = nodes.min(axis=0), nodes.max(axis=0)
     val["force_balance"] = np.linalg.norm(F_net) / f_scale
-    val["moment_balance"] = abs(M_net) / (np.linalg.norm(hi - lo) * f_scale)
+    val["moment_balance"] = abs(M_net) / (np.linalg.norm(hi_xy - lo_xy) * f_scale)
     st["force_balance"] = "pass" if val["force_balance"] <= 1e-8 else "FAIL"
     st["moment_balance"] = "pass" if val["moment_balance"] <= 1e-8 else "FAIL"
-    # the uncertainty estimate needs a trustworthy lambda_min
-    val["lambda_min_reliable"] = bool(eig_ok)
-    passed = all(s == "pass" for s in st.values())
-    return d, dict(status=st, values=val, passed=passed)
+    return d, dict(status=st, values=val, passed=all(v == "pass" for v in st.values()))
 
 
-RESULTS = []          # one record per solved case; exported at the end
+SOLVER_CACHE, SOLVER_ROWS = {}, []
 
-def solve_object(obj, case, *, study, variant, area, conditioning=False):
+def solver_protocol(A, b, x_ref, system_key):
+    if system_key not in SOLVER_CACHE:
+        out = {}
+        for m in PROTOCOL_METHODS:
+            times, runs = [], []
+            for _ in range(TIMING_RUNS):
+                t0 = perf_counter(); runs.append(iterative(A, b, m, history=False)); times.append(perf_counter() - t0)
+            x, k, status, _ = runs[0]
+            assert all(r[1] == k and r[2] == status for r in runs), "non-deterministic solver run"
+            rr, accepted = true_check(A, b, x)
+            out[m] = dict(method=m, iterations=k, native_status=status, true_relative_residual=rr, accepted=accepted,
+                          relative_error_vs_lu=float(np.linalg.norm(x - x_ref) / np.linalg.norm(x_ref)),
+                          best_seconds=min(times))
+        SOLVER_CACHE[system_key] = out
+    return SOLVER_CACHE[system_key]
+
+
+RESULTS = []          # one record per solved case; exported in Part 8
+
+def solve_object(obj, case, *, study, variant, area, system_key):
     A, b = case["A"], case["b"]
     x = splu(A.tocsc()).solve(b)                     # checked same-mesh LU reference
     d, acc = acceptance(case, x)
-    u = d.reshape(-1, 2)
     W = observable_weights(obj, case)
     r_norm = np.linalg.norm(b - A @ x)
+    v = acc["values"]
     rec = dict(case_id=f"{obj['id']}|{study}|{variant}|a={area:g}", object=obj["id"], object_name=obj["name"],
-               study=study, variant=variant, max_triangle_area_m2=area,
+               study=study, variant=variant, max_triangle_area_m2=area, mesh_sha256=case["mesh_sha256"],
                nodes=len(case["nodes"]), triangles=len(case["triangles"]), free_unknowns=len(b), stored_nnz=A.nnz)
     for name, w in W.items():
         rec[name + "_m"] = float(w @ d)
-        rec["unc_" + name + "_m"] = (float(np.linalg.norm(w[case["free"]]) * r_norm / acc["values"]["lambda_min"])
-                                     if acc["values"]["lambda_min_reliable"] else np.nan)
-    rec["cg_iterations"] = iterative(A, b, "CG", history=False)[1]
-    rec["pcg_iterations"] = iterative(A, b, "PCG (diagonal)", history=False)[1]
-    rec["lambda_min"] = acc["values"]["lambda_min"]
-    rec["kappa_2"] = np.nan
-    if conditioning:
-        lo, hi = extreme_eigs(A); rec["lambda_max"] = hi; rec["kappa_2"] = hi / lo
-    rec.update({f"check_{k}": v for k, v in acc["status"].items()})
-    rec.update({f"value_{k}": v for k, v in acc["values"].items()})
+        rec["unc_" + name + "_m"] = (float(np.linalg.norm(w[case["free"]]) * r_norm / v["lambda_min"])
+                                     if v["lambda_min_reliable"] else np.nan)
+    hi = eig_end(A, "LA")
+    rec["lambda_min"], rec["lambda_max"] = v["lambda_min"], hi["value"]
+    kappa_ok = v["lambda_min_reliable"] and hi["converged"] and hi["defect"] <= 1e-8
+    rec["kappa_2"] = hi["value"] / v["lambda_min"] if kappa_ok else np.nan
+    rec["kappa_status"] = "ok" if kappa_ok else "unavailable (eigenvalue diagnostic not reliable)"
+    rec.update({f"check_{k}": s for k, s in acc["status"].items()})
+    rec.update({f"value_{k}": s for k, s in v.items()})
     rec["passed_all_checks"] = acc["passed"]
+    sol = solver_protocol(A, b, x, system_key)
+    for m, r in sol.items():
+        SOLVER_ROWS.append(dict(case_id=rec["case_id"], system_key=str(system_key), free_unknowns=len(b), **r))
+    for m, tag in (("CG", "cg"), ("PCG (diagonal)", "pcg")):
+        rec[f"{tag}_iterations"] = sol[m]["iterations"]
+        rec[f"{tag}_native_status"] = sol[m]["native_status"]
+        rec[f"{tag}_true_relative_residual"] = sol[m]["true_relative_residual"]
+        rec[f"{tag}_accepted"] = sol[m]["accepted"]
+    rec["all_protocol_methods_accepted"] = all(r["accepted"] for r in sol.values())
     RESULTS.append(rec)
     return d, rec
 
 mm = lambda v: 1e3 * v
 ok = lambda r: "pass" if r["passed_all_checks"] else "NOT ACCEPTED"
 """)
-md("### 7.1 Meshes")
+md(r"""
+### 7.1 Meshes
+
+Triangle's output can differ slightly between platforms, even with the same version and options. To make the tables exactly reproducible, the meshes used are saved to `outputs/meshes/` with a SHA-256 fingerprint. When those files are present, they are reused. Set `REGENERATE_MESHES = True` to mesh again from the specification.
+""")
 code(r"""
+REGENERATE_MESHES = False
+MESH_DIR = OUT / "meshes"; MESH_DIR.mkdir(parents=True, exist_ok=True)
+
+def mesh_hash(nodes, tris):
+    return hashlib.sha256(np.ascontiguousarray(nodes, dtype=np.float64).tobytes()
+                          + np.ascontiguousarray(tris, dtype=np.int64).tobytes()).hexdigest()
+
 meshes, mesh_rows = {}, []
 for oid, obj in OBJECTS.items():
     for a in AREAS:
-        meshes[oid, a] = mesh_object(obj, a)
-        chk = mesh_checks(obj, *meshes[oid, a])
-        mesh_rows.append(dict(object=oid, max_triangle_area_m2=a, **chk))
+        path = MESH_DIR / f"{oid}_a{a:g}.npz"
+        if path.exists() and not REGENERATE_MESHES:
+            z = np.load(path); nodes, tris, source = z["nodes"], z["triangles"].astype(np.int64), "snapshot"
+        else:
+            nodes, tris = mesh_object(obj, a); tris = tris.astype(np.int64); source = "generated by Triangle"
+            np.savez_compressed(path, nodes=nodes, triangles=tris)
+        meshes[oid, a] = (nodes, tris)
+        chk = mesh_checks(obj, nodes, tris)
+        mesh_rows.append(dict(object=oid, max_triangle_area_m2=a, source=source, file=path.name,
+                              sha256=mesh_hash(nodes, tris), **chk))
         print(f"{oid} area<={a:<9g} nodes {chk['nodes']:5d} triangles {chk['triangles']:5d} "
               f"material area {chk['material_area_m2']:.4f} m^2  min angle {chk['min_angle_deg']:.1f} deg  "
-              f"centroids in hole {chk['centroids_in_hole']}  edge-connected {chk['edge_connected']}")
+              f"hole centroids {chk['centroids_in_hole']}  connected {chk['edge_connected']}  "
+              f"[{source}, sha256 {mesh_rows[-1]['sha256'][:12]}]")
         assert chk["min_area_m2"] > 0 and chk["centroids_in_hole"] == 0 and chk["edge_connected"]
+MESH_SHA = {(r["object"], r["max_triangle_area_m2"]): r["sha256"] for r in mesh_rows}
+
+def make_case(oid, a, **kw):
+    cs = object_case(OBJECTS[oid], *meshes[oid, a], **kw)
+    cs["mesh_sha256"] = MESH_SHA[oid, a]
+    return cs
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.4), gridspec_kw=dict(width_ratios=[1, 2, 1]), constrained_layout=True)
 for ax, oid in zip(axes, OBJECTS):
@@ -770,37 +841,56 @@ md(r"""
 Baseline load and clamp, middle mesh. This compares deformation and solver effort across the three shapes.
 """)
 code(r"""
+F0 = CASES["baseline"]["total_force_N"][0]
+FULL_EDGE, FULL_CLAMP = (0.0, 1.0), (0.0, 1.0)
 base = {}
 for oid, obj in OBJECTS.items():
-    cs = object_case(obj, *meshes[oid, MID])
-    d, rec = solve_object(obj, cs, study="geometry", variant="baseline", area=MID, conditioning=True)
+    cs = make_case(oid, MID)
+    d, rec = solve_object(obj, cs, study="geometry", variant="baseline", area=MID,
+                          system_key=(oid, MID, FULL_EDGE, 1.0, FULL_CLAMP))
     base[oid] = (cs, d, rec)
 
-print(f"{'object':28s} {'unknowns':>8s} {'kappa_2':>9s} {'CG':>5s} {'PCG':>5s} {'mean u_x right [mm]':>20s} {'mid u_x [mm]':>12s} {'mid u_y [mm]':>12s}  checks")
+print(f"{'object':28s} {'unknowns':>8s} {'kappa_2':>9s} {'mean u_x right [mm]':>20s} {'mid u_x [mm]':>12s} {'mid u_y [mm]':>12s}  checks")
 for oid, (cs, d, r) in base.items():
-    print(f"{r['object_name']:28s} {r['free_unknowns']:8d} {r['kappa_2']:9.0f} {r['cg_iterations']:5d} {r['pcg_iterations']:5d} "
+    print(f"{r['object_name']:28s} {r['free_unknowns']:8d} {r['kappa_2']:9.0f} "
           f"{mm(r['mean_right_ux_m']):20.5f} {mm(r['mid_ux_m']):12.5f} {mm(r['mid_uy_m']):12.2e}  {ok(r)}")
+
+print(f"\nSolver protocol (Part 4 rules) on each object, middle mesh:")
+print(f"{'method':16s} " + " ".join(f"{oid + ' its':>9s} {'status':>16s} {'acc.':>5s} {'time [s]':>8s}" for oid in OBJECTS))
+for m in PROTOCOL_METHODS:
+    cells = []
+    for oid in OBJECTS:
+        r = SOLVER_CACHE[oid, MID, FULL_EDGE, 1.0, FULL_CLAMP][m]
+        cells.append(f"{r['iterations']:9d} {r['native_status']:>16s} {('yes' if r['accepted'] else 'NO'):>5s} {r['best_seconds']:8.3f}")
+    print(f"{m:16s} " + " ".join(cells))
 """)
 code(r"""
 fig, axes = plt.subplots(1, 3, figsize=(13, 3.6), gridspec_kw=dict(width_ratios=[1, 2, 1]), constrained_layout=True)
-vmax = max(np.linalg.norm(d.reshape(-1, 2), axis=1).max() for _, d, _ in base.values()) * 1e3
+accepted = [(oid, v) for oid, v in base.items() if v[2]["passed_all_checks"]]
+vmax = max((np.linalg.norm(d.reshape(-1, 2), axis=1).max() for _, (_, d, _) in accepted), default=1e-3) * 1e3
+tp = None
 for ax, (oid, (cs, d, r)) in zip(axes, base.items()):
-    tp = plot_deformed(ax, cs["nodes"], cs["triangles"], d, 200, f"{r['object_name']}, displacements x200")
-    tp.set_clim(0, vmax)
-fig.colorbar(tp, ax=axes, label="|u| [mm]")
+    if r["passed_all_checks"]:
+        tp = plot_deformed(ax, cs["nodes"], cs["triangles"], d, 200, f"{r['object_name']}, displacements x200")
+        tp.set_clim(0, vmax)
+    else:
+        ax.text(0.5, 0.5, "not accepted:\nnot plotted", ha="center", va="center", transform=ax.transAxes); ax.set_axis_off()
+if tp is not None:
+    fig.colorbar(tp, ax=axes, label="|u| [mm]")
 save(fig, "objects_deformed"); plt.show()
 """)
 md(r"""
 ### 7.3 Mesh study
 
-The same physical case on three meshes per object. Meshes are not nested, so we report the **successive differences** of each observable, signed and absolute, in metres. These measure mesh dependence, not the error against an exact solution, so no convergence rate is inferred.
+The same physical case on three meshes per object. Meshes are not nested, so we report the **successive differences** of each observable, signed and absolute, in metres. These measure mesh dependence, not the error against an exact solution, so no convergence rate is inferred. A difference is only classified if both meshes' cases pass every check; otherwise it is *unverified*.
 """)
 code(r"""
 mesh_study = {}
 for oid, obj in OBJECTS.items():
     for a in AREAS:
-        cs = object_case(obj, *meshes[oid, a])
-        _, mesh_study[oid, a] = solve_object(obj, cs, study="mesh", variant="baseline", area=a, conditioning=True)
+        cs = make_case(oid, a)
+        _, mesh_study[oid, a] = solve_object(obj, cs, study="mesh", variant="baseline", area=a,
+                                             system_key=(oid, a, FULL_EDGE, 1.0, FULL_CLAMP))
 
 OBS = ["mean_right_ux", "mid_ux", "mid_uy"]
 diff_rows = []
@@ -817,11 +907,13 @@ for oid in OBJECTS:
                                   value_from_m=r0[n + "_m"], value_to_m=r1[n + "_m"], signed_difference_m=signed,
                                   abs_difference_m=abs(signed), summed_algebraic_estimate_m=est, status=status))
 
-print(f"{'obj':3s} {'area':>9s} {'unknowns':>8s} {'kappa_2':>8s} {'CG':>4s}  " + "  ".join(f"{n + ' [mm]':>18s}" for n in OBS) + "  checks")
+print(f"{'obj':3s} {'area':>9s} {'unknowns':>8s} {'kappa_2':>8s} {'CG':>4s} {'GS':>6s}  " + "  ".join(f"{n + ' [mm]':>18s}" for n in OBS) + "  checks")
 for oid in OBJECTS:
     for a in AREAS:
         r = mesh_study[oid, a]
-        print(f"{oid:3s} {a:9g} {r['free_unknowns']:8d} {r['kappa_2']:8.0f} {r['cg_iterations']:4d}  "
+        gs = SOLVER_CACHE[oid, a, FULL_EDGE, 1.0, FULL_CLAMP].get("Gauss-Seidel")
+        gs_txt = f"{gs['iterations']:6d}" if gs else f"{'-':>6s}"
+        print(f"{oid:3s} {a:9g} {r['free_unknowns']:8d} {r['kappa_2']:8.0f} {r['cg_iterations']:4d} {gs_txt}  "
               + "  ".join(f"{mm(r[n + '_m']):18.6f}" for n in OBS) + f"  {ok(r)}")
 print(f"\n{'obj':3s} {'areas':>20s} {'observable':>14s} {'signed diff [m]':>16s} {'summed estimate [m]':>20s}  status")
 for row in diff_rows:
@@ -837,22 +929,24 @@ md(r"""
 * **Supports:** the full left clamp vs. a central half-clamp ($y\in[0.25,0.75]$).
 """)
 code(r"""
-F0 = CASES["baseline"]["total_force_N"][0]
 print("Magnitude study (mean right-edge u_x [mm]; ratio to the F0 case)")
 for oid, obj in OBJECTS.items():
     vals = {}
     for fac in CASES["studies"]["magnitude"]["force_factors"]:
-        cs = object_case(obj, *meshes[oid, MID], force=fac * F0)
-        _, r = solve_object(obj, cs, study="magnitude", variant=f"{fac:g}F0", area=MID)
-        vals[fac] = mm(r["mean_right_ux_m"])
-    print(f"  {oid}: " + "  ".join(f"{fac:g}F0 -> {v:.5f} ({v / vals[1]:.6f})" for fac, v in vals.items()))
+        cs = make_case(oid, MID, force=fac * F0)
+        _, r = solve_object(obj, cs, study="magnitude", variant=f"{fac:g}F0", area=MID,
+                            system_key=(oid, MID, FULL_EDGE, fac, FULL_CLAMP))
+        vals[fac] = (mm(r["mean_right_ux_m"]), r["passed_all_checks"])
+    print(f"  {oid}: " + "  ".join(f"{fac:g}F0 -> {v:.5f} ({v / vals[1][0]:.6f}){'' if okk else ' NOT ACCEPTED'}"
+                                   for fac, (v, okk) in vals.items()))
 
 print("\nLocation study (same total force on a 0.25 m patch)")
 print(f"  {'obj':3s} {'patch y [m]':>14s} {'mean u_x right [mm]':>20s} {'mid u_x [mm]':>12s} {'mid u_y [mm]':>12s} {'CG':>5s}  checks")
 for oid, obj in OBJECTS.items():
     for y0, y1 in CASES["studies"]["location"]["right_edge_intervals_y_m"]:
-        cs = object_case(obj, *meshes[oid, MID], load_y=(y0, y1))
-        _, r = solve_object(obj, cs, study="location", variant=f"y=[{y0:g},{y1:g}]", area=MID)
+        cs = make_case(oid, MID, load_y=(y0, y1))
+        _, r = solve_object(obj, cs, study="location", variant=f"y=[{y0:g},{y1:g}]", area=MID,
+                            system_key=(oid, MID, (y0, y1), 1.0, FULL_CLAMP))
         print(f"  {oid:3s} {f'[{y0:g}, {y1:g}]':>14s} {mm(r['mean_right_ux_m']):20.5f} {mm(r['mid_ux_m']):12.5f} "
               f"{mm(r['mid_uy_m']):12.5f} {r['cg_iterations']:5d}  {ok(r)}")
 
@@ -860,20 +954,28 @@ print("\nSupport study (full-edge load)")
 print(f"  {'obj':3s} {'clamp y [m]':>12s} {'unknowns':>8s} {'mean u_x right [mm]':>20s} {'mid u_y [mm]':>12s} {'kappa_2':>9s} {'CG':>5s}  checks")
 for oid, obj in OBJECTS.items():
     for y0, y1 in CASES["studies"]["supports"]["left_clamp_intervals_y_m"]:
-        cs = object_case(obj, *meshes[oid, MID], clamp_y=(y0, y1))
-        _, r = solve_object(obj, cs, study="supports", variant=f"clamp y=[{y0:g},{y1:g}]", area=MID, conditioning=True)
+        cs = make_case(oid, MID, clamp_y=(y0, y1))
+        _, r = solve_object(obj, cs, study="supports", variant=f"clamp y=[{y0:g},{y1:g}]", area=MID,
+                            system_key=(oid, MID, FULL_EDGE, 1.0, (y0, y1)))
         print(f"  {oid:3s} {f'[{y0:g}, {y1:g}]':>12s} {r['free_unknowns']:8d} {mm(r['mean_right_ux_m']):20.5f} "
               f"{mm(r['mid_uy_m']):12.5f} {r['kappa_2']:9.0f} {r['cg_iterations']:5d}  {ok(r)}")
 """)
-md("### 7.5 Acceptance summary\n\nEvery case solved in Part 7, with each check recorded separately.")
+md("### 7.5 Acceptance and solver summary\n\nEvery case solved in Part 7, with each check recorded separately, followed by the solver protocol for every distinct system.")
 code(r"""
 CHECKS = ["structure", "symmetry", "spd", "residual", "supports", "force_balance", "moment_balance"]
-print(f"{'case':42s} " + " ".join(f"{c[:9]:>9s}" for c in CHECKS) + f" {'residual':>9s} {'force':>8s} {'moment':>8s}")
+print(f"{'case':42s} " + " ".join(f"{c[:10]:>10s}" for c in CHECKS) + f" {'residual':>9s} {'force':>8s} {'moment':>8s}")
 for r in RESULTS:
-    print(f"{r['case_id']:42s} " + " ".join(f"{r['check_' + c]:>9s}" for c in CHECKS)
+    print(f"{r['case_id']:42s} " + " ".join(f"{r['check_' + c]:>10s}" for c in CHECKS)
           + f" {r['value_residual']:9.1e} {r['value_force_balance']:8.1e} {r['value_moment_balance']:8.1e}")
 n_pass = sum(r["passed_all_checks"] for r in RESULTS)
-print(f"\n{n_pass} of {len(RESULTS)} cases pass every check")
+n_unverified = sum(any(r["check_" + c] == "unverified" for c in CHECKS) for r in RESULTS)
+print(f"\n{n_pass} of {len(RESULTS)} cases pass every check ({n_unverified} with an unverified check)")
+
+print(f"\nIterations per method for each distinct system ({len(SOLVER_CACHE)} systems); '*' = not accepted by the true-residual check")
+print(f"{'system (object, area, load patch, load factor, clamp)':58s} " + " ".join(f"{m[:9]:>9s}" for m in PROTOCOL_METHODS))
+for key, sol in SOLVER_CACHE.items():
+    print(f"{str(key):58s} " + " ".join(f"{sol[m]['iterations']:8d}{'' if sol[m]['accepted'] else '*'}" + (" " if sol[m]['accepted'] else "")
+                                        for m in PROTOCOL_METHODS))
 """)
 
 # ---------------------------------------------------------------- export
@@ -882,11 +984,12 @@ md(r"""
 
 Every table and figure above is written to `outputs/` next to this notebook, so the report can cite a traceable source:
 
-* `outputs/results/objects_cases.csv`: one row per Part 7 case (case ID, mesh size, observables in metres, algebraic estimates, κ, iterations, every acceptance check and value);
-* `outputs/results/objects_mesh_differences.csv`: successive-mesh differences (signed and absolute) with the resolution status;
-* `outputs/results/objects_meshes.csv`: mesh sizes and quality;
-* `outputs/results/structured_solvers.csv`, `structured_refinement.csv`, `structured_validation.json`: Parts 3–6 (structured meshes);
-* `outputs/results/manifest.json`: environment, the source of the specification, observable and κ definitions, thresholds;
+* `outputs/results/objects_cases.csv`: one row per Part 7 case (case ID, mesh fingerprint and size, observables in metres, algebraic estimates, λ and κ with status, CG/PCG status and acceptance, every acceptance check with its value);
+* `outputs/results/objects_solvers.csv`: the full solver protocol (8 methods) for every case: iterations, native status, true residual, accepted, error against LU, best time;
+* `outputs/results/objects_mesh_differences.csv`: successive-mesh differences (signed and absolute) with resolved, unresolved or unverified status;
+* `outputs/results/objects_meshes.csv` and `outputs/meshes/*.npz`: the exact meshes used (nodes, triangles), with SHA-256 fingerprints;
+* `outputs/results/structured_solvers.csv`, `structured_refinement.csv`, `structured_validation.json`: Parts 3–6 (structured meshes; keep them separate from Part 7);
+* `outputs/results/manifest.json`: environment, the specification source, observable and κ definitions, thresholds, protocol and outcome counts;
 * `outputs/figures/*.png`.
 """)
 code(r"""
@@ -898,11 +1001,12 @@ def write_csv(path, rows):
 
 RES = OUT / "results"
 write_csv(RES / "objects_cases.csv", RESULTS)
+write_csv(RES / "objects_solvers.csv", SOLVER_ROWS)
 write_csv(RES / "objects_mesh_differences.csv", diff_rows)
 write_csv(RES / "objects_meshes.csv", mesh_rows)
 write_csv(RES / "structured_solvers.csv",
-          [dict(method=m, iterations=k, status=s, relative_residual=rr, relative_error_vs_lu=err, best_seconds=tm,
-                mesh="20x20 structured", free_unknowns=len(b)) for m, k, s, rr, err, tm in rows])
+          [dict(method=m, iterations=k, native_status=s, true_relative_residual=rr, accepted=acc, relative_error_vs_lu=err,
+                best_seconds=tm, mesh="20x20 structured", free_unknowns=len(b)) for m, k, s, rr, acc, err, tm in rows])
 write_csv(RES / "structured_refinement.csv",
           [dict(cells=f"{r[0]}x{r[0]}", free_unknowns=r[1], stored_nnz=r[2], kappa_2=r[3], cg_iterations=r[4],
                 top_right_ux_mm=r[5]) for r in refine])
@@ -917,16 +1021,23 @@ manifest = dict(
     environment=dict(python=platform.python_version(), numpy=np.__version__, scipy=scipy.__version__,
                      matplotlib=matplotlib.__version__, triangle=str(getattr(tr, "__version__", "")), platform=platform.platform()),
     material=dict(E_Pa=E, nu=NU, thickness_m=T, model="plane stress"),
+    meshes=dict(source="outputs/meshes/*.npz (see objects_meshes.csv for SHA-256)",
+                note="Triangle output can differ across platforms; the saved meshes are the ones behind every Part 7 number"),
     observables=dict(mean_right_ux="integral of u_x over the whole right edge / its length (exact for the piecewise-linear trace), metres",
                      mid_ux="u_x at the right-edge midpoint (x_r, 0.5), metres",
                      mid_uy="u_y at the right-edge midpoint (x_r, 0.5), metres"),
     condition_number="kappa_2 = lambda_max / lambda_min of the supported (free-free), unscaled stiffness matrix A; "
-                     "lambda_max by ARPACK (largest algebraic), lambda_min by ARPACK shift-invert at 0",
+                     "ARPACK which='LA' and which='SA'; reported only when both eigenpairs converged with defect <= 1e-8",
     algebraic_estimate="||w_free||_2 ||b - A x_ref||_2 / lambda_min_est; an estimate, not a certified bound; a successive difference "
                        "<= the sum of both meshes' estimates is 'unresolved'",
-    solver_protocol=dict(tolerance=TOL, iteration_cap=CAP, x0="zero", timing="best of 3 runs; machine dependent"),
+    solver_protocol=dict(methods=PROTOCOL_METHODS, full_protocol=FULL_PROTOCOL, tolerance=TOL, iteration_cap=CAP, x0="zero",
+                         acceptance="independently recomputed relative residual finite and < 1e-8; native status recorded separately",
+                         timing=f"best of {TIMING_RUNS} runs; machine dependent", reuse="identical systems solved once"),
     acceptance_thresholds=CASES["proposed_acceptance"],
-    cases_total=len(RESULTS), cases_passing_all_checks=int(n_pass))
+    outcomes=dict(cases_total=len(RESULTS), cases_passing_all_checks=int(n_pass), cases_with_unverified_check=int(n_unverified),
+                  distinct_systems=len(SOLVER_CACHE),
+                  solver_runs_accepted=int(sum(r["accepted"] for s in SOLVER_CACHE.values() for r in s.values())),
+                  solver_runs_total=int(sum(len(s) for s in SOLVER_CACHE.values()))))
 (RES / "manifest.json").write_text(json.dumps(manifest, indent=2, default=str))
 for p in sorted(OUT.rglob("*.*")):
     print(p, p.stat().st_size, "bytes")
@@ -936,40 +1047,50 @@ for p in sorted(OUT.rglob("*.*")):
 md(r"""
 ## 9. Summary
 
-The cell below recomputes the headline comparisons from the exported results, so the text and the numbers cannot drift apart.
+**Structured square (Parts 3–6).** The supported stiffness matrix $A$ is sparse, symmetric and positive definite, as the energy argument predicts, and its condition number grows like $h^{-2}$. The direct methods solve the small system to rounding accuracy. On the larger system, the Krylov methods (CG, PCG, MINRES, GMRES) reach the target in a few hundred iterations, while Gauss–Seidel needs tens of thousands. Steepest descent and damped Jacobi stop at the iteration cap. Positive definiteness does **not** guarantee that Jacobi converges: its iteration matrix has spectral radius above 1. Equilibrium and an exact linear solution confirm that the model is assembled correctly, not just that the linear system was solved.
 
-**What the structured-square study (Parts 3–6) shows**
-* The supported stiffness matrix $A$ is sparse, symmetric and positive definite, as the energy argument predicts. Its condition number grows like $h^{-2}$.
-* All direct methods solve the small system to rounding accuracy. On the larger system, Krylov methods (CG, PCG, MINRES, GMRES) need a few hundred iterations, while Gauss–Seidel needs tens of thousands. CG is the natural choice for an SPD matrix: it is fastest and needs the least memory.
-* Positive definiteness does **not** guarantee that Jacobi converges. Here $\rho(I-D_A^{-1}A)\approx1.96>1$.
-* Equilibrium and an exact linear solution confirm that the assembled model is correct, not just that the linear system was solved.
-
-**What the other objects (Part 7) show**, for the specification of report §5
-* All cases pass every acceptance check.
-* The mesh-to-mesh differences are far above the algebraic uncertainty estimates, so they reflect discretization, not solver error.
-* The square with an opening changes much more between meshes than the plain square or the rectangle. This is consistent with stress concentrating at its re-entrant corners, but the measurements alone do not prove the cause or give a convergence rate.
-* At the right-edge midpoint, $u_y$ is close to zero by symmetry (for S and H), and its successive differences are of the same order as its value. It should not be interpreted as a physical result.
+**Other objects (Part 7).** The cell below derives every Part 7 statement from the exported records. A comparison is printed only when all the cases it uses pass every acceptance check.
 """)
 code(r"""
+acc_cases = [r for r in RESULTS if r["passed_all_checks"]]
+print(f"Acceptance: {len(acc_cases)} of {len(RESULTS)} cases pass every check; "
+      f"{manifest['outcomes']['solver_runs_accepted']} of {manifest['outcomes']['solver_runs_total']} solver runs reach the target "
+      f"(by the true residual) within the cap.\n")
 g = {r["object"]: r for r in RESULTS if r["study"] == "geometry"}
-print(f"mean right-edge u_x:  R / S = {g['R']['mean_right_ux_m'] / g['S']['mean_right_ux_m']:.3f},  "
-      f"H / S = {g['H']['mean_right_ux_m'] / g['S']['mean_right_ux_m']:.3f}")
-print(f"kappa_2 (same mesh-area limit {MID}):  R / S = {g['R']['kappa_2'] / g['S']['kappa_2']:.2f},  "
-      f"H / S = {g['H']['kappa_2'] / g['S']['kappa_2']:.2f}")
+def both_ok(*rs): return all(r["passed_all_checks"] for r in rs)
+for o in ("R", "H"):
+    if both_ok(g[o], g["S"]):
+        print(f"{o} vs S (same mesh-area limit {MID}): mean right-edge u_x x{g[o]['mean_right_ux_m'] / g['S']['mean_right_ux_m']:.3f}, "
+              f"kappa_2 x{g[o]['kappa_2'] / g['S']['kappa_2']:.2f}")
+    else:
+        print(f"{o} vs S: not reported (a case failed acceptance)")
 for oid in OBJECTS:
     d_last = [r for r in diff_rows if r["object"] == oid and r["observable"] == "mean_right_ux"][-1]
-    print(f"{oid}: last successive change in mean right-edge u_x = {d_last['abs_difference_m']:.2e} m "
-          f"({100 * d_last['abs_difference_m'] / abs(d_last['value_to_m']):.3f}% of its value), {d_last['status']}")
+    if d_last["status"] == "unverified":
+        print(f"{oid}: last mesh step not reported (unverified)")
+    else:
+        print(f"{oid}: last mesh step changes mean right-edge u_x by {d_last['abs_difference_m']:.2e} m "
+              f"({100 * d_last['abs_difference_m'] / abs(d_last['value_to_m']):.3f}% of its value); {d_last['status']}")
 sup = {(r["object"], r["variant"]): r for r in RESULTS if r["study"] == "supports"}
 for oid in OBJECTS:
     full, half = sup[oid, "clamp y=[0,1]"], sup[oid, "clamp y=[0.25,0.75]"]
-    print(f"{oid}: half clamp vs full clamp: mean u_x x{half['mean_right_ux_m'] / full['mean_right_ux_m']:.3f}, "
-          f"kappa_2 x{half['kappa_2'] / full['kappa_2']:.2f}")
+    if both_ok(full, half):
+        print(f"{oid}: half clamp vs full clamp: mean u_x x{half['mean_right_ux_m'] / full['mean_right_ux_m']:.3f}, "
+              f"kappa_2 x{half['kappa_2'] / full['kappa_2']:.2f}")
+mag = [r for r in RESULTS if r["study"] == "magnitude"]
+if both_ok(*mag):
+    lin = max(abs(r["mean_right_ux_m"] / g[r["object"]]["mean_right_ux_m"] - float(r["variant"][:-2])) for r in mag)
+    print(f"linearity: largest deviation of u(cF0)/u(F0) from c = {lin:.1e}")
+print("\nInterpretation notes:")
+print("* The square with an opening changes more between meshes than S or R. This is consistent with stress concentrating at its")
+print("  re-entrant corners, but the measurements alone neither prove that cause nor give a convergence rate.")
+print("* u_y at the right-edge midpoint is close to zero by symmetry for S and H, and of the same order as its mesh-to-mesh")
+print("  changes. It should not be interpreted as a physical result.")
 """)
 md(r"""
 ## Code provenance and AI use
 
-The finite-element assembly, load/support handling and solver protocol in this notebook are self-contained copies of the group repository's `fem/elasticity.py`, `fem/plate.py`, `solvers/system_tools.py` and `solvers/progress_benchmark.py`. The Part 7 case specification and acceptance criteria come from report §5 (`cases.json` @ `2b23fd5`). Library routines: SciPy (sparse LU, CG, GMRES, MINRES, ARPACK eigenvalues) and Triangle by J. R. Shewchuk, via the `triangle` Python package (meshing). AI assistance was used in writing this code. See the AI-use statement in the report.
+The finite-element assembly, load/support handling and solver protocol in this notebook are self-contained copies of the group repository's `fem/elasticity.py`, `fem/plate.py`, `solvers/system_tools.py` and `solvers/progress_benchmark.py`. The only change is that the Gauss–Seidel triangular solve is prepared once with a sparse factorisation. It gives the same iterates and iteration counts, much faster. The Part 7 case specification and acceptance criteria come from report §5 (`cases.json` @ `2b23fd5`). Library routines: SciPy (sparse LU, CG, GMRES, MINRES, ARPACK eigenvalues) and Triangle by J. R. Shewchuk, via the `triangle` Python package (meshing). AI assistance was used in writing this code. See the AI-use statement in the report.
 """)
 
 nb = nbf.v4.new_notebook(cells=cells, metadata={

@@ -15,18 +15,35 @@
     "thickness_m": 0.01,
     "model": "plane stress"
   },
+  "meshes": {
+    "source": "outputs/meshes/*.npz (see objects_meshes.csv for SHA-256)",
+    "note": "Triangle output can differ across platforms; the saved meshes are the ones behind every Part 7 number"
+  },
   "observables": {
     "mean_right_ux": "integral of u_x over the whole right edge / its length (exact for the piecewise-linear trace), metres",
     "mid_ux": "u_x at the right-edge midpoint (x_r, 0.5), metres",
     "mid_uy": "u_y at the right-edge midpoint (x_r, 0.5), metres"
   },
-  "condition_number": "kappa_2 = lambda_max / lambda_min of the supported (free-free), unscaled stiffness matrix A; lambda_max by ARPACK (largest algebraic), lambda_min by ARPACK shift-invert at 0",
+  "condition_number": "kappa_2 = lambda_max / lambda_min of the supported (free-free), unscaled stiffness matrix A; ARPACK which='LA' and which='SA'; reported only when both eigenpairs converged with defect <= 1e-8",
   "algebraic_estimate": "||w_free||_2 ||b - A x_ref||_2 / lambda_min_est; an estimate, not a certified bound; a successive difference <= the sum of both meshes' estimates is 'unresolved'",
   "solver_protocol": {
+    "methods": [
+      "Jacobi",
+      "Damped Jacobi",
+      "Gauss-Seidel",
+      "SD",
+      "CG",
+      "PCG (diagonal)",
+      "MINRES",
+      "GMRES (full)"
+    ],
+    "full_protocol": true,
     "tolerance": 1e-08,
     "iteration_cap": 20000,
     "x0": "zero",
-    "timing": "best of 3 runs; machine dependent"
+    "acceptance": "independently recomputed relative residual finite and < 1e-8; native status recorded separately",
+    "timing": "best of 3 runs; machine dependent",
+    "reuse": "identical systems solved once"
   },
   "acceptance_thresholds": {
     "status": "Proposed execution criteria, not implemented or passed tests; not derived from Section 4 observed imbalances.",
@@ -69,6 +86,12 @@
     },
     "outcome": "Record each check separately. Do not admit a failed or unverified reference into physical/refinement plots as validated. Solver failure records still belong in solver comparisons."
   },
-  "cases_total": 36,
-  "cases_passing_all_checks": 36
+  "outcomes": {
+    "cases_total": 36,
+    "cases_passing_all_checks": 36,
+    "cases_with_unverified_check": 0,
+    "distinct_systems": 27,
+    "solver_runs_accepted": 112,
+    "solver_runs_total": 216
+  }
 }
