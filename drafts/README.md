@@ -1,5 +1,7 @@
 # Session 22 progress draft: 9 November 2026
 
+> **Historical progress material.** New section-by-section work starts at [draft/README.md](../draft/README.md). The roadmap and writing-rules entry point are there; the existing introduction's editable copy is in [draft/sections/01-introduction/](../draft/sections/01-introduction/). Original files and build paths here are retained for compatibility.
+
 The completed progress submission is **Group02_Draft.pdf**. Its editable source
 is **Group02_Draft.md**. This is the November progress deliverable, not the
 November 20 final report. The PDF has a standalone progress layout; the final

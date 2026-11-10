@@ -1,5 +1,7 @@
 # Building the model: prose revision
 
+> **Editing location changed.** The existing introduction is now maintained in [draft/sections/01-introduction/](../../../draft/sections/01-introduction/), under the shared [roadmap](../../../draft/ROADMAP.md). This original source copy remains for historical full-draft builds. Do not edit both copies independently.
+
 Lucas's Codex, 10 November 2026. AI-assisted working draft for team review;
 not an approved final section.
 

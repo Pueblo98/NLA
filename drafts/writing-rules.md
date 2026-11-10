@@ -1,5 +1,7 @@
 # Writing rules for the next sections
 
+> **Preserved proposal.** The current shared entry point is [draft/WRITING_RULES.md](../draft/WRITING_RULES.md), pending the new rules Simon will provide. This earlier proposal is retained for reference, not silently adopted as the final shared rules.
+
 Apply these rules when drafting or revising our report, based on the team's
 feedback on the opening section:
 

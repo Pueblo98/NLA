@@ -1,0 +1,37 @@
+{
+  "base_revision": "4264fbb00ca0baf55f8306de876b30b234f695e0",
+  "seven_section_folders": [
+    "01-introduction",
+    "02-mechanics-and-matrix",
+    "03-solvers-and-protocol",
+    "04-square-example",
+    "05-objects-and-experiments",
+    "06-results-and-validation",
+    "07-conclusion"
+  ],
+  "introduction_sources_unchanged": true,
+  "introduction_source_sha256": {
+    "section.tex": "85d79c87dcff4a106560c67fb52c96c20a887caf5600ff095d973e3d8faa3cff",
+    "main.tex": "492e9c37068683ed59d4eb3a268ffd905eae817b9b0943fa2cd699433954b4f2",
+    "references.bib": "c0b5236415d7e8e5e9cc75a4ed3b813b275270215c43083892f2ca9aeccfbd81",
+    "build.sh": "a7407722c954c1d5b85e1f9ce1e2d38423177863d7380f81e4d7285d0cfc2bd6",
+    "make_triangulation.py": "50cc28e4e129802565bcfecbacca2f8f1af28f9e04aa491eb418977e69790781",
+    "figures/triangulation.pdf": "d142002f680bf4d3fcd27d8a4a0af5727feb97a028bb238039d8ce9fb84a8ae5",
+    "figures/triangulation.png": "325098952484e40d831cb514995f73235a9e340c55f39b21a631b9cb99e81ac9"
+  },
+  "preview_matches_previously_compiled_exact_source": true,
+  "preview_sha256": "051ea5ee751c9ee3a469cd5aca1c57b91b7dc1c4ab09a1a88f83be5886a3a10e",
+  "previous_progress_pdfs_unchanged": true,
+  "reference_markdown_changes": "relative image paths only",
+  "existing_writing_rules_proposal_preserved": true,
+  "new_shared_writing_rules_status": "pending user instructions",
+  "relative_links_checked": 70,
+  "broken_links": [],
+  "no_new_report_prose": true,
+  "existing_file_changes": [
+    "README.md",
+    "drafts/README.md",
+    "drafts/modules/01-building-model/README.md",
+    "drafts/writing-rules.md"
+  ]
+}
