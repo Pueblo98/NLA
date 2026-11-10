@@ -23,8 +23,8 @@
   "preview_sha256": "051ea5ee751c9ee3a469cd5aca1c57b91b7dc1c4ab09a1a88f83be5886a3a10e",
   "previous_progress_pdfs_unchanged": true,
   "reference_markdown_changes": "relative image paths only",
-  "existing_writing_rules_proposal_preserved": true,
-  "new_shared_writing_rules_status": "pending user instructions",
+  "existing_writing_rules_proposal_preserved": false,
+  "new_shared_writing_rules_status": "consolidated in draft/WRITING_RULES.md",
   "relative_links_checked": 70,
   "broken_links": [],
   "no_new_report_prose": true,
@@ -33,5 +33,17 @@
     "drafts/README.md",
     "drafts/modules/01-building-model/README.md",
     "drafts/writing-rules.md"
-  ]
+  ],
+  "writing_rules_recheck": {
+    "date": "2026-11-10",
+    "canonical_path": "draft/WRITING_RULES.md",
+    "guide_paths_found": [
+      "draft/WRITING_RULES.md"
+    ],
+    "duplicate_guides_found": [],
+    "action": "Clarified the sole guide, introduction baseline and mandatory review of all earlier sections; corrected stale roadmap and status notices.",
+    "roadmap_pdf": "Predates consolidation; pending-rules notice superseded by WRITING_RULES.md.",
+    "relative_links_checked": 69,
+    "broken_links": []
+  }
 }

@@ -1,9 +1,10 @@
 # Shared writing rules
 
-Use this document for all report sections. Consolidated on 10 November 2026 at Lucas's request from the existing writing-rules proposal and Darius's review posted in the section-one Slack thread. It supersedes earlier notices that the shared rules were pending, including those in the roadmap and its PDF. Later team instructions should be incorporated here rather than in another guide.
+This is the **only shared writing guide** for the report. Edit this file when the team changes a rule; do not create another writing-rules file or folder. It combines the existing rules and Darius's review from the section-one thread.
 
 ## Style, length and readability
 
+- Use the existing [introduction](sections/01-introduction/section.tex) as the style baseline: explain the physical meaning, introduce the necessary equation, then define its symbols. Later sections may need more detail, but should keep the same direct prose.
 - Write direct, plain academic prose in English. Explain the purpose and physical meaning before introducing notation; explain technical terms when first needed.
 - Use short, connected paragraphs, each with one main idea. Use lists only for actual steps or items to compare. Avoid filler, dense jargon, awkward opening lists and unnecessary commas.
 - Keep the agreed scope and length. Remove repetition before changing layout. The final report must use the required Overleaf template with `clean,onecolumn`, retain its fonts, margins and spacing, and fit within 10 pages including title and references (appendices excluded).
@@ -28,13 +29,13 @@ Use this document for all report sections. Consolidated on 10 November 2026 at L
 ## Review after each section
 
 1. Read the section's scope in [ROADMAP.md](ROADMAP.md) before writing. Work in its folder under [sections/](sections/).
-2. After drafting or revising a section, reread **all previous sections**. Remove overlapping explanations and repeated derivations; use cross-references and check that notation, assumptions and claims remain consistent. Keep detailed mechanics in Section 2 rather than repeating the introduction.
+2. After drafting or revising Section \(n\), reread **every earlier section, 1 through \(n-1\)** before calling it complete. For Section 2, this means rereading Section 1. Remove overlapping explanations and repeated derivations; use cross-references and check that notation, assumptions and claims remain consistent. Keep detailed mechanics in Section 2 rather than repeating the introduction.
 3. Check concision, paragraph flow, definitions, evidence, citations and figure references. Record unresolved questions in the section's README.
 4. Compile the exact revised source and inspect its PDF before claiming the layout is checked. Check figures, references, pagination and readability, and keep the source and preview synchronized.
 5. Keep section drafts subject to team review. This consolidation does not reopen the introduction or mark any report section final.
 
 ## Consolidation record
 
-The duplicate proposals at `drafts/writing-rules.md` and `draft/reference/writing-rules-proposal.md` were merged here and removed. Darius's separate `WRITING_GUIDELINES.md` was not present in this checkout; the five rules in his Slack message (style, rigor, brevity, readability and review of previous sections) are incorporated above. If that file appears in a later update, compare it against this document, preserve any additional useful rule here, and remove the duplicate guide.
+Rechecked on 10 November 2026 after Lucas's follow-up: the checkout contains this guide only. There is no separate `writing_rules/WRITING_GUIDELINES.md`, root `WRITING_GUIDELINES.md`, `drafts/writing-rules.md` or `draft/reference/writing-rules-proposal.md` to delete. Darius's posted rules on style, rigor, brevity, readability and review of earlier sections are included above. If another copy arrives from a teammate's checkout, merge any additional rules here and remove that copy.
 
-Workspace and section README references now point to this guide. The consolidation check found no broken targets among 55 relative links in the 11 affected guide and README documents.
+The roadmap PDF predates this consolidation; its pending-rules notice is superseded by this guide. Repository entry points and section READMEs link here.

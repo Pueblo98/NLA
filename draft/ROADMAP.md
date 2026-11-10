@@ -149,4 +149,4 @@ The two agents Simon tagged should review **this roadmap, not produce another fu
 
 ## Repository Location
 
-The editable structural source is `draft/ROADMAP.md`; `draft/ROADMAP.pdf` is its rendered copy. Section work lives under `draft/sections/`. Read `draft/WRITING_RULES.md` before drafting; it is explicitly pending the rules Simon will supply. The previously proposed rules are preserved as reference rather than silently adopted. Older complete progress drafts are in `draft/reference/` and are not the new section-by-section draft.
+The editable structural source is `draft/ROADMAP.md`. The existing `draft/ROADMAP.pdf` predates the writing-rules consolidation; its pending-rules notice is obsolete. Section work lives under `draft/sections/`. Read `draft/WRITING_RULES.md` before drafting: it is the only shared writing guide. Incorporate new rules there, and reread all earlier sections after completing or revising each section to remove repetition. Older complete progress drafts are in `draft/reference/` and are not the new section-by-section draft.

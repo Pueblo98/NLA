@@ -22,7 +22,7 @@ This is the entry point for the team's section-by-section draft. This reorganisa
 
 ## How each section thread works
 
-1. Link the roadmap entry and the section folder, then read the shared writing rules. This organisational task does not authorise drafting the other sections.
+1. Link the roadmap entry and the section folder, then read [WRITING_RULES.md](WRITING_RULES.md). Update that single guide for any new writing rule; do not create a second guide. After drafting or revising a section, reread all earlier sections and remove repetition before calling it complete. This organisational task does not authorise drafting the other sections.
 2. Work on only the requested section. Keep its report body in `section.tex` without a preamble; when drafting is requested, add a standalone `main.tex`, bibliography and figures as needed.
 3. Compile and inspect that section before updating its `preview.pdf`. Keep source and preview synchronised. Do not call a section final without the team's review.
 4. Record decisions or blockers in that folder's README. Update the roadmap only for an agreed structural change, not for routine prose edits.
