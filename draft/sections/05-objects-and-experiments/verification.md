@@ -24,7 +24,7 @@ either page (small glyph tolerances allowed; page-number footers excluded).
 SHA-256 of the inspected `preview.pdf`:
 
 ```text
-7fab327755f4e673774e3463963bb3e426bbad9c34e695f2ca23083d005a520d
+ea812946552597092ef7512f83f8dc91a0d19e7e559158012ec21e197582bea8
 ```
 
 This standalone build does not certify the final `clean,onecolumn` template or
@@ -47,6 +47,17 @@ small-strain validity and force/moment balance remain future execution work.
 The figure was regenerated from `cases.json` with `make_figure.py` before the
 final build. The mesher's documented `p`, `q`, `a` options and hole-seed handling
 were read at <https://rufat.be/triangle/API.html>; the mesher was not run.
+
+## Review follow-up verification
+
+After the independent drafting review, clarified the physical solution source,
+successive-mesh comparison and proposed acceptance criteria. Rebuilt the exact
+revised source successfully: two pages, no compiler warnings and no text-margin
+violations. Page 1's render is byte-identical to the previously inspected render;
+the revised page 2 was visually inspected with its table and references intact.
+The input checker passed again; it does not implement the newly proposed
+matrix/reference/equilibrium acceptance criteria. Earlier section sources were
+not changed. The hash above now identifies this reviewed revision.
 
 ## Cross-section review and publication scope
 

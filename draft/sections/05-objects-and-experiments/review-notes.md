@@ -57,6 +57,24 @@ Section 2's README still says Sections 3–7 have only scope READMEs, which no
 longer describes the current source tree. The current section bodies, not that
 historical statement, were used for this review.
 
+## Independent drafting review and targeted follow-up
+
+A background drafting subagent found the design consistent with Sections 2–4
+and acceptable as an initial proposal, subject to two execution clarifications.
+It did not inspect the PDF and did not modify files. The follow-up explicitly
+assigns physical observables to the checked same-mesh LU reference and records
+absolute successive-mesh differences for all three specified scalar observables.
+Conditional algebraic uncertainty estimates guard against interpreting unresolved
+small differences as mesh effects; zero-component relative ratios are not used.
+
+The companion specification now gives proposed acceptance thresholds and
+normalizations for symmetry, SPD diagnostics, reference residual, prescribed
+values, total force and total moment. They are not inferred from Section 4's
+observed errors and are not claimed implemented or passed. The smaller-system
+Cholesky and larger-system eigenpair checks supplement the structural SPD
+argument; eigenvalue estimates are explicitly not certified spectral bounds.
+These are limited corrections to this draft, not approval of the whole report.
+
 ## Open integration decisions
 
 The README records object approval, meshing/execution, assembly permission,

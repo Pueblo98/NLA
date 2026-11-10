@@ -62,6 +62,24 @@ runs as not completed; do not silently change restart, cap, methods or timing
 scope to manufacture a comparable table. Any revised protocol needs an explicit
 Section 3 update before fresh measurements.
 
+## Review clarifications
+
+An independent drafting subagent reviewed the design and requested two
+clarifications before execution. These are now specified: physical observables
+and outlines use the checked same-mesh LU reference, and refinement reports
+absolute successive differences for the right-edge mean and both midpoint
+components. Using absolute differences avoids division by nearly zero components.
+The specification records a conditional algebraic uncertainty estimate; differences
+below that scale are unresolved, not demonstrated mesh effects.
+
+`cases.json` now also proposes explicit symmetry, positive-definiteness diagnostic,
+reference-residual, support, force-balance and moment-balance criteria. These are
+**future execution criteria**, not implemented checks or measured outcomes.
+Reaction normalization uses applied-force magnitude and a fixed geometric length
+scale, not Section 4's observed errors or a potentially zero net applied moment.
+The current `check_spec.py` remains only a geometric/input consistency check.
+The review did not assess PDF layout or confer team approval.
+
 ## Decisions still required
 
 1. Team approval of the rectangle and square-opening candidates, dimensions and

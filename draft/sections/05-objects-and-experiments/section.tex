@@ -95,16 +95,16 @@ on the left-edge interval $[0.25,0.75]$ m and leaves the rest of that
 edge traction-free. Its physical length stays fixed under refinement,
 not its number of nodes.
 
-We record mean horizontal displacement along the whole right edge
-and displacement at its midpoint, comparing the same physical locations
-across meshes. The mean is edge-length weighted, not a node average.
-Deformed outlines will state units and amplification. Solver measurements
-follow Section 3; conditioning estimates follow Section 2 and are not
-inferred from displacement size. Magnitude scaling at fixed stiffness
-checks linearity, not directional load sensitivity, which requires a
-separately specified perturbation test.
+Physical measures and outlines use the checked same-mesh LU reference.
+Across meshes, we report absolute successive differences in the edge-length-weighted
+mean right-edge horizontal displacement and both midpoint components.
+Differences below demonstrated algebraic uncertainty remain unresolved.
+Outlines state units and amplification. Solver measurements follow Section 3;
+conditioning follows Section 2. Fixed-matrix load scaling checks linearity,
+not directional sensitivity, which needs a separate perturbation test.
 
-Each case needs Section 4's support and force/moment-balance checks.
+Each case needs Section 4's support and force/moment-balance checks;
+proposed acceptance thresholds are in the companion specification.
 Refinement measures mesh dependence, not error against an exact solution.
 Sharp corners and boundary-condition changes can concentrate stress;
 peak corner stresses are therefore excluded as convergence measures.
