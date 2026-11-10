@@ -53,3 +53,50 @@ a progress draft; retain contributions and AI-use disclosure.
 For darius-codex: use these sources as the local baseline and ask Hermes to
 identify any newer unmerged source by repository path and revision. This
 handoff adds no new experimental results or final-draft approval.
+
+## Follow-up source audit for consolidation
+
+Rechecked the current sources on 10 November after the handoff above. A
+read-only standard-library check confirmed that all eight CSV rows exactly
+match `benchmark.json` in method, iterations, residual, error, status,
+acceptance and best time. Acceptance agrees with the saved `1e-8` tolerance;
+each best time equals the minimum of its three saved repeats. Eight histories
+are present. This is a saved-data consistency check, not a new solver run.
+
+Keep the following distinctions when filling the seven sections:
+
+- **Specify the physical benchmark:** `force_driven(20)` in
+  `fem/plate.py` uses a 1 m by 1 m plane-stress square, E = 200 GPa,
+  Poisson ratio 0.3, thickness 0.01 m and right-edge horizontal traction
+  p = 100 MPa. The left edge is clamped in both components. The equivalent
+  line load is t p = 1e6 N/m and the total applied force is 1e6 N.
+  There are 441 nodes, 800 triangles and 840 free unknowns. Calling this
+  force-driven does not imply that total force stays fixed if thickness is
+  changed: the implementation holds p fixed unless the caller adjusts it.
+- **Keep stopping protocols attached to results:** the older
+  `fem/README.md` reports SD reaching the target at 46,030 iterations for
+  the 840-unknown case, using its uncapped textbook implementation. The
+  newer progress comparison uses a 20,000-iteration cap and reports SD
+  failing to reach the target at that cap. These are distinct runs. For
+  the consolidated progress table use `drafts/results/solver_comparison.csv`
+  with its saved statuses, rather than combining iteration counts across
+  the two protocols.
+- **Describe the timing scope:** the saved iterative times include
+  method-specific setup inside `iterative` and required stopping checks.
+  They exclude assembly, eigenvalue diagnostics, construction of the sparse
+  LU reference and history storage. Sparse LU supplies the same-mesh
+  solution reference; its runtime is not a measured row in this table.
+  The small direct example establishes agreement between LU, inverse and
+  Cholesky, not a large-system direct-versus-iterative timing comparison.
+- **Distinguish nonzero conventions:** the 840-unknown matrix has 11,112
+  stored CSR entries and 9,590 numerical nonzeros under the benchmark's
+  relative cutoff. Do not compare stored entries with numerical nonzeros
+  from the separate 538-unknown grip case without identifying the convention.
+
+The files named `NLA Seven Section Report.md` and
+`NLA Seven Section Report.pdf` in darius-codex's thread message are absent
+from this checkout. Their contents and rendering have therefore not been
+reviewed here. darius-codex should provide their repository paths/revision
+for a review of the consolidated document; the sources listed above remain
+the locally available baseline. The opening module's compilation status is
+unchanged by this source audit.
