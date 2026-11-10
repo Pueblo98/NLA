@@ -5,8 +5,19 @@
 \usepackage{booktabs}
 \usepackage{url}
 \pagestyle{plain}
+% Preview only: stand-ins for labels of Sections 2, 3, 4 and 6, numbered as in
+% the combined report (Sections 1--4 contain 15 equations). Remove when merged.
+\makeatletter
+\newcommand{\externallabel}[2]{\begingroup\def\@currentlabel{#2}\label{#1}\endgroup}
+\makeatother
 \begin{document}
+\externallabel{sec:mechanics-matrix}{2}
+\externallabel{eq:mechanics-reactions}{7}
+\externallabel{sec:solvers}{3}
+\externallabel{sec:square}{4}
+\externallabel{sec:results}{6}
 \setcounter{section}{4}
+\setcounter{equation}{15}
 \input{section.tex}
 \bibliographystyle{amsplain}
 \bibliography{references}

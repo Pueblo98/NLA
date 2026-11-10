@@ -1,0 +1,4377 @@
+{
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "triangle": "20250106",
+  "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "processor": "x86_64",
+  "date": "2026-11-10 18:07:20"
+ },
+ "protocol": {
+  "tol": 1e-08,
+  "cap": 20000,
+  "x0": "zeros",
+  "methods_full": [
+   "Jacobi",
+   "Damped Jacobi",
+   "Gauss-Seidel",
+   "SD",
+   "CG",
+   "GMRES (full)",
+   "MINRES",
+   "PCG (diagonal)"
+  ],
+  "methods_core": [
+   "CG",
+   "PCG (diagonal)",
+   "MINRES",
+   "Gauss-Seidel"
+  ],
+  "eig_tol": 1e-10,
+  "eig_note": "eigsh on every system (shift-invert sigma=0 was fast enough everywhere; none skipped)",
+  "gauss_seidel_policy": "Gauss-Seidel timed best-of-3 with separate history only on levels 1-2 base meshes; elsewhere one timed run without history (each capped run costs ~5-20 s)",
+  "timing": "best of 3 perf_counter runs, excluding assembly, diagnostics, history runs"
+ },
+ "settings": {
+  "E_Pa": 200000000000.0,
+  "nu": 0.3,
+  "t_m": 0.01,
+  "p_Pa": 100000000.0,
+  "tau_beam_Pa": 10000000.0,
+  "min_angle_deg": 30,
+  "max_area_rule": "a_max = sqrt(3)/4 h^2 (equilateral triangle of side h); boundary segments split to length <= h",
+  "markers": {
+   "bottom": 2,
+   "right": 3,
+   "top": 4,
+   "left": 5,
+   "hole": 6,
+   "inner_horizontal": 7,
+   "inner_vertical": 8
+  }
+ },
+ "objects": {
+  "S": {
+   "title": "Square plate (unstructured)",
+   "reason": "Section 4 geometry meshed with Triangle: structured vs unstructured mesh",
+   "outer": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     0.5
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     0.5
+    ]
+   ],
+   "markers": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    5
+   ],
+   "holes": [],
+   "levels_h": [
+    0.1,
+    0.05,
+    0.03333333333333333,
+    0.025
+   ],
+   "points": {
+    "right_mid": [
+     1,
+     0.5
+    ],
+    "top_right": [
+     1,
+     1
+    ]
+   }
+  },
+  "H": {
+   "title": "Square plate with central hole",
+   "reason": "circular opening: stress concentration and a multiply connected domain",
+   "outer": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     0.5
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     0.5
+    ]
+   ],
+   "markers": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    5
+   ],
+   "holes": [
+    {
+     "centre": [
+      0.5,
+      0.5
+     ],
+     "radius": 0.15
+    }
+   ],
+   "levels_h": [
+    0.1,
+    0.05,
+    0.03333333333333333,
+    0.025
+   ],
+   "points": {
+    "right_mid": [
+     1,
+     0.5
+    ],
+    "hole_top": [
+     0.5,
+     0.65
+    ]
+   }
+  },
+  "L": {
+   "title": "L-shaped bracket",
+   "reason": "re-entrant corner (stress singularity) and two arms that can be loaded",
+   "outer": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     0.25
+    ],
+    [
+     1,
+     0.5
+    ],
+    [
+     0.5,
+     0.5
+    ],
+    [
+     0.5,
+     1
+    ],
+    [
+     0.25,
+     1
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     0.5
+    ]
+   ],
+   "markers": [
+    2,
+    3,
+    3,
+    7,
+    8,
+    4,
+    4,
+    5,
+    5
+   ],
+   "holes": [],
+   "levels_h": [
+    0.1,
+    0.05,
+    0.03333333333333333,
+    0.025
+   ],
+   "points": {
+    "right_mid": [
+     1,
+     0.25
+    ],
+    "top_mid": [
+     0.25,
+     1
+    ],
+    "corner": [
+     0.5,
+     0.5
+    ]
+   }
+  },
+  "B": {
+   "title": "Slender cantilever beam",
+   "reason": "bending response with an Euler-Bernoulli/Timoshenko estimate; slender aspect 8:1",
+   "outer": [
+    [
+     0,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     4,
+     0.25
+    ],
+    [
+     4,
+     0.5
+    ],
+    [
+     0,
+     0.5
+    ],
+    [
+     0,
+     0.25
+    ]
+   ],
+   "markers": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    5
+   ],
+   "holes": [],
+   "levels_h": [
+    0.125,
+    0.0625,
+    0.041666666666666664,
+    0.03125
+   ],
+   "points": {
+    "tip_mid": [
+     4,
+     0.25
+    ],
+    "tip_top": [
+     4,
+     0.5
+    ]
+   }
+  }
+ },
+ "cases": [
+  {
+   "name": "S-base-L1",
+   "object": "S",
+   "level": 1,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 22,
+   "mesh": {
+    "h": 0.1,
+    "triangle_options": "pq30a0.0043301270",
+    "nodes": 206,
+    "triangles": 370,
+    "boundary_segments": 40,
+    "min_area": 0.0014485166151586516,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.08828760245533,
+    "max_angle_deg": 119.82342479508928,
+    "edge_min": 0.057786504944980575,
+    "edge_max": 0.12757595633363286,
+    "edge_mean": 0.08161083240924928,
+    "area_sum": 1.0,
+    "pslg_area": 1.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.012557799000092018,
+   "diagnostics": {
+    "unknowns": 390,
+    "stored_nnz": 5116,
+    "numeric_nnz": 5106,
+    "symmetry_rel": 1.0023097483304746e-16,
+    "lambda_min": 4118198.2899186774,
+    "lambda_max": 13900970866.624304,
+    "kappa2": 3375.4981882863167,
+    "S_lambda_min": 0.0008358835740161633,
+    "S_lambda_max": 2.2721848775838827,
+    "rho_J": 1.2721848775838827,
+    "kappa2_jacobi_scaled": 2718.3030606364637,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 3375.4981882860634,
+    "dense_vs_eigsh_kappa_rel": 7.503907877146684e-14,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.02709610099998372
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.5795161560458218e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.0010759389999748237,
+     "factor_best_seconds": 0.0010272460000351202,
+     "solve_best_seconds": 4.869299993970344e-05,
+     "timing_runs": 3,
+     "lu_fill_nnz": 18642
+    },
+    {
+     "method": "CG",
+     "iterations": 148,
+     "relative_residual": 9.34998152151035e-09,
+     "relative_error": 6.505254764746976e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.003323582999996688,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 133,
+     "relative_residual": 9.172714831778298e-09,
+     "relative_error": 8.025926868170331e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.0038058999999748266,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 146,
+     "relative_residual": 8.725057613446424e-09,
+     "relative_error": 1.96163971932406e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.007923870000013267,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 6816,
+     "relative_residual": 9.988702639226402e-09,
+     "relative_error": 1.4076816387886155e-07,
+     "accepted": true,
+     "status": "target",
+     "best_seconds": 2.329514655999901,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -500000.0,
+    "reaction_resultant_N": [
+     -999999.9999999962,
+     1.0804797057062387e-09
+    ],
+    "force_imbalance_rel": 3.892795419456674e-15,
+    "moment_imbalance_Nm": -7.203198038041592e-10,
+    "moment_imbalance_rel": 7.203198038041591e-16,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.8226273823529478e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.4914091281538306,
+    "right_mid_uy_mm": -0.00012577651238127177,
+    "top_right_ux_mm": 0.49595593023948276,
+    "top_right_uy_mm": -0.07787828143485563,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.4914091281538306,
+    "max_abs_displacement_mm": 0.5020331776476106,
+    "max_von_mises_MPa": 124.46495616912439
+   },
+   "case_seconds": 9.770566446999965
+  },
+  {
+   "name": "S-base-L2",
+   "object": "S",
+   "level": 2,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 763,
+    "triangles": 1444,
+    "boundary_segments": 80,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.0288932524724903,
+    "edge_max": 0.06551689499351114,
+    "edge_mean": 0.04134507943825682,
+    "area_sum": 0.9999999999999999,
+    "pslg_area": 1.0,
+    "area_rel_error_vs_pslg": 1.1102230246251565e-16,
+    "area_rel_diff_vs_true_geometry": 1.1102230246251565e-16,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.03964653000002727,
+   "diagnostics": {
+    "unknowns": 1484,
+    "stored_nnz": 20080,
+    "numeric_nnz": 19990,
+    "symmetry_rel": 9.746924470836353e-17,
+    "lambda_min": 1109426.2544899941,
+    "lambda_max": 15901036134.717474,
+    "kappa2": 14332.666159975832,
+    "S_lambda_min": 0.00021076421435340233,
+    "S_lambda_max": 2.2721491158257683,
+    "rho_J": 1.2721491158257683,
+    "kappa2_jacobi_scaled": 10780.526109692917,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 14332.666159973385,
+    "dense_vs_eigsh_kappa_rel": 1.7069683480113252e-13,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.20944185299993023
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 4.872991127430415e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004642104999902585,
+     "factor_best_seconds": 0.004446825999934845,
+     "solve_best_seconds": 0.00019527899996774067,
+     "timing_runs": 3,
+     "lu_fill_nnz": 113851
+    },
+    {
+     "method": "Jacobi",
+     "iterations": 107,
+     "relative_residual": 11473689665.063335,
+     "relative_error": 35596086.03459052,
+     "accepted": false,
+     "status": "divergence_guard",
+     "best_seconds": 0.0027387200000248413,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Damped Jacobi",
+     "iterations": 20000,
+     "relative_residual": 1.9280123480977584e-05,
+     "relative_error": 0.0004672012686148973,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.4995329310000898,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 5.235655126921432e-08,
+     "relative_error": 1.0257777559869885e-06,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 11.710451920999958,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "SD",
+     "iterations": 20000,
+     "relative_residual": 1.797591171385185e-05,
+     "relative_error": 0.0003259437502610815,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.8504792439999846,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "CG",
+     "iterations": 292,
+     "relative_residual": 8.788464609903277e-09,
+     "relative_error": 6.911763328619829e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.010835885000005874,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "GMRES (full)",
+     "iterations": 277,
+     "relative_residual": 9.323987920463516e-09,
+     "relative_error": 3.837397377120551e-09,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.3685702110000193,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 285,
+     "relative_residual": 9.594405363009978e-09,
+     "relative_error": 3.965050386020272e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.02602986499994131,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 264,
+     "relative_residual": 9.051220406003532e-09,
+     "relative_error": 9.923453800394992e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.010554705000004105,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -499999.99999999994,
+    "reaction_resultant_N": [
+     -1000000.000000007,
+     2.6284396881237626e-09
+    ],
+    "force_imbalance_rel": 7.585811528057036e-15,
+    "moment_imbalance_Nm": 7.024937076494098e-09,
+    "moment_imbalance_rel": 7.024937076494098e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 4.714820533990856e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.49183475479951805,
+    "right_mid_uy_mm": -3.4610337715825976e-05,
+    "top_right_ux_mm": 0.49619184815899214,
+    "top_right_uy_mm": -0.07770821112737204,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.49183475479951805,
+    "max_abs_displacement_mm": 0.5022398991080383,
+    "max_von_mises_MPa": 145.42714486803297
+   },
+   "case_seconds": 56.04080929999998
+  },
+  {
+   "name": "S-base-L3",
+   "object": "S",
+   "level": 3,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 62,
+   "mesh": {
+    "h": 0.03333333333333333,
+    "triangle_options": "pq30a0.0004811252",
+    "nodes": 1706,
+    "triangles": 3290,
+    "boundary_segments": 120,
+    "min_area": 0.00016094629057318284,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.00011293932795,
+    "max_angle_deg": 119.8234247950897,
+    "edge_min": 0.019262168314993472,
+    "edge_max": 0.04379075903893131,
+    "edge_mean": 0.02737214354532355,
+    "area_sum": 1.0,
+    "pslg_area": 1.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.07409708199998022,
+   "diagnostics": {
+    "unknowns": 3350,
+    "stored_nnz": 45836,
+    "numeric_nnz": 45812,
+    "symmetry_rel": 9.924584163695993e-17,
+    "lambda_min": 499544.0138229984,
+    "lambda_max": 14549698337.19518,
+    "kappa2": 29125.958743548315,
+    "S_lambda_min": 9.196461504087453e-05,
+    "S_lambda_max": 2.270319358851289,
+    "rho_J": 1.2703193588512889,
+    "kappa2_jacobi_scaled": 24686.87938118617,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.10392363000005389
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 9.976945553877413e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.01792540199994619,
+     "factor_best_seconds": 0.01696651599991128,
+     "solve_best_seconds": 0.0009588860000349086,
+     "timing_runs": 3,
+     "lu_fill_nnz": 350080
+    },
+    {
+     "method": "CG",
+     "iterations": 421,
+     "relative_residual": 9.74879613651672e-09,
+     "relative_error": 1.0347196701903242e-09,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.0253858159999254,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 402,
+     "relative_residual": 9.486499742706448e-09,
+     "relative_error": 8.430008583015765e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.028136437000057413,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 414,
+     "relative_residual": 9.356926984873809e-09,
+     "relative_error": 3.108640816674544e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.06235870100010743,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 9.512742410764363e-06,
+     "relative_error": 0.00022579927856501692,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 21.756068908999964,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0000000005,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -500000.0,
+    "reaction_resultant_N": [
+     -1000000.0000000166,
+     1.5825207810848951e-10
+    ],
+    "force_imbalance_rel": 1.6429874450235997e-14,
+    "moment_imbalance_Nm": 8.41100700199604e-09,
+    "moment_imbalance_rel": 8.411007001996037e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.0973963071592135e-13
+   },
+   "response": {
+    "right_mid_ux_mm": 0.491941366620844,
+    "right_mid_uy_mm": -2.3591101629611416e-05,
+    "top_right_ux_mm": 0.49627982393435227,
+    "top_right_uy_mm": -0.07768748719597221,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.491941366620844,
+    "max_abs_displacement_mm": 0.5023236101470206,
+    "max_von_mises_MPa": 160.18957242690036
+   },
+   "case_seconds": 22.61844419399995
+  },
+  {
+   "name": "S-base-L4",
+   "object": "S",
+   "level": 4,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 82,
+   "mesh": {
+    "h": 0.025,
+    "triangle_options": "pq30a0.0002706329",
+    "nodes": 3009,
+    "triangles": 5856,
+    "boundary_segments": 160,
+    "min_area": 9.028110575954722e-05,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.008153036210746,
+    "max_angle_deg": 119.96143531801108,
+    "edge_min": 0.014436562595225532,
+    "edge_max": 0.032999562791685304,
+    "edge_mean": 0.020529652527000893,
+    "area_sum": 1.0,
+    "pslg_area": 1.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.14318764200004352,
+   "diagnostics": {
+    "unknowns": 5936,
+    "stored_nnz": 81760,
+    "numeric_nnz": 81464,
+    "symmetry_rel": 9.749990665969648e-17,
+    "lambda_min": 283306.6471908857,
+    "lambda_max": 15824591270.93671,
+    "kappa2": 55856.759549571936,
+    "S_lambda_min": 5.155264931298794e-05,
+    "S_lambda_max": 2.243470842739104,
+    "rho_J": 1.2434708427391041,
+    "kappa2_jacobi_scaled": 43518.051402527904,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.19564639899999747
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.509330727257192e-13,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.024638522999907764,
+     "factor_best_seconds": 0.023631507999994028,
+     "solve_best_seconds": 0.0010070149999137357,
+     "timing_runs": 3,
+     "lu_fill_nnz": 754726
+    },
+    {
+     "method": "CG",
+     "iterations": 580,
+     "relative_residual": 9.76047511953276e-09,
+     "relative_error": 7.919098565141225e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.04795210700001462,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 528,
+     "relative_residual": 9.815217433563643e-09,
+     "relative_error": 1.2378447384565934e-09,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.052596334999975625,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 558,
+     "relative_residual": 9.992978994662565e-09,
+     "relative_error": 3.618305584601207e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.15539556700002777,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 1.289587268871195e-05,
+     "relative_error": 0.00035047333675045143,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 33.92186564999997,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -500000.0,
+    "reaction_resultant_N": [
+     -1000000.0,
+     2.646629582159221e-10
+    ],
+    "force_imbalance_rel": 2.9369920234423904e-16,
+    "moment_imbalance_Nm": -1.0360963642597198e-08,
+    "moment_imbalance_rel": 1.0360963642597198e-14,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.40862539410591e-13
+   },
+   "response": {
+    "right_mid_ux_mm": 0.49198857672908847,
+    "right_mid_uy_mm": -1.6733122614296897e-05,
+    "top_right_ux_mm": 0.4963109881785874,
+    "top_right_uy_mm": -0.077672987803092,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.49198857672908847,
+    "max_abs_displacement_mm": 0.5023521573767402,
+    "max_von_mises_MPa": 171.5759918017594
+   },
+   "case_seconds": 35.68105246099992
+  },
+  {
+   "name": "H-base-L1",
+   "object": "H",
+   "level": 1,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 22,
+   "mesh": {
+    "h": 0.1,
+    "triangle_options": "pq30a0.0043301270",
+    "nodes": 201,
+    "triangles": 350,
+    "boundary_segments": 52,
+    "min_area": 0.0014477914632026424,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.075843790500677,
+    "max_angle_deg": 119.84831241899866,
+    "edge_min": 0.05777923544292518,
+    "edge_max": 0.1202575925160039,
+    "edge_mean": 0.0814019490514102,
+    "area_sum": 0.9325,
+    "pslg_area": 0.9325,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0034281568330142907,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.012430338999934065,
+   "diagnostics": {
+    "unknowns": 380,
+    "stored_nnz": 4872,
+    "numeric_nnz": 4862,
+    "symmetry_rel": 1.0000682055338151e-16,
+    "lambda_min": 3539523.488620354,
+    "lambda_max": 16002635755.079231,
+    "kappa2": 4521.127153564048,
+    "S_lambda_min": 0.0007339493471334057,
+    "S_lambda_max": 2.2821756660789108,
+    "rho_J": 1.2821756660789108,
+    "kappa2_jacobi_scaled": 3109.445733540646,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 4521.127153562448,
+    "dense_vs_eigsh_kappa_rel": 3.538500745676755e-13,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 2.077071890999946
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 2.090994582964381e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.000952398000094945,
+     "factor_best_seconds": 0.0008978399999932662,
+     "solve_best_seconds": 5.455800010167877e-05,
+     "timing_runs": 3,
+     "lu_fill_nnz": 18847
+    },
+    {
+     "method": "CG",
+     "iterations": 153,
+     "relative_residual": 8.922078479283242e-09,
+     "relative_error": 6.373796224848734e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.007567300999994586,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 141,
+     "relative_residual": 9.983728464550834e-09,
+     "relative_error": 5.138206159353868e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.008003910999946129,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 152,
+     "relative_residual": 7.995542396040815e-09,
+     "relative_error": 1.112178446681659e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.0086797660000002,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 7956,
+     "relative_residual": 9.99252002125063e-09,
+     "relative_error": 1.3397035977912312e-07,
+     "accepted": true,
+     "status": "target",
+     "best_seconds": 2.6901922849999664,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -500000.0,
+    "reaction_resultant_N": [
+     -1000000.0000000026,
+     9.36779542826116e-10
+    ],
+    "force_imbalance_rel": 2.809241133842086e-15,
+    "moment_imbalance_Nm": 1.1641532182693481e-10,
+    "moment_imbalance_rel": 1.164153218269348e-16,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.8771970644593234e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6537366679307364,
+    "right_mid_uy_mm": 0.000841133679078731,
+    "hole_top_ux_mm": 0.2981357599781824,
+    "hole_top_uy_mm": -0.08316714634242882,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6537366679307364,
+    "max_abs_displacement_mm": 0.6537372090550208,
+    "max_von_mises_MPa": 270.206380922956,
+    "hole_max_sigma_xx_MPa": 279.76649550059636
+   },
+   "case_seconds": 13.769778869000106
+  },
+  {
+   "name": "H-base-L2",
+   "object": "H",
+   "level": 2,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.0319909079998979,
+   "diagnostics": {
+    "unknowns": 1414,
+    "stored_nnz": 18964,
+    "numeric_nnz": 18858,
+    "symmetry_rel": 1.0017271295302556e-16,
+    "lambda_min": 935653.6385140199,
+    "lambda_max": 14968219244.756516,
+    "kappa2": 15997.60705096882,
+    "S_lambda_min": 0.0001810533722556695,
+    "S_lambda_max": 2.2690199734071137,
+    "rho_J": 1.2690199734071137,
+    "kappa2_jacobi_scaled": 12532.326491013822,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 15997.607050996781,
+    "dense_vs_eigsh_kappa_rel": 1.7478554775236555e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 8.814375652999956
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 5.85004990031694e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004549401999952352,
+     "factor_best_seconds": 0.004340377999938028,
+     "solve_best_seconds": 0.00020902400001432397,
+     "timing_runs": 3,
+     "lu_fill_nnz": 98671
+    },
+    {
+     "method": "Jacobi",
+     "iterations": 150,
+     "relative_residual": 11486267682.071352,
+     "relative_error": 23875727.7020899,
+     "accepted": false,
+     "status": "divergence_guard",
+     "best_seconds": 0.0037689539999519184,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Damped Jacobi",
+     "iterations": 20000,
+     "relative_residual": 2.64049051142004e-05,
+     "relative_error": 0.000516960318482768,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.4810071650000509,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 4.5736098550232075e-07,
+     "relative_error": 8.465992574367903e-06,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 11.717959665999956,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "SD",
+     "iterations": 20000,
+     "relative_residual": 2.009551292924928e-05,
+     "relative_error": 0.0003559819209919693,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.7778791050000109,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "CG",
+     "iterations": 306,
+     "relative_residual": 9.73883812011138e-09,
+     "relative_error": 4.992480870746302e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.011055019999957949,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "GMRES (full)",
+     "iterations": 293,
+     "relative_residual": 9.140518463600074e-09,
+     "relative_error": 2.5207588067991607e-09,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.31013325799995073,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 302,
+     "relative_residual": 9.159968868110654e-09,
+     "relative_error": 2.5307216975549797e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.026653527999997095,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 281,
+     "relative_residual": 8.22226215305188e-09,
+     "relative_error": 3.144054496044744e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.01219306999996661,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -499999.99999999994,
+    "reaction_resultant_N": [
+     -1000000.0000000035,
+     -2.346496330574155e-10
+    ],
+    "force_imbalance_rel": 3.6600602628626245e-15,
+    "moment_imbalance_Nm": -1.877197064459324e-09,
+    "moment_imbalance_rel": 1.8771970644593238e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 4.582290102916882e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6762967903702312,
+    "right_mid_uy_mm": -0.00037716759139068325,
+    "hole_top_ux_mm": 0.3043841277505779,
+    "hole_top_uy_mm": -0.0982617211961759,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6762967903702312,
+    "max_abs_displacement_mm": 0.6762968955425335,
+    "max_von_mises_MPa": 326.2456195812511,
+    "hole_max_sigma_xx_MPa": 334.9985855346221
+   },
+   "case_seconds": 63.23555477500008
+  },
+  {
+   "name": "H-base-L3",
+   "object": "H",
+   "level": 3,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 62,
+   "mesh": {
+    "h": 0.03333333333333333,
+    "triangle_options": "pq30a0.0004811252",
+    "nodes": 1606,
+    "triangles": 3060,
+    "boundary_segments": 152,
+    "min_area": 0.00016037959172094513,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.00069876033123,
+    "max_angle_deg": 119.9986024793375,
+    "edge_min": 0.01924514448280017,
+    "edge_max": 0.04375402900802469,
+    "edge_mean": 0.0273739078039234,
+    "area_sum": 0.9297674840741939,
+    "pslg_area": 0.9297674840741939,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.00048779927918210004,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.0883466129999988,
+   "diagnostics": {
+    "unknowns": 3150,
+    "stored_nnz": 42820,
+    "numeric_nnz": 42816,
+    "symmetry_rel": 9.986094028972813e-17,
+    "lambda_min": 416060.7814352586,
+    "lambda_max": 14599430345.958227,
+    "kappa2": 35089.65756300196,
+    "S_lambda_min": 7.783301020196006e-05,
+    "S_lambda_max": 2.3937548288105948,
+    "rho_J": 1.3937548288105948,
+    "kappa2_jacobi_scaled": 30755.007709445024,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.06102118100000098
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.157782203274473e-13,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.010143662000018594,
+     "factor_best_seconds": 0.009666551999998774,
+     "solve_best_seconds": 0.0004771100000198203,
+     "timing_runs": 3,
+     "lu_fill_nnz": 295450
+    },
+    {
+     "method": "CG",
+     "iterations": 452,
+     "relative_residual": 9.106479502460081e-09,
+     "relative_error": 5.234735144517545e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.02423343600003136,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 425,
+     "relative_residual": 9.134163371851304e-09,
+     "relative_error": 3.388913270460249e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.023925333000079263,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 438,
+     "relative_residual": 9.55966088676908e-09,
+     "relative_error": 3.0319503213709723e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.05444936899993991,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 1.2397098816625648e-05,
+     "relative_error": 0.00028145644043946677,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 20.028292485000065,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0000000005,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -500000.0,
+    "reaction_resultant_N": [
+     -1000000.0000000036,
+     5.413312464952469e-09
+    ],
+    "force_imbalance_rel": 6.489893165701578e-15,
+    "moment_imbalance_Nm": 6.111804395914078e-09,
+    "moment_imbalance_rel": 6.111804395914075e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.172156771644948e-13
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6846332553710056,
+    "right_mid_uy_mm": 7.860495018556808e-05,
+    "hole_top_ux_mm": 0.3067513323638037,
+    "hole_top_uy_mm": -0.09924900104670725,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6846332553710056,
+    "max_abs_displacement_mm": 0.6846332598834495,
+    "max_von_mises_MPa": 352.5526144021301,
+    "hole_max_sigma_xx_MPa": 360.4792621541345
+   },
+   "case_seconds": 20.80033619400001
+  },
+  {
+   "name": "H-base-L4",
+   "object": "H",
+   "level": 4,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 82,
+   "mesh": {
+    "h": 0.025,
+    "triangle_options": "pq30a0.0002706329",
+    "nodes": 2823,
+    "triangles": 5446,
+    "boundary_segments": 200,
+    "min_area": 9.021787463803219e-05,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.001896246102856,
+    "max_angle_deg": 119.99620750779424,
+    "edge_min": 0.014434032540731757,
+    "edge_max": 0.03312044438334401,
+    "edge_mean": 0.02053979967487292,
+    "area_sum": 0.9296044907318961,
+    "pslg_area": 0.9296044907318961,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0003124082775328993,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.1461499140000342,
+   "diagnostics": {
+    "unknowns": 5564,
+    "stored_nnz": 76232,
+    "numeric_nnz": 75958,
+    "symmetry_rel": 9.890963500232943e-17,
+    "lambda_min": 235420.0968913288,
+    "lambda_max": 15737325156.321428,
+    "kappa2": 66847.84079239362,
+    "S_lambda_min": 4.2967059971370145e-05,
+    "S_lambda_max": 2.3830917115224803,
+    "rho_J": 1.3830917115224803,
+    "kappa2_jacobi_scaled": 55463.22492417178,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.17190557000003537
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.9863838721830015e-13,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.03035080399990875,
+     "factor_best_seconds": 0.028835447000005843,
+     "solve_best_seconds": 0.001515356999902906,
+     "timing_runs": 3,
+     "lu_fill_nnz": 627628
+    },
+    {
+     "method": "CG",
+     "iterations": 618,
+     "relative_residual": 9.779895558115564e-09,
+     "relative_error": 3.957539219746086e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.06193426000004365,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 573,
+     "relative_residual": 9.8796769535341e-09,
+     "relative_error": 4.261196552939961e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.06585559300003752,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 602,
+     "relative_residual": 9.672499051161302e-09,
+     "relative_error": 2.924277256791486e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.16111068899999736,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 2.2064872041118272e-05,
+     "relative_error": 0.00039717421508797963,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 31.157553838000013,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -500000.0,
+    "reaction_resultant_N": [
+     -1000000.0000000279,
+     1.1356860341038555e-08
+    ],
+    "force_imbalance_rel": 2.994407495706314e-14,
+    "moment_imbalance_Nm": 2.450542524456978e-08,
+    "moment_imbalance_rel": 2.4505425244569778e-14,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.786702341632916e-13
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6868421880737812,
+    "right_mid_uy_mm": 1.0540583075129334e-05,
+    "hole_top_ux_mm": 0.30672183302359013,
+    "hole_top_uy_mm": -0.10240943018059709,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6868421880737812,
+    "max_abs_displacement_mm": 0.6868421881546614,
+    "max_von_mises_MPa": 361.70639286853094,
+    "hole_max_sigma_xx_MPa": 367.7221621167436
+   },
+   "case_seconds": 33.06146796999997
+  },
+  {
+   "name": "L-base-L1",
+   "object": "L",
+   "level": 1,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 22,
+   "mesh": {
+    "h": 0.1,
+    "triangle_options": "pq30a0.0043301270",
+    "nodes": 162,
+    "triangles": 280,
+    "boundary_segments": 42,
+    "min_area": 0.0014539696529658804,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.181762969128975,
+    "max_angle_deg": 119.636474061742,
+    "edge_min": 0.05784125777244374,
+    "edge_max": 0.12757595633363286,
+    "edge_mean": 0.0810109101866183,
+    "area_sum": 0.75,
+    "pslg_area": 0.75,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.005244219000019257,
+   "diagnostics": {
+    "unknowns": 302,
+    "stored_nnz": 3860,
+    "numeric_nnz": 3856,
+    "symmetry_rel": 1.1487515114116726e-16,
+    "lambda_min": 3938040.1576477643,
+    "lambda_max": 12987298572.715986,
+    "kappa2": 3297.9091255568724,
+    "S_lambda_min": 0.0009018687257427078,
+    "S_lambda_max": 2.176642961944995,
+    "rho_J": 1.176642961944995,
+    "kappa2_jacobi_scaled": 2413.480920022461,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 3297.9091255570465,
+    "dense_vs_eigsh_kappa_rel": 5.2811714561754753e-14,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.011518719999912719
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.3870638330083134e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.0006147550000150659,
+     "factor_best_seconds": 0.0005783550000160176,
+     "solve_best_seconds": 3.6399999999048305e-05,
+     "timing_runs": 3,
+     "lu_fill_nnz": 13238
+    },
+    {
+     "method": "CG",
+     "iterations": 137,
+     "relative_residual": 7.87634812244416e-09,
+     "relative_error": 3.1408070661782125e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.002101989000038884,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 120,
+     "relative_residual": 6.540242165183512e-09,
+     "relative_error": 2.372594483267137e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.002805211000008967,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 135,
+     "relative_residual": 9.74239062655456e-09,
+     "relative_error": 1.1001559312259143e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.005257329000073696,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 8545,
+     "relative_residual": 9.988458608601246e-09,
+     "relative_error": 1.2040792044399993e-07,
+     "accepted": true,
+     "status": "target",
+     "best_seconds": 2.9087587709999525,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     500000.00000000006,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -125000.0,
+    "reaction_resultant_N": [
+     -499999.9999999985,
+     -7.548806024715304e-10
+    ],
+    "force_imbalance_rel": 3.592291773549173e-15,
+    "moment_imbalance_Nm": -8.585629984736443e-10,
+    "moment_imbalance_rel": 1.7171259969472882e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 8.381903171539305e-15
+   },
+   "response": {
+    "right_mid_ux_mm": 0.4696537528680302,
+    "right_mid_uy_mm": 0.2764751333735289,
+    "top_mid_ux_mm": -0.01582311191264782,
+    "top_mid_uy_mm": 0.012121358300208863,
+    "corner_ux_mm": 0.12423759968399983,
+    "corner_uy_mm": 0.08058286623412589,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.4696537528680302,
+    "max_abs_displacement_mm": 0.6355725920908739,
+    "max_von_mises_MPa": 139.98038644425117,
+    "corner_max_von_mises_MPa": 119.08302342683113
+   },
+   "case_seconds": 11.76230180999994
+  },
+  {
+   "name": "L-base-L2",
+   "object": "L",
+   "level": 2,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 587,
+    "triangles": 1092,
+    "boundary_segments": 80,
+    "min_area": 0.00036212915378966377,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.00140196669659,
+    "max_angle_deg": 119.82342479508924,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06546824825862536,
+    "edge_mean": 0.04123283629690432,
+    "area_sum": 0.75,
+    "pslg_area": 0.75,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.026024944000027972,
+   "diagnostics": {
+    "unknowns": 1132,
+    "stored_nnz": 15160,
+    "numeric_nnz": 15086,
+    "symmetry_rel": 1.0017271295302594e-16,
+    "lambda_min": 1139817.6066461862,
+    "lambda_max": 14440930957.147926,
+    "kappa2": 12669.510343535669,
+    "S_lambda_min": 0.0002281303515755357,
+    "S_lambda_max": 2.272200264318518,
+    "rho_J": 1.272200264318518,
+    "kappa2_jacobi_scaled": 9960.096272267285,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 12669.51034361918,
+    "dense_vs_eigsh_kappa_rel": 6.591543022718611e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.10739440200006811
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 4.6503070479055323e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.002928122999946936,
+     "factor_best_seconds": 0.0027896770000097604,
+     "solve_best_seconds": 0.00013844599993717566,
+     "timing_runs": 3,
+     "lu_fill_nnz": 62559
+    },
+    {
+     "method": "Jacobi",
+     "iterations": 164,
+     "relative_residual": 11636992417.180363,
+     "relative_error": 35633068.61527064,
+     "accepted": false,
+     "status": "divergence_guard",
+     "best_seconds": 0.003348114000004898,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Damped Jacobi",
+     "iterations": 20000,
+     "relative_residual": 0.0028645582886621195,
+     "relative_error": 0.061280538576296256,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.3514935629999627,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 3.769437872254734e-06,
+     "relative_error": 6.584517510105395e-05,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 10.562069005000012,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "SD",
+     "iterations": 20000,
+     "relative_residual": 0.0015074567710167538,
+     "relative_error": 0.024519329858773278,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.7734342999999626,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "CG",
+     "iterations": 271,
+     "relative_residual": 8.969817159408791e-09,
+     "relative_error": 4.4866100954481867e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.006917071000088981,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "GMRES (full)",
+     "iterations": 262,
+     "relative_residual": 8.71876225358587e-09,
+     "relative_error": 1.3125772113692925e-09,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.2865259010000045,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 268,
+     "relative_residual": 8.536085849280864e-09,
+     "relative_error": 1.2829984227433817e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.02046700199980478,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 246,
+     "relative_residual": 9.164241248733304e-09,
+     "relative_error": 4.785470300619454e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.009545304000084798,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     500000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -125000.0,
+    "reaction_resultant_N": [
+     -499999.9999999961,
+     -4.729372449219227e-11
+    ],
+    "force_imbalance_rel": 7.625790215894322e-15,
+    "moment_imbalance_Nm": 2.9103830456733704e-10,
+    "moment_imbalance_rel": 5.820766091346741e-16,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 3.550667315721511e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.4717269222383327,
+    "right_mid_uy_mm": 0.27148680556251736,
+    "top_mid_ux_mm": -0.016313068384742987,
+    "top_mid_uy_mm": 0.01212954919290994,
+    "corner_ux_mm": 0.12661558556634758,
+    "corner_uy_mm": 0.08281234989101001,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.4717269222383327,
+    "max_abs_displacement_mm": 0.6325814398280114,
+    "max_von_mises_MPa": 159.255377272276,
+    "corner_max_von_mises_MPa": 138.0356184837038
+   },
+   "case_seconds": 48.71978758800003
+  },
+  {
+   "name": "L-base-L3",
+   "object": "L",
+   "level": 3,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 62,
+   "mesh": {
+    "h": 0.03333333333333333,
+    "triangle_options": "pq30a0.0004811252",
+    "nodes": 1280,
+    "triangles": 2436,
+    "boundary_segments": 122,
+    "min_area": 0.00016094629057318284,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.00011293932795,
+    "max_angle_deg": 119.8234247950895,
+    "edge_min": 0.019262168314993472,
+    "edge_max": 0.04380390094512089,
+    "edge_mean": 0.027535965395240874,
+    "area_sum": 0.75,
+    "pslg_area": 0.75,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.05788985499998489,
+   "diagnostics": {
+    "unknowns": 2498,
+    "stored_nnz": 33924,
+    "numeric_nnz": 33860,
+    "symmetry_rel": 9.890963500232952e-17,
+    "lambda_min": 517623.4105887523,
+    "lambda_max": 14628611224.500128,
+    "kappa2": 28261.10822124783,
+    "S_lambda_min": 9.962622167109595e-05,
+    "S_lambda_max": 2.3432126326159053,
+    "rho_J": 1.3432126326159053,
+    "kappa2_jacobi_scaled": 23520.039135396917,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 2.5241857870000786
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 9.837656492695982e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.016202151000015874,
+     "factor_best_seconds": 0.015782055000045148,
+     "solve_best_seconds": 0.00042009599997072655,
+     "timing_runs": 3,
+     "lu_fill_nnz": 192062
+    },
+    {
+     "method": "CG",
+     "iterations": 396,
+     "relative_residual": 9.682445171447219e-09,
+     "relative_error": 7.370122595814788e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.019459488000165948,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 370,
+     "relative_residual": 9.566521559692943e-09,
+     "relative_error": 4.116591577823012e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.021221356999831187,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 390,
+     "relative_residual": 9.769665225434929e-09,
+     "relative_error": 1.5565711567610543e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.037029139999958716,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.0005267771540356316,
+     "relative_error": 0.010951492931612253,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 18.157389923999972,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     500000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -125000.0,
+    "reaction_resultant_N": [
+     -500000.00000001944,
+     2.15550244320184e-09
+    ],
+    "force_imbalance_rel": 3.928007257493947e-14,
+    "moment_imbalance_Nm": 8.018105290830135e-09,
+    "moment_imbalance_rel": 1.603621058166027e-14,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 8.009374141693116e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.47235571756197675,
+    "right_mid_uy_mm": 0.2689150829475571,
+    "top_mid_ux_mm": -0.016393337604181175,
+    "top_mid_uy_mm": 0.012320906428666902,
+    "corner_ux_mm": 0.12783019269304924,
+    "corner_uy_mm": 0.0841031792226826,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.47235571756197675,
+    "max_abs_displacement_mm": 0.6308276153740288,
+    "max_von_mises_MPa": 173.40429795955214,
+    "corner_max_von_mises_MPa": 154.40508338560582
+   },
+   "case_seconds": 21.239098341000044
+  },
+  {
+   "name": "L-base-L4",
+   "object": "L",
+   "level": 4,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 82,
+   "mesh": {
+    "h": 0.025,
+    "triangle_options": "pq30a0.0002706329",
+    "nodes": 2276,
+    "triangles": 4390,
+    "boundary_segments": 160,
+    "min_area": 9.053228844741505e-05,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455114,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.014446626236245097,
+    "edge_max": 0.033046288333146864,
+    "edge_mean": 0.020514149294252795,
+    "area_sum": 0.75,
+    "pslg_area": 0.75,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.09181316700005482,
+   "diagnostics": {
+    "unknowns": 4470,
+    "stored_nnz": 61204,
+    "numeric_nnz": 60910,
+    "symmetry_rel": 1.0017271295302549e-16,
+    "lambda_min": 292922.346374654,
+    "lambda_max": 14515539918.911444,
+    "kappa2": 49554.225201875706,
+    "S_lambda_min": 5.490393517963911e-05,
+    "S_lambda_max": 2.3057008716092136,
+    "rho_J": 1.3057008716092136,
+    "kappa2_jacobi_scaled": 41995.18420793038,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.10253444099998887
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.6000509582980223e-13,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.014101304000178061,
+     "factor_best_seconds": 0.013449637000121584,
+     "solve_best_seconds": 0.0006516670000564773,
+     "timing_runs": 3,
+     "lu_fill_nnz": 431891
+    },
+    {
+     "method": "CG",
+     "iterations": 537,
+     "relative_residual": 9.997417748480812e-09,
+     "relative_error": 5.921395062865739e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.0421738140000798,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 499,
+     "relative_residual": 8.805926832927611e-09,
+     "relative_error": 3.1355120310886516e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.04384546199980832,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 526,
+     "relative_residual": 9.958831333509246e-09,
+     "relative_error": 2.4367187388333966e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.09503941699995266,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.002702766557795636,
+     "relative_error": 0.06623728203327042,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 26.42530336699997,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     500000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -124999.99999999999,
+    "reaction_resultant_N": [
+     -499999.9999999838,
+     1.5018486010376364e-08
+    ],
+    "force_imbalance_rel": 4.4197106099678975e-14,
+    "moment_imbalance_Nm": 5.660695023834705e-09,
+    "moment_imbalance_rel": 1.1321390047669411e-14,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 8.629285730421536e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.47264015747036675,
+    "right_mid_uy_mm": 0.26760962825031515,
+    "top_mid_ux_mm": -0.016491520700067767,
+    "top_mid_uy_mm": 0.012368417281174866,
+    "corner_ux_mm": 0.1279906183538861,
+    "corner_uy_mm": 0.08415093250279142,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.47264015747036675,
+    "max_abs_displacement_mm": 0.6299154010607964,
+    "max_von_mises_MPa": 184.6820206982802,
+    "corner_max_von_mises_MPa": 177.54666018946077
+   },
+   "case_seconds": 27.592569125999944
+  },
+  {
+   "name": "B-base-L1",
+   "object": "B",
+   "level": 1,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      0,
+      -10000000.0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 10,
+   "mesh": {
+    "h": 0.125,
+    "triangle_options": "pq30a0.0067658235",
+    "nodes": 272,
+    "triangles": 470,
+    "boundary_segments": 72,
+    "min_area": 0.0022633072111853956,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.08828760245537,
+    "max_angle_deg": 119.82342479508927,
+    "edge_min": 0.07220136212193194,
+    "edge_max": 0.1569478486750061,
+    "edge_mean": 0.10253752697089036,
+    "area_sum": 2.0,
+    "pslg_area": 2.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.010422697999956654,
+   "diagnostics": {
+    "unknowns": 534,
+    "stored_nnz": 6876,
+    "numeric_nnz": 6850,
+    "symmetry_rel": 1.0835140273061484e-16,
+    "lambda_min": 15128.61564504588,
+    "lambda_max": 15210302273.626068,
+    "kappa2": 1005399.4780815876,
+    "S_lambda_min": 3.0080344916843553e-06,
+    "S_lambda_max": 2.442217500361534,
+    "rho_J": 1.4422175003615338,
+    "kappa2_jacobi_scaled": 811898.1039323153,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 1005399.4774091434,
+    "dense_vs_eigsh_kappa_rel": 6.688328870197677e-10,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 2.9923389309999493
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.7624282744343408e-11,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.0011862530000144034,
+     "factor_best_seconds": 0.001112078999994992,
+     "solve_best_seconds": 7.417400001941132e-05,
+     "timing_runs": 3,
+     "lu_fill_nnz": 15528
+    },
+    {
+     "method": "CG",
+     "iterations": 269,
+     "relative_residual": 7.058794194975543e-09,
+     "relative_error": 8.600315572611844e-12,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.006426696000062293,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 244,
+     "relative_residual": 7.399372813313202e-09,
+     "relative_error": 8.164016601870158e-12,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.007235677999915424,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 277,
+     "relative_residual": 1.6310080982373662e-08,
+     "relative_error": 4.033702313396945e-12,
+     "accepted": false,
+     "status": "native_info=0",
+     "best_seconds": 0.019137133000185713,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.28434155491663554,
+     "relative_error": 0.8850568835840212,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 7.6222399220000625,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     0.0,
+     -50000.0
+    ],
+    "applied_moment_origin_Nm": -200000.0,
+    "reaction_resultant_N": [
+     -4.045432433485985e-08,
+     49999.999999515174
+    ],
+    "force_imbalance_rel": 9.730111327612704e-12,
+    "moment_imbalance_Nm": -1.525710104033351e-06,
+    "moment_imbalance_rel": 3.051420208066702e-11,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 9.5367431640625e-12
+   },
+   "response": {
+    "tip_mid_ux_mm": -1.2231987020050244e-05,
+    "tip_mid_uy_mm": -48.30734257165142,
+    "tip_top_ux_mm": 4.485869998081746,
+    "tip_top_uy_mm": -48.31291108915071,
+    "matched_point": "tip_mid",
+    "matched_component": "y",
+    "matched_value_mm": -48.30734257165142,
+    "max_abs_displacement_mm": 48.52158413507368,
+    "max_von_mises_MPa": 447.4033195074952
+   },
+   "case_seconds": 34.914568418000044,
+   "beam_reference": {
+    "P_N": 50000.0,
+    "I_m4": 0.00010416666666666667,
+    "delta_EB_m": 0.051199999999999996,
+    "delta_shear_m": 0.000624,
+    "delta_Timoshenko_m": 0.051823999999999995
+   }
+  },
+  {
+   "name": "B-base-L2",
+   "object": "B",
+   "level": 2,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      0,
+      -10000000.0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 18,
+   "mesh": {
+    "h": 0.0625,
+    "triangle_options": "pq30a0.0016914559",
+    "nodes": 1019,
+    "triangles": 1892,
+    "boundary_segments": 144,
+    "min_area": 0.0005638359664760424,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.000763194619335,
+    "max_angle_deg": 119.99847361076134,
+    "edge_min": 0.03608466933508162,
+    "edge_max": 0.08133495689649506,
+    "edge_mean": 0.051065703690841,
+    "area_sum": 2.0,
+    "pslg_area": 2.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.045026523999922574,
+   "diagnostics": {
+    "unknowns": 2020,
+    "stored_nnz": 27096,
+    "numeric_nnz": 27068,
+    "symmetry_rel": 9.986172665874804e-17,
+    "lambda_min": 3838.287998639294,
+    "lambda_max": 14382533949.577114,
+    "kappa2": 3747122.1426521004,
+    "S_lambda_min": 7.138444984655287e-07,
+    "S_lambda_max": 2.276848854648724,
+    "rho_J": 1.276848854648724,
+    "kappa2_jacobi_scaled": 3189558.593703545,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.09655179300011696
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 5.461643726559671e-11,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004972048999889012,
+     "factor_best_seconds": 0.004734292999955869,
+     "solve_best_seconds": 0.00023775599993314245,
+     "timing_runs": 3,
+     "lu_fill_nnz": 100517
+    },
+    {
+     "method": "Jacobi",
+     "iterations": 170,
+     "relative_residual": 10790002093.24299,
+     "relative_error": 32121.436044339684,
+     "accepted": false,
+     "status": "divergence_guard",
+     "best_seconds": 0.0054742439999699855,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Damped Jacobi",
+     "iterations": 20000,
+     "relative_residual": 0.22856469350297484,
+     "relative_error": 0.9925817055659256,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 0.6678927289999592,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.23630421625427966,
+     "relative_error": 0.9712628389401138,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 14.83487515600018,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "SD",
+     "iterations": 20000,
+     "relative_residual": 0.2647436482718574,
+     "relative_error": 0.9884205787936036,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 1.2042781310001374,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "CG",
+     "iterations": 534,
+     "relative_residual": 8.718475580242613e-09,
+     "relative_error": 2.990045925648343e-13,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.02400277099991399,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "GMRES (full)",
+     "iterations": 516,
+     "relative_residual": 8.275811264809315e-09,
+     "relative_error": 9.765034614820182e-12,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 1.0520475770001667,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 541,
+     "relative_residual": 1.769177694503693e-07,
+     "relative_error": 8.356704326892317e-12,
+     "accepted": false,
+     "status": "native_info=0",
+     "best_seconds": 0.05047399799991581,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 493,
+     "relative_residual": 9.67679912229e-09,
+     "relative_error": 4.613713935195433e-13,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.02094163800006754,
+     "timing_runs": 3,
+     "timing_note": "best of 3; history recorded in a separate run"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     0.0,
+     -50000.0
+    ],
+    "applied_moment_origin_Nm": -200000.0,
+    "reaction_resultant_N": [
+     7.37491063773632e-08,
+     50000.00000048395
+    ],
+    "force_imbalance_rel": 9.790513684959596e-12,
+    "moment_imbalance_Nm": 1.2031523510813713e-06,
+    "moment_imbalance_rel": 2.4063047021627426e-11,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 2.473592758178711e-11
+   },
+   "response": {
+    "tip_mid_ux_mm": 8.453209621381389e-05,
+    "tip_mid_uy_mm": -50.82422895749114,
+    "tip_top_ux_mm": 4.720439626743113,
+    "tip_top_uy_mm": -50.83374295837449,
+    "matched_point": "tip_mid",
+    "matched_component": "y",
+    "matched_value_mm": -50.82422895749114,
+    "max_abs_displacement_mm": 51.05244336393524,
+    "max_von_mises_MPa": 494.20491382183803
+   },
+   "case_seconds": 74.89184879499999,
+   "beam_reference": {
+    "P_N": 50000.0,
+    "I_m4": 0.00010416666666666667,
+    "delta_EB_m": 0.051199999999999996,
+    "delta_shear_m": 0.000624,
+    "delta_Timoshenko_m": 0.051823999999999995
+   }
+  },
+  {
+   "name": "B-base-L3",
+   "object": "B",
+   "level": 3,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      0,
+      -10000000.0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 26,
+   "mesh": {
+    "h": 0.041666666666666664,
+    "triangle_options": "pq30a0.0007517582",
+    "nodes": 2220,
+    "triangles": 4222,
+    "boundary_segments": 216,
+    "min_area": 0.000251478579020594,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.08110218242591,
+    "max_angle_deg": 119.82342479509076,
+    "edge_min": 0.02407771039374157,
+    "edge_max": 0.05469140043933748,
+    "edge_mean": 0.03420593889651321,
+    "area_sum": 2.0,
+    "pslg_area": 2.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.07991017399990596,
+   "diagnostics": {
+    "unknowns": 4414,
+    "stored_nnz": 60012,
+    "numeric_nnz": 59666,
+    "symmetry_rel": 9.890963500232946e-17,
+    "lambda_min": 1785.133950688403,
+    "lambda_max": 15034777310.992123,
+    "kappa2": 8422212.408875113,
+    "S_lambda_min": 3.2466768773497344e-07,
+    "S_lambda_max": 2.276616837862693,
+    "rho_J": 1.2766168378626932,
+    "kappa2_jacobi_scaled": 7012144.798718306,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.09362168200004817
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.1724251321298298e-10,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.010860016000151518,
+     "factor_best_seconds": 0.010374929000136035,
+     "solve_best_seconds": 0.00048508700001548277,
+     "timing_runs": 3,
+     "lu_fill_nnz": 311255
+    },
+    {
+     "method": "CG",
+     "iterations": 807,
+     "relative_residual": 9.575828059485379e-09,
+     "relative_error": 3.341909245159825e-11,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.04959703700001228,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 740,
+     "relative_residual": 8.960856054326551e-09,
+     "relative_error": 3.0861225672319186e-11,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.05164095400004953,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 811,
+     "relative_residual": 6.187686203520072e-07,
+     "relative_error": 5.855613102742926e-11,
+     "accepted": false,
+     "status": "native_info=0",
+     "best_seconds": 0.11412418300005811,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.21970722917474922,
+     "relative_error": 0.9865894682902508,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 26.068508077999923,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     0.0,
+     -50000.0
+    ],
+    "applied_moment_origin_Nm": -200000.0,
+    "reaction_resultant_N": [
+     1.4674151316285133e-07,
+     49999.999995751205
+    ],
+    "force_imbalance_rel": 8.502664700320304e-11,
+    "moment_imbalance_Nm": -1.3204844435676932e-05,
+    "moment_imbalance_rel": 2.640968887135386e-10,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 4.8279762268066384e-11
+   },
+   "response": {
+    "tip_mid_ux_mm": 1.8527909066734277e-05,
+    "tip_mid_uy_mm": -51.29424993320464,
+    "tip_top_ux_mm": 4.765353355771072,
+    "tip_top_uy_mm": -51.30488722433519,
+    "matched_point": "tip_mid",
+    "matched_component": "y",
+    "matched_value_mm": -51.29424993320464,
+    "max_abs_displacement_mm": 51.52584079872119,
+    "max_von_mises_MPa": 524.4734738195722
+   },
+   "case_seconds": 27.526548964000085,
+   "beam_reference": {
+    "P_N": 50000.0,
+    "I_m4": 0.00010416666666666667,
+    "delta_EB_m": 0.051199999999999996,
+    "delta_shear_m": 0.000624,
+    "delta_Timoshenko_m": 0.051823999999999995
+   }
+  },
+  {
+   "name": "B-base-L4",
+   "object": "B",
+   "level": 4,
+   "question": "geometry + refinement",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      0,
+      -10000000.0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 34,
+   "mesh": {
+    "h": 0.03125,
+    "triangle_options": "pq30a0.0004228640",
+    "nodes": 3905,
+    "triangles": 7520,
+    "boundary_segments": 288,
+    "min_area": 0.00014145670069908717,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.00057555832688,
+    "max_angle_deg": 119.82342479508927,
+    "edge_min": 0.01805828279530645,
+    "edge_max": 0.04204395562258337,
+    "edge_mean": 0.02559143844351677,
+    "area_sum": 2.0,
+    "pslg_area": 2.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.17445923900004345,
+   "diagnostics": {
+    "unknowns": 7776,
+    "stored_nnz": 106520,
+    "numeric_nnz": 106420,
+    "symmetry_rel": 9.870167014698154e-17,
+    "lambda_min": 1001.2137555037343,
+    "lambda_max": 15224477003.275774,
+    "kappa2": 15206020.612067979,
+    "S_lambda_min": 1.812897182472305e-07,
+    "S_lambda_max": 2.4296973192364963,
+    "rho_J": 1.4296973192364963,
+    "kappa2_jacobi_scaled": 13402289.676036904,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "positive_definite": true,
+    "diagnostics_seconds": 0.19047403300010046
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 1.895070296270079e-10,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.031314569999949526,
+     "factor_best_seconds": 0.029926928000122643,
+     "solve_best_seconds": 0.001387641999826883,
+     "timing_runs": 3,
+     "lu_fill_nnz": 713016
+    },
+    {
+     "method": "CG",
+     "iterations": 1067,
+     "relative_residual": 9.771276224931544e-09,
+     "relative_error": 4.181486887886758e-11,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.16162780600006954,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 991,
+     "relative_residual": 9.94520070274001e-09,
+     "relative_error": 4.448563296534713e-11,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.1627052219998859,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 1066,
+     "relative_residual": 1.4935784343794861e-06,
+     "relative_error": 2.5328854822683958e-11,
+     "accepted": false,
+     "status": "native_info=0",
+     "best_seconds": 0.34768493299998227,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.20604376469353422,
+     "relative_error": 0.9925392010933101,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 40.529396472999906,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     0.0,
+     -50000.0
+    ],
+    "applied_moment_origin_Nm": -200000.0,
+    "reaction_resultant_N": [
+     -3.65689629688859e-08,
+     49999.99999870397
+    ],
+    "force_imbalance_rel": 2.5930951662836534e-11,
+    "moment_imbalance_Nm": -5.132547812536359e-06,
+    "moment_imbalance_rel": 1.0265095625072718e-10,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 7.867813110351562e-11
+   },
+   "response": {
+    "tip_mid_ux_mm": 3.996361367370743e-05,
+    "tip_mid_uy_mm": -51.47237935729584,
+    "tip_top_ux_mm": 4.7822206855037,
+    "tip_top_uy_mm": -51.48386676118416,
+    "matched_point": "tip_mid",
+    "matched_component": "y",
+    "matched_value_mm": -51.47237935729584,
+    "max_abs_displacement_mm": 51.70549459552846,
+    "max_von_mises_MPa": 543.0567448640916
+   },
+   "case_seconds": 44.516345451999996,
+   "beam_reference": {
+    "P_N": 50000.0,
+    "I_m4": 0.00010416666666666667,
+    "delta_EB_m": 0.051199999999999996,
+    "delta_shear_m": 0.000624,
+    "delta_Timoshenko_m": 0.051823999999999995
+   }
+  },
+  {
+   "name": "H-p25-L2",
+   "object": "H",
+   "level": 2,
+   "question": "load magnitude",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      25000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.0319909079998979,
+   "diagnostics": {
+    "unknowns": 1414,
+    "stored_nnz": 18964,
+    "numeric_nnz": 18858,
+    "symmetry_rel": 1.0017271295302556e-16,
+    "lambda_min": 935653.6385140199,
+    "lambda_max": 14968219244.756516,
+    "kappa2": 15997.60705096882,
+    "S_lambda_min": 0.0001810533722556695,
+    "S_lambda_max": 2.2690199734071137,
+    "rho_J": 1.2690199734071137,
+    "kappa2_jacobi_scaled": 12532.326491013822,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 15997.607050996781,
+    "dense_vs_eigsh_kappa_rel": 1.7478554775236555e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.18606585300017286
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 5.85004990031694e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004819260999965991,
+     "factor_best_seconds": 0.004510608999908072,
+     "solve_best_seconds": 0.0003086520000579185,
+     "timing_runs": 3,
+     "lu_fill_nnz": 98671
+    },
+    {
+     "method": "CG",
+     "iterations": 306,
+     "relative_residual": 9.73883812011138e-09,
+     "relative_error": 4.992480870746302e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.011354168000025311,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 281,
+     "relative_residual": 8.22226215305188e-09,
+     "relative_error": 3.144054496044744e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.01584024700014197,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 302,
+     "relative_residual": 9.159968868110654e-09,
+     "relative_error": 2.5307216975549797e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.02667162499983533,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 4.5736098550232075e-07,
+     "relative_error": 8.465992574367903e-06,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 12.435524125000029,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     250000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -124999.99999999999,
+    "reaction_resultant_N": [
+     -250000.00000000087,
+     -5.866240826435387e-11
+    ],
+    "force_imbalance_rel": 3.6600602628626245e-15,
+    "moment_imbalance_Nm": -4.69299266114831e-10,
+    "moment_imbalance_rel": 1.8771970644593238e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 4.582290102916882e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.1690741975925578,
+    "right_mid_uy_mm": -9.429189784767081e-05,
+    "hole_top_ux_mm": 0.07609603193764447,
+    "hole_top_uy_mm": -0.024565430299043976,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.1690741975925578,
+    "max_abs_displacement_mm": 0.16907422388563337,
+    "max_von_mises_MPa": 81.56140489531278,
+    "hole_max_sigma_xx_MPa": 83.74964638365553
+   },
+   "case_seconds": 12.898092313999996
+  },
+  {
+   "name": "H-p250-L2",
+   "object": "H",
+   "level": 2,
+   "question": "load magnitude",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      250000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.0319909079998979,
+   "diagnostics": {
+    "unknowns": 1414,
+    "stored_nnz": 18964,
+    "numeric_nnz": 18858,
+    "symmetry_rel": 1.0017271295302556e-16,
+    "lambda_min": 935653.6385140199,
+    "lambda_max": 14968219244.756516,
+    "kappa2": 15997.60705096882,
+    "S_lambda_min": 0.0001810533722556695,
+    "S_lambda_max": 2.2690199734071137,
+    "rho_J": 1.2690199734071137,
+    "kappa2_jacobi_scaled": 12532.326491013822,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 15997.607050996781,
+    "dense_vs_eigsh_kappa_rel": 1.7478554775236555e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.15417465800010177
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 6.006896292770147e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.003329806000010649,
+     "factor_best_seconds": 0.0031890860000203247,
+     "solve_best_seconds": 0.00014071999999032414,
+     "timing_runs": 3,
+     "lu_fill_nnz": 98671
+    },
+    {
+     "method": "CG",
+     "iterations": 306,
+     "relative_residual": 9.91103284110433e-09,
+     "relative_error": 4.8309525895101e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.008172651999984737,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 281,
+     "relative_residual": 8.219711548244389e-09,
+     "relative_error": 3.14824098069655e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.008992929999976695,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 302,
+     "relative_residual": 9.250853582459083e-09,
+     "relative_error": 2.5676649038817705e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.019355714999846896,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 4.573609845241522e-07,
+     "relative_error": 8.465992573602775e-06,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 11.598977361000152,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     2500000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -1250000.0,
+    "reaction_resultant_N": [
+     -2500000.000000009,
+     -7.8580342233181e-10
+    ],
+    "force_imbalance_rel": 3.552956715120561e-15,
+    "moment_imbalance_Nm": -4.787580110132694e-09,
+    "moment_imbalance_rel": 1.9150320440530777e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 5.288438842399041e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 1.6907419759255766,
+    "right_mid_uy_mm": -0.0009429189784762983,
+    "hole_top_ux_mm": 0.7609603193764448,
+    "hole_top_uy_mm": -0.24565430299043992,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 1.6907419759255766,
+    "max_abs_displacement_mm": 1.6907422388563325,
+    "max_von_mises_MPa": 815.614048953126,
+    "hole_max_sigma_xx_MPa": 837.4964638365536
+   },
+   "case_seconds": 11.934510553999871
+  },
+  {
+   "name": "L-top-L2",
+   "object": "L",
+   "level": 2,
+   "question": "load location",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 4,
+     "traction_Pa": [
+      0,
+      100000000.0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 587,
+    "triangles": 1092,
+    "boundary_segments": 80,
+    "min_area": 0.00036212915378966377,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.00140196669659,
+    "max_angle_deg": 119.82342479508924,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06546824825862536,
+    "edge_mean": 0.04123283629690432,
+    "area_sum": 0.75,
+    "pslg_area": 0.75,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.026024944000027972,
+   "diagnostics": {
+    "unknowns": 1132,
+    "stored_nnz": 15160,
+    "numeric_nnz": 15086,
+    "symmetry_rel": 1.0017271295302594e-16,
+    "lambda_min": 1139817.6066461862,
+    "lambda_max": 14440930957.147926,
+    "kappa2": 12669.510343535669,
+    "S_lambda_min": 0.0002281303515755357,
+    "S_lambda_max": 2.272200264318518,
+    "rho_J": 1.272200264318518,
+    "kappa2_jacobi_scaled": 9960.096272267285,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 12669.51034361918,
+    "dense_vs_eigsh_kappa_rel": 6.591543022718611e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.09526012099991021
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 3.5465194919681855e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.0025842840000223077,
+     "factor_best_seconds": 0.002461823999965418,
+     "solve_best_seconds": 0.00012246000005688984,
+     "timing_runs": 3,
+     "lu_fill_nnz": 62559
+    },
+    {
+     "method": "CG",
+     "iterations": 270,
+     "relative_residual": 9.57481849172352e-09,
+     "relative_error": 5.233315532177726e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.007334239000101661,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 247,
+     "relative_residual": 8.550443112172908e-09,
+     "relative_error": 6.558789357045128e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.00812574799988397,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 267,
+     "relative_residual": 9.544516171185013e-09,
+     "relative_error": 1.5829066503405213e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.01734468800009381,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 3.988499773336198e-06,
+     "relative_error": 8.729833508888797e-05,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 10.461739541000043,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     0.0,
+     500000.0
+    ],
+    "applied_moment_origin_Nm": 125000.0,
+    "reaction_resultant_N": [
+     5.929905455559492e-10,
+     -500000.00000000006
+    ],
+    "force_imbalance_rel": 1.1884392011698129e-15,
+    "moment_imbalance_Nm": 7.785274647176266e-10,
+    "moment_imbalance_rel": 1.5570549294352531e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 2.1536834537982934e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.0165480747705913,
+    "right_mid_uy_mm": 0.2669810158714292,
+    "top_mid_ux_mm": -0.13511229509367834,
+    "top_mid_uy_mm": 0.3037199198200044,
+    "corner_ux_mm": -0.013989954446461847,
+    "corner_uy_mm": 0.20683264123055153,
+    "matched_point": "top_mid",
+    "matched_component": "y",
+    "matched_value_mm": 0.3037199198200044,
+    "max_abs_displacement_mm": 0.4706362042362551,
+    "max_von_mises_MPa": 332.45666528452074,
+    "corner_max_von_mises_MPa": 71.13907647668738
+   },
+   "case_seconds": 10.720680261000098
+  },
+  {
+   "name": "B-axial-L2",
+   "object": "B",
+   "level": 2,
+   "question": "load type on slender object",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 18,
+   "mesh": {
+    "h": 0.0625,
+    "triangle_options": "pq30a0.0016914559",
+    "nodes": 1019,
+    "triangles": 1892,
+    "boundary_segments": 144,
+    "min_area": 0.0005638359664760424,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.000763194619335,
+    "max_angle_deg": 119.99847361076134,
+    "edge_min": 0.03608466933508162,
+    "edge_max": 0.08133495689649506,
+    "edge_mean": 0.051065703690841,
+    "area_sum": 2.0,
+    "pslg_area": 2.0,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.0,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 1,
+    "expected_euler": 1
+   },
+   "assembly_seconds": 0.045026523999922574,
+   "diagnostics": {
+    "unknowns": 2020,
+    "stored_nnz": 27096,
+    "numeric_nnz": 27068,
+    "symmetry_rel": 9.986172665874804e-17,
+    "lambda_min": 3838.287998639294,
+    "lambda_max": 14382533949.577114,
+    "kappa2": 3747122.1426521004,
+    "S_lambda_min": 7.138444984655287e-07,
+    "S_lambda_max": 2.276848854648724,
+    "rho_J": 1.276848854648724,
+    "kappa2_jacobi_scaled": 3189558.593703545,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.09031970199998796
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 2.514559121111779e-13,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.005501538999851618,
+     "factor_best_seconds": 0.005265335999865783,
+     "solve_best_seconds": 0.00023620299998583505,
+     "timing_runs": 3,
+     "lu_fill_nnz": 100517
+    },
+    {
+     "method": "CG",
+     "iterations": 533,
+     "relative_residual": 8.083174277955231e-09,
+     "relative_error": 6.328510863091948e-11,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.02593600999989576,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 492,
+     "relative_residual": 9.40092953781194e-09,
+     "relative_error": 7.952426362868298e-11,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.025764935000097466,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 529,
+     "relative_residual": 9.138915393076577e-09,
+     "relative_error": 7.501889346524766e-08,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.05595009100011339,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 0.0017026108828945155,
+     "relative_error": 0.010210770054912345,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 15.125513076000061,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     500000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -125000.0,
+    "reaction_resultant_N": [
+     -500000.000000011,
+     3.810782800428569e-09
+    ],
+    "force_imbalance_rel": 2.335391109100667e-14,
+    "moment_imbalance_Nm": -5.209585651755333e-09,
+    "moment_imbalance_rel": 1.0419171303510665e-14,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 1.0955773177556693e-13
+   },
+   "response": {
+    "tip_mid_ux_mm": 1.9965498721538577,
+    "tip_mid_uy_mm": -0.0013450865567315423,
+    "tip_top_ux_mm": 1.9966317541171594,
+    "tip_top_uy_mm": -0.03884508655673015,
+    "matched_point": "tip_mid",
+    "matched_component": "x",
+    "matched_value_mm": 1.9965498721538577,
+    "max_abs_displacement_mm": 1.9970095899365545,
+    "max_von_mises_MPa": 119.2183618638968
+   },
+   "case_seconds": 15.711975892000055,
+   "beam_reference": {
+    "P_N": 50000.0,
+    "I_m4": 0.00010416666666666667,
+    "delta_EB_m": 0.051199999999999996,
+    "delta_shear_m": 0.000624,
+    "delta_Timoshenko_m": 0.051823999999999995
+   }
+  },
+  {
+   "name": "H-rollerpin-L2",
+   "object": "H",
+   "level": 2,
+   "question": "support conditions",
+   "E_Pa": 200000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "x"
+    },
+    {
+     "kind": "point",
+     "where": [
+      0,
+      0.5
+     ],
+     "comps": "y"
+    }
+   ],
+   "constrained_dofs": 22,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.0319909079998979,
+   "diagnostics": {
+    "unknowns": 1434,
+    "stored_nnz": 19196,
+    "numeric_nnz": 19090,
+    "symmetry_rel": 1.0017271295302556e-16,
+    "lambda_min": 675654.8840643512,
+    "lambda_max": 14968219244.75656,
+    "kappa2": 22153.646185041038,
+    "S_lambda_min": 0.00012939991826876432,
+    "S_lambda_max": 2.2690238679979924,
+    "rho_J": 1.2690238679979924,
+    "kappa2_jacobi_scaled": 17534.97141540088,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 22153.646184945737,
+    "dense_vs_eigsh_kappa_rel": 4.301797186547329e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.18017582400011634
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 6.121087968278953e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004510905000188359,
+     "factor_best_seconds": 0.004329398000209039,
+     "solve_best_seconds": 0.00018150699997931952,
+     "timing_runs": 3,
+     "lu_fill_nnz": 100545
+    },
+    {
+     "method": "CG",
+     "iterations": 331,
+     "relative_residual": 9.324497632425986e-09,
+     "relative_error": 4.5540152592767563e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.012069018999909531,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 301,
+     "relative_residual": 8.697874984508233e-09,
+     "relative_error": 5.046796846096165e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.012951529000019946,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 328,
+     "relative_residual": 8.537230213475761e-09,
+     "relative_error": 1.295051475746123e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.027832507999846712,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 2.192305126526442e-06,
+     "relative_error": 5.5549715594892776e-05,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 12.424846522999815,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -499999.99999999994,
+    "reaction_resultant_N": [
+     -999999.9999999986,
+     -3.425313366278715e-09
+    ],
+    "force_imbalance_rel": 3.750654105363128e-15,
+    "moment_imbalance_Nm": -4.463799996301532e-09,
+    "moment_imbalance_rel": 4.463799996301532e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 4.423782229423519e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6821368597620531,
+    "right_mid_uy_mm": -0.0003143921028667679,
+    "hole_top_ux_mm": 0.3115612848952924,
+    "hole_top_uy_mm": -0.10051132655516172,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6821368597620531,
+    "max_abs_displacement_mm": 0.6821369322126088,
+    "max_von_mises_MPa": 323.7181204406957,
+    "hole_max_sigma_xx_MPa": 332.4518802937572
+   },
+   "case_seconds": 12.862162717000047
+  },
+  {
+   "name": "H-E200-nu0-L2",
+   "object": "H",
+   "level": 2,
+   "question": "material",
+   "E_Pa": 200000000000.0,
+   "nu": 0.0,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.03174201100000573,
+   "diagnostics": {
+    "unknowns": 1414,
+    "stored_nnz": 18964,
+    "numeric_nnz": 18858,
+    "symmetry_rel": 1.0565742413962086e-16,
+    "lambda_min": 1016307.9531091712,
+    "lambda_max": 13901868549.603401,
+    "kappa2": 13678.795395700372,
+    "S_lambda_min": 0.00019389715356266468,
+    "S_lambda_max": 2.0869474359414393,
+    "rho_J": 1.0869474359414393,
+    "kappa2_jacobi_scaled": 10763.166955243461,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 13678.795395564168,
+    "dense_vs_eigsh_kappa_rel": 9.957317410487984e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.15327677100003712
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 5.904705388464108e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004300913000179207,
+     "factor_best_seconds": 0.004125330000078975,
+     "solve_best_seconds": 0.0001755830001002323,
+     "timing_runs": 3,
+     "lu_fill_nnz": 98666
+    },
+    {
+     "method": "CG",
+     "iterations": 278,
+     "relative_residual": 8.597921450100791e-09,
+     "relative_error": 4.3190297148959385e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.01001583200013556,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 259,
+     "relative_residual": 9.695207052697367e-09,
+     "relative_error": 4.752585727645822e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.010957180999866978,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 275,
+     "relative_residual": 8.965088500776135e-09,
+     "relative_error": 1.1947968536810113e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.023388709000073504,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 5.819879527398654e-07,
+     "relative_error": 1.0168848401851996e-05,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 11.993135997000081,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -499999.99999999994,
+    "reaction_resultant_N": [
+     -1000000.0000000058,
+     -5.267111191642471e-10
+    ],
+    "force_imbalance_rel": 5.692391382327636e-15,
+    "moment_imbalance_Nm": 2.190063241869211e-09,
+    "moment_imbalance_rel": 2.190063241869211e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 3.947207005694505e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6812473455775284,
+    "right_mid_uy_mm": -0.00035771343011435733,
+    "hole_top_ux_mm": 0.3088520256798487,
+    "hole_top_uy_mm": -0.09770444445891217,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6812473455775284,
+    "max_abs_displacement_mm": 0.6812474394926755,
+    "max_von_mises_MPa": 325.00449948882135,
+    "hole_max_sigma_xx_MPa": 324.5656443241615
+   },
+   "case_seconds": 12.396270335000054
+  },
+  {
+   "name": "H-E200-nu0.45-L2",
+   "object": "H",
+   "level": 2,
+   "question": "material",
+   "E_Pa": 200000000000.0,
+   "nu": 0.45,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.03150668699981907,
+   "diagnostics": {
+    "unknowns": 1414,
+    "stored_nnz": 18964,
+    "numeric_nnz": 18858,
+    "symmetry_rel": 8.966527380849233e-17,
+    "lambda_min": 905516.3510938378,
+    "lambda_max": 16915971303.755291,
+    "kappa2": 18681.022472229557,
+    "S_lambda_min": 0.00016289689071985282,
+    "S_lambda_max": 2.3878590709098297,
+    "rho_J": 1.3878590709098297,
+    "kappa2_jacobi_scaled": 14658.71484936092,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 18681.02247224382,
+    "dense_vs_eigsh_kappa_rel": 7.635831991429618e-13,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.15626948499993887
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 6.084019247727053e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.004298915999925157,
+     "factor_best_seconds": 0.004122924000057537,
+     "solve_best_seconds": 0.0001759919998676196,
+     "timing_runs": 3,
+     "lu_fill_nnz": 98670
+    },
+    {
+     "method": "CG",
+     "iterations": 332,
+     "relative_residual": 9.977534856403741e-09,
+     "relative_error": 5.871725613957693e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.011597821000123076,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 301,
+     "relative_residual": 9.574124087863375e-09,
+     "relative_error": 6.53620770088322e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.012392266999995627,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 326,
+     "relative_residual": 9.734183364028878e-09,
+     "relative_error": 3.17062631019867e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.027480307000132598,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 4.248995769276582e-07,
+     "relative_error": 8.025813132564338e-06,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 11.340120439999964,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -499999.99999999994,
+    "reaction_resultant_N": [
+     -1000000.0000000029,
+     2.1846062736585736e-09
+    ],
+    "force_imbalance_rel": 3.6507189834899156e-15,
+    "moment_imbalance_Nm": 3.0631781555712223e-09,
+    "moment_imbalance_rel": 3.0631781555712222e-15,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 5.455149221234019e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 0.6694271492321283,
+    "right_mid_uy_mm": -0.0004399314018170212,
+    "hole_top_ux_mm": 0.2980815333884092,
+    "hole_top_uy_mm": -0.09881984399373267,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 0.6694271492321283,
+    "max_abs_displacement_mm": 0.6694272937882743,
+    "max_von_mises_MPa": 330.51104579926067,
+    "hole_max_sigma_xx_MPa": 344.6079288306246
+   },
+   "case_seconds": 11.769686419999971
+  },
+  {
+   "name": "H-E70-nu0.3-L2",
+   "object": "H",
+   "level": 2,
+   "question": "material",
+   "E_Pa": 70000000000.0,
+   "nu": 0.3,
+   "t_m": 0.01,
+   "loads": [
+    {
+     "marker": 3,
+     "traction_Pa": [
+      100000000.0,
+      0
+     ]
+    }
+   ],
+   "supports": [
+    {
+     "kind": "segment",
+     "where": 5,
+     "comps": "xy"
+    }
+   ],
+   "constrained_dofs": 42,
+   "mesh": {
+    "h": 0.05,
+    "triangle_options": "pq30a0.0010825318",
+    "nodes": 728,
+    "triangles": 1356,
+    "boundary_segments": 100,
+    "min_area": 0.0003621291537896617,
+    "all_ccw_positive": true,
+    "min_angle_deg": 30.088287602455228,
+    "max_angle_deg": 119.82342479508954,
+    "edge_min": 0.028893252472490267,
+    "edge_max": 0.06633959266934533,
+    "edge_mean": 0.04111603461589152,
+    "area_sum": 0.9304711762656368,
+    "pslg_area": 0.9304711762656368,
+    "area_rel_error_vs_pslg": 0.0,
+    "area_rel_diff_vs_true_geometry": 0.001245015964047928,
+    "boundary_edges_equal_segments": true,
+    "max_segment_deviation_m": 0.0,
+    "centroids_in_holes": 0,
+    "connected_components": 1,
+    "euler_characteristic": 0,
+    "expected_euler": 0
+   },
+   "assembly_seconds": 0.026408274000004894,
+   "diagnostics": {
+    "unknowns": 1414,
+    "stored_nnz": 18964,
+    "numeric_nnz": 18858,
+    "symmetry_rel": 7.15519378235897e-17,
+    "lambda_min": 327478.77347990527,
+    "lambda_max": 5238876735.664785,
+    "kappa2": 15997.607050968918,
+    "S_lambda_min": 0.0001810533722556821,
+    "S_lambda_max": 2.2690199734071133,
+    "rho_J": 1.2690199734071133,
+    "kappa2_jacobi_scaled": 12532.326491012947,
+    "eig_method": "eigsh LA + shift-invert sigma=0",
+    "diag_positive": true,
+    "dense_kappa2": 15997.607050844872,
+    "dense_vs_eigsh_kappa_rel": 7.754033586372949e-12,
+    "dense_cholesky": "success",
+    "positive_definite": true,
+    "diagnostics_seconds": 0.1543858080001428
+   },
+   "solvers": [
+    {
+     "method": "splu",
+     "iterations": null,
+     "relative_residual": 6.091164069668776e-14,
+     "relative_error": 0.0,
+     "accepted": true,
+     "status": "direct",
+     "best_seconds": 0.003830338999932792,
+     "factor_best_seconds": 0.0036767619999409362,
+     "solve_best_seconds": 0.0001535769999918557,
+     "timing_runs": 3,
+     "lu_fill_nnz": 98667
+    },
+    {
+     "method": "CG",
+     "iterations": 307,
+     "relative_residual": 8.742567245488096e-09,
+     "relative_error": 4.142284490245435e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.009242477000043436,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "PCG (diagonal)",
+     "iterations": 281,
+     "relative_residual": 8.230325289668624e-09,
+     "relative_error": 3.141465237516578e-10,
+     "accepted": true,
+     "status": "native_info=0",
+     "best_seconds": 0.010557300000073155,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "MINRES",
+     "iterations": 302,
+     "relative_residual": 9.171770620635035e-09,
+     "relative_error": 2.535529141378111e-09,
+     "accepted": true,
+     "status": "callback_target",
+     "best_seconds": 0.022647374999905878,
+     "timing_runs": 3,
+     "timing_note": "best of 3"
+    },
+    {
+     "method": "Gauss-Seidel",
+     "iterations": 20000,
+     "relative_residual": 4.57360984721006e-07,
+     "relative_error": 8.465992602681413e-06,
+     "accepted": false,
+     "status": "iteration_limit",
+     "best_seconds": 12.445121977999861,
+     "timing_runs": 1,
+     "timing_note": "single timed run without history (Gauss-Seidel cost policy)"
+    }
+   ],
+   "validation": {
+    "applied_resultant_N": [
+     1000000.0,
+     0.0
+    ],
+    "applied_moment_origin_Nm": -499999.99999999994,
+    "reaction_resultant_N": [
+     -1000000.0000000001,
+     2.673914423212409e-09
+    ],
+    "force_imbalance_rel": 2.7070107166067086e-15,
+    "moment_imbalance_Nm": -3.710738383233547e-10,
+    "moment_imbalance_rel": 3.710738383233547e-16,
+    "max_support_displacement_m": 0.0,
+    "free_residual_force_rel": 5.37784217158332e-14
+   },
+   "response": {
+    "right_mid_ux_mm": 1.9322765439149436,
+    "right_mid_uy_mm": -0.0010776216897241428,
+    "hole_top_ux_mm": 0.8696689364302161,
+    "hole_top_uy_mm": -0.28074777484623453,
+    "matched_point": "right_mid",
+    "matched_component": "x",
+    "matched_value_mm": 1.9322765439149436,
+    "max_abs_displacement_mm": 1.9322768444072358,
+    "max_von_mises_MPa": 326.24561958125076,
+    "hole_max_sigma_xx_MPa": 334.9985855346216
+   },
+   "case_seconds": 12.831232629999931
+  }
+ ],
+ "negative_control": {
+  "case": "H-rolleronly-L1",
+  "supports": "u_x = 0 on left edge only",
+  "unknowns": 391,
+  "lambda_min": 1.7342214520204073e-06,
+  "lambda_2": 8019495.529486758,
+  "lambda_max": 16003082746.932781,
+  "lambda_min_over_max": 1.0836796131375348e-16,
+  "dense_cholesky": "failed: Internal potrf return info = [391] for slices [0].",
+  "note": "expected one zero eigenvalue (rigid vertical translation); not solved"
+ },
+ "structured_square": [
+  {
+   "cells_per_side": 10,
+   "nodes": 121,
+   "triangles": 200,
+   "unknowns": 220,
+   "stored_nnz": 2752,
+   "kappa2": 2469.4758071049073,
+   "right_mid_ux_mm": 0.4908102935078857,
+   "top_right_ux_mm": 0.4938485633526277,
+   "cg_iterations": 119,
+   "pcg_iterations": 108
+  },
+  {
+   "cells_per_side": 20,
+   "nodes": 441,
+   "triangles": 800,
+   "unknowns": 840,
+   "stored_nnz": 11112,
+   "kappa2": 9103.940945292885,
+   "right_mid_ux_mm": 0.4915989892039077,
+   "top_right_ux_mm": 0.49550874507056314,
+   "cg_iterations": 242,
+   "pcg_iterations": 226
+  },
+  {
+   "cells_per_side": 30,
+   "nodes": 961,
+   "triangles": 1800,
+   "unknowns": 1860,
+   "stored_nnz": 25072,
+   "kappa2": 19796.095852918774,
+   "right_mid_ux_mm": 0.4918090057654755,
+   "top_right_ux_mm": 0.4959083257838958,
+   "cg_iterations": 357,
+   "pcg_iterations": 335
+  },
+  {
+   "cells_per_side": 40,
+   "nodes": 1681,
+   "triangles": 3200,
+   "unknowns": 3280,
+   "stored_nnz": 44632,
+   "kappa2": 34547.65893951825,
+   "right_mid_ux_mm": 0.4918999090234799,
+   "top_right_ux_mm": 0.4960729842293594,
+   "cg_iterations": 469,
+   "pcg_iterations": 446
+  }
+ ],
+ "total_seconds": 647.6499219380001
+}

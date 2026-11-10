@@ -4,6 +4,8 @@ This is the **only shared writing guide** for the report. Edit this file when th
 
 ## Style, length and readability
 
+- Write for third-year applied mathematics students: assume linear algebra and an introductory numerical linear algebra course, but not finite elements, elasticity or software internals. Keep the key equations and a short reason for each claim; leave implementation details (library flags, stopping-test mechanics, storage conventions) to READMEs and scripts. State each limitation once, where it matters.
+
 - Use the existing [introduction](sections/01-introduction/section.tex) as the style baseline: explain the physical meaning, introduce the necessary equation, then define its symbols. Later sections may need more detail, but should keep the same direct prose.
 - Write direct, plain academic prose in English. Explain the purpose and physical meaning before introducing notation; explain technical terms when first needed.
 - Use short, connected paragraphs, each with one main idea. Use lists only for actual steps or items to compare. Avoid filler, dense jargon, awkward opening lists and unnecessary commas.

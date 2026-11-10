@@ -52,20 +52,20 @@ def panel(ax, obj, title):
     ax.set_aspect("equal")
     ax.axis("off")
     c = m["checks"]
-    ax.set_title(f"{title}\nlevel 1: {c['nodes']} nodes, {c['triangles']} triangles",
+    ax.set_title(f"{title}: {c['nodes']} nodes, {c['triangles']} triangles",
                  fontsize=8, color=INK, pad=3)
     return m
 
 
 def main():
     FIG.mkdir(parents=True, exist_ok=True)
-    fig = plt.figure(figsize=(6.3, 3.35))
-    gs = fig.add_gridspec(2, 3, height_ratios=[1.0, 0.42], hspace=0.28, wspace=0.12,
-                          left=0.03, right=0.97, top=0.92, bottom=0.02)
+    fig = plt.figure(figsize=(6.3, 2.75))
+    gs = fig.add_gridspec(2, 3, height_ratios=[1.0, 0.36], hspace=0.12, wspace=0.08,
+                          left=0.02, right=0.98, top=0.94, bottom=0.0)
     ys = np.linspace(0.05, 0.95, 7)
     # (a) square
     ax = fig.add_subplot(gs[0, 0])
-    panel(ax, "S", "(a) square S")
+    panel(ax, "S", "(a) S")
     clamp(ax, 0, 0, 1, 0.05)
     arrows(ax, np.column_stack([np.ones(7), ys]), np.array([0.16, 0]), LOAD)
     point(ax, (1, .5), "", 0, 0)
@@ -73,7 +73,7 @@ def main():
     ax.set_xlim(-0.1, 1.2); ax.set_ylim(-0.05, 1.1)
     # (b) hole plate
     ax = fig.add_subplot(gs[0, 1])
-    panel(ax, "H", "(b) plate with hole H")
+    panel(ax, "H", "(b) H")
     clamp(ax, 0, 0, 1, 0.05)
     arrows(ax, np.column_stack([np.ones(7), ys]), np.array([0.16, 0]), LOAD)
     point(ax, (1, .5), "", 0, 0)
@@ -83,7 +83,7 @@ def main():
     ax.set_xlim(-0.1, 1.2); ax.set_ylim(-0.05, 1.1)
     # (c) L-bracket
     ax = fig.add_subplot(gs[0, 2])
-    panel(ax, "L", "(c) L-bracket L")
+    panel(ax, "L", "(c) L")
     clamp(ax, 0, 0, 1, 0.05)
     arrows(ax, np.column_stack([np.ones(4), np.linspace(0.05, 0.45, 4)]), np.array([0.16, 0]), LOAD)
     arrows(ax, np.column_stack([np.linspace(0.05, 0.45, 4), np.ones(4)]), np.array([0, 0.16]), ALT,
@@ -94,7 +94,7 @@ def main():
     ax.set_xlim(-0.1, 1.2); ax.set_ylim(-0.05, 1.2)
     # (d) beam
     ax = fig.add_subplot(gs[1, :])
-    panel(ax, "B", "(d) cantilever beam B (4 m x 0.5 m)")
+    panel(ax, "B", "(d) B (4 m x 0.5 m)")
     clamp(ax, 0, 0, .5, 0.06)
     # downward shear traction on the tip face, drawn just outside the edge
     arrows(ax, np.column_stack([np.full(3, 4.07), [0.16, 0.32, 0.48]]),
