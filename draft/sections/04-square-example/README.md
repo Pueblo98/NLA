@@ -1,24 +1,28 @@
 # Section 4. Simple Square Demonstration
 
-**Status: workspace ready; no section prose has been drafted by this reorganisation.**
+**Status: AI-assisted working draft for team review (10 Nov 2026); not approved.**
 
-## Scope
+Scope: [ROADMAP Section 4](../../ROADMAP.md#4-simple-square-demonstration); style: [WRITING_RULES](../../WRITING_RULES.md).
 
-Use [the Section 4 roadmap entry](../../ROADMAP.md#4-simple-square-demonstration) as the source of truth for this section's purpose, required contents, boundaries and expected output. Do not duplicate or silently redefine that scope here.
+## Contents
+- Case specification of the clamped square under uniform traction (`fem/plate.py:force_driven`).
+- 2x2-cell worked system: free unknowns, `b`, the 12x12 `A` in exact integer-scaled form, eigenvalues/kappa_2, PA=LU / inverse / Cholesky residuals, right-edge displacements.
+- 20x20-cell system (N = 840): all protocol methods (Table 1, Fig. 2), kappa_2 and rho_J linked to Jacobi divergence, damped Jacobi/SD stall, CG vs the sqrt(kappa) bound, PCG, GMRES cost, sparse LU.
+- Deformed view (Fig. 1c, x200) and validation: supports, force/moment balance with reactions, solver agreement, affine patch test.
+- One forward pointer to Section 6 for refinement.
 
-Follow [the shared writing rules](../../WRITING_RULES.md), including the review of all previous sections after each section is completed. Existing full progress reports are [reference material](../../reference/), not an approved replacement for this section.
+## Files
+- `section.tex`, `main.tex` (preview; contains preview-only `\stublabel` stand-ins for Sections 2, 3, 6 labels — drop them in the combined report), `references.bib` (entries copied verbatim from Section 3), `build.sh`, `preview.pdf`.
+- `figures/square_setup.{pdf,png}` (schematic, 2x2 numbering, deformed plate), `figures/square_residuals.{pdf,png}`.
 
-## Files to add when this section is requested
+## Reproduce
+From the repository root: `python3 draft/experiments/square.py` (about 1 min; reruns timings).
+`python3 draft/experiments/square.py --figures-only` redraws figures without retiming.
+Outputs in `draft/experiments/results/square/`: `small.json`, `small_A.csv`, `small_A_integer.csv`,
+`small_b.csv`, `small_x.csv`, `solvers.json`, `solver_comparison.csv`, `histories.json`,
+`validation.json`, `refinement.json` (5..80 cells and the seeded 1e-6 load perturbation, for Section 6), `square.log`.
+Timings in Table 1 are from the last full run recorded in `solvers.json`; timings vary between runs.
 
-- `section.tex`: only this section's body, suitable for later inclusion in the combined report.
-- `main.tex`: standalone preview wrapper.
-- `references.bib` and `figures/`: references and assets actually used by this section.
-- `preview.pdf`: compiled and visually checked against the current source.
-
-Do not create these as empty report stubs or claim the section is completed. Record the agreed section owner, review status and unresolved decisions below when the section thread starts.
-
-## Handoff status
-
-- Owner: not assigned here.
-- Draft/review: not started in this workspace.
-- Next action: open the individual section thread and apply the shared writing rules and confirm the required inputs.
+## Open decisions
+- Body is about 2.5 preview pages, above the 1.5–2 page target. Possible cuts: move the 12x12 matrix to an appendix/CSV, or drop panel (a) of Fig. 2.
+- Load-perturbation result (4.51e-7 vs kappa bound 9.1e-3) is saved but left to Section 6.

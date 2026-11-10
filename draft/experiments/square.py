@@ -1,6 +1,7 @@
 """Section 4 square demonstration: fresh numbers and figures.
 
 Run from the repository root:  python3 draft/experiments/square.py
+(add --figures-only to redraw the figures from saved results without rerunning timings)
 
 Case: fem/plate.py:force_driven -- 1 m x 1 m plate, E = 200 GPa, nu = 0.3,
 t = 0.01 m, plane stress, left edge clamped, uniform traction (p, 0) with
@@ -378,7 +379,7 @@ def figures(small_s, s20, d20, hists, rows):
     ax.set_xlim(-0.05, 1.15)
     ax.set_ylim(-0.05, 1.05)
     ax.tick_params(labelsize=6.5)
-    ax.set_title(rf"(c) deformed $20\times20$, $\times{SCALE}$")
+    ax.set_title(rf"(c) $20\times20$ cells, deformed $\times{SCALE}$")
     save(fig, "square_setup")
 
     # ---- Figure: residual histories ----
@@ -410,12 +411,24 @@ def figures(small_s, s20, d20, hists, rows):
 def save(fig, name):
     import matplotlib.pyplot as plt
     FIG.mkdir(parents=True, exist_ok=True)
-    fig.savefig(FIG / f"{name}.pdf")
-    fig.savefig(FIG / f"{name}.png", dpi=200)
+    fig.savefig(FIG / f"{name}.pdf", bbox_inches="tight", pad_inches=0.02)
+    fig.savefig(FIG / f"{name}.png", dpi=200, bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
 
 
+def figures_only():
+    """Redraw the figures from saved histories and fresh direct solves (no timing)."""
+    hists = json.loads((OUT / "histories.json").read_text())
+    small_s = force_driven(2)
+    s20 = force_driven(20)
+    d20 = full_solution(s20, splu(s20["A"].tocsc()).solve(s20["b"]))
+    figures(small_s, s20, d20, hists, None)
+
+
 def main():
+    if "--figures-only" in sys.argv:
+        figures_only()
+        return
     OUT.mkdir(parents=True, exist_ok=True)
     pb.known_answer_checks()
     log("known_answer_checks passed; environment " + json.dumps(env()))

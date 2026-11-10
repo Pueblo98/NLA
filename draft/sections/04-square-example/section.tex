@@ -42,7 +42,7 @@ $b=2.5\times10^5\,(0,0,1,0,0,0,2,0,0,0,1,0)^T$~N. For $\nu=0.3$ every entry
 of $A$ is an integer multiple of $Et/(40(1-\nu^2))=5.495\times10^7$~N/m:
 \begin{equation}
  \setlength{\arraycolsep}{3.2pt}
- A=\frac{Et}{40(1-\nu^2)}\scriptsize
+ A=\frac{Et}{40(1-\nu^2)}\mbox{\footnotesize$
  \left[\begin{array}{@{}*{12}{r}@{}}
  54 & -13 & -20 & 6 & -14 & 13 & \cdot & -13 & \cdot & \cdot & \cdot & \cdot \\
  -13 & 54 & 7 & -7 & 13 & -40 & -13 & \cdot & \cdot & \cdot & \cdot & \cdot \\
@@ -56,7 +56,7 @@ of $A$ is an integer multiple of $Et/(40(1-\nu^2))=5.495\times10^7$~N/m:
  \cdot & \cdot & \cdot & \cdot & 13 & -40 & \cdot & \cdot & -13 & 54 & 6 & -7 \\
  \cdot & \cdot & \cdot & \cdot & \cdot & -13 & -7 & 7 & -20 & 6 & 27 & \cdot \\
  \cdot & \cdot & \cdot & \cdot & -13 & \cdot & 6 & -20 & 7 & -7 & \cdot & 27
- \end{array}\right].
+ \end{array}\right]$}.
  \label{eq:square-small-matrix}
 \end{equation}
 Dots are zeros, mostly between nodes without a common triangle, such as 1
@@ -95,15 +95,15 @@ the methods.
  \toprule
  Method & Iterations & Final $\eta$ & Error vs LU & Time (ms) & Stop \\
  \midrule
- Sparse LU (\texttt{splu}) & -- & $3.5\times10^{-14}$ & -- & $2.12+0.09$ & factor + solve \\
- Jacobi* & 49 & $1.3\times10^{10}$ & $3.4\times10^{7}$ & 0.78 & divergence guard \\
- Damped Jacobi ($\omega=0.5$)* & 20{,}000 & $4.8\times10^{-6}$ & $8.7\times10^{-5}$ & 246 & iteration cap \\
- Gauss--Seidel & 19{,}136 & $1.0\times10^{-8}$ & $1.7\times10^{-7}$ & 7{,}437 & target \\
- Steepest descent* & 20{,}000 & $3.1\times10^{-6}$ & $4.2\times10^{-5}$ & 532 & iteration cap \\
- CG & 242 & $8.8\times10^{-9}$ & $9.6\times10^{-10}$ & 5.3 & target \\
- Diagonal PCG & 226 & $8.8\times10^{-9}$ & $4.9\times10^{-10}$ & 5.3 & target \\
- MINRES & 236 & $9.4\times10^{-9}$ & $5.9\times10^{-9}$ & 11.0 & target \\
- Full GMRES ($\text{restart}=N$) & 228 & $9.5\times10^{-9}$ & $6.0\times10^{-9}$ & 150 & target \\
+ Sparse LU (\texttt{splu}) & -- & $3.5\times10^{-14}$ & -- & $2.20+0.09$ & factor + solve \\
+ Jacobi* & 49 & $1.3\times10^{10}$ & $3.4\times10^{7}$ & 0.65 & divergence guard \\
+ Damped Jacobi ($\omega=0.5$)* & 20{,}000 & $4.8\times10^{-6}$ & $8.7\times10^{-5}$ & 284 & iteration cap \\
+ Gauss--Seidel & 19{,}136 & $1.0\times10^{-8}$ & $1.7\times10^{-7}$ & 7{,}178 & target \\
+ Steepest descent* & 20{,}000 & $3.1\times10^{-6}$ & $4.2\times10^{-5}$ & 541 & iteration cap \\
+ CG & 242 & $8.8\times10^{-9}$ & $9.6\times10^{-10}$ & 5.4 & target \\
+ Diagonal PCG & 226 & $8.8\times10^{-9}$ & $4.9\times10^{-10}$ & 6.8 & target \\
+ MINRES & 236 & $9.4\times10^{-9}$ & $5.9\times10^{-9}$ & 13.7 & target \\
+ Full GMRES ($\text{restart}=N$) & 228 & $9.5\times10^{-9}$ & $6.0\times10^{-9}$ & 186 & target \\
  \bottomrule
  \end{tabular}
 \end{table}
@@ -136,9 +136,9 @@ iterations; CG needs about a quarter of this, because the bound uses only
 the extreme eigenvalues~\cite{shewchuk-cg}. Diagonal preconditioning helps little:
 $\kappa_2(S)=8029$ is only 12\% below $\kappa_2(A)$, since the diagonal of
 $A$ varies only near the boundary, and PCG saves 16 iterations. Full GMRES
-needs the fewest iterations but is 28 times slower than CG, the cost of
+needs the fewest iterations but is 35 times slower than CG, the cost of
 orthogonalizing against all previous basis vectors~\cite{saad-iterative}. At this size, sparse
-LU factorization and solve together take 2.2~ms, less than any iterative
+LU factorization and solve together take 2.3~ms, less than any iterative
 method.
 
 Equal residual targets do not give equal accuracy: the errors of
@@ -154,8 +154,8 @@ edges move inwards by $0.077$ and $0.079$~mm, together matching the free
 lateral contraction $\nu pL/E=0.15$~mm. The clamp prevents this
 contraction at $x=0$, producing the tapered shape.
 
-We check this solution in three ways. All 42 prescribed components are
-exactly zero in the reconstructed $d$. The reactions of
+For validation, all 42 prescribed components are exactly zero in the
+reconstructed $d$. The reactions of
 Eq.~\eqref{eq:mechanics-reactions} sum to $-1.000\times10^6$~N in $x$,
 leaving a force imbalance of $(-4.0,-2.6)\times10^{-9}$~N and a moment
 imbalance about the origin of $4.5\times10^{-9}$~N\,m, against an applied
