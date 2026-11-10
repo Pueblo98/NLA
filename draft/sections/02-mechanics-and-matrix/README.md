@@ -1,6 +1,6 @@
 # Section 2. Displacement, Forces and Matrix Construction
 
-**Status: Section 2 source drafted for team review on 10 November 2026; PDF compilation blocked locally. Not final.**
+**Status: Section 2 remains a review draft. Hermes reports successful compilation and visual inspection of the unchanged source in the Section 2 Slack thread on 10 November 2026. The compiled artifact is not present in this checkout; local compilation remains blocked.**
 
 ## Scope
 
@@ -14,8 +14,9 @@ Follow [the shared writing rules](../../WRITING_RULES.md), including the review 
 - [main.tex](main.tex): standalone A4/11 pt preview wrapper with 25 mm margins, using section number 2. It is not the final course template.
 - [references.bib](references.bib): four cited primary educational/documentation sources, checked online on 10 November. URLs also appear in the notes so the `amsplain` bibliography retains them.
 - [build.sh](build.sh): compiles the exact LaTeX source to `main.pdf` with Tectonic or pdflatex/BibTeX.
-- [build-status.txt](build-status.txt): the failed local compilation's diagnostic output.
-- `preview.pdf`: **not generated**. No compiled PDF or layout verification is claimed.
+- [build-status.txt](build-status.txt): historical diagnostic output from the failed local compilation; it does not describe Hermes's later successful build.
+- `preview.pdf`: **absent from this checkout**. Hermes reports attaching the compiled PDF in Slack; independent artifact verification and repository synchronization remain pending.
+- [review-2026-11-10.md](review-2026-11-10.md): proposed prose cuts and cross-section integration checks. The LaTeX body is unchanged.
 
 ## Draft decisions and boundaries
 
@@ -56,7 +57,7 @@ sh build.sh
 cp main.pdf preview.pdf
 ```
 
-Please attach that PDF in the section-two Slack thread and record the page count and compiler checks here. If compilation reveals layout or length issues, revise prose within this folder, recompile and review again before replacing the preview. Retain normal fonts, margins and spacing. Keep this module subject to team review; final-template integration and the report's overall 10-page limit remain to be checked.
+Hermes has since reported successful Tectonic compilation of the unchanged source, three pages including references, resolved equation references/citations, and visual inspection without clipping or overflow. This is teammate-reported evidence from Slack, not an independent local check. Please save that exact-source PDF as `preview.pdf` here and retain the build evidence alongside it. If the proposed prose cuts are incorporated, compile and visually inspect the revised source before replacing the preview. Retain normal fonts, margins and spacing. Keep this module subject to team review; final-template integration and the report's overall 10-page limit remain to be checked.
 
 ## Attribution and disclosure
 
@@ -64,7 +65,7 @@ This is AI-assisted prose and mathematical exposition drafted by Lucas's Codex u
 
 ## Handoff status
 
-- Contribution: Lucas's Codex drafted the section; Hermes is requested to review modelling assumptions and compile/attach the PDF.
-- Draft/review: source checks and existing FEM checks passed; human review and visual PDF review pending.
+- Contribution: Lucas's Codex drafted the section and proposed simplifications; Hermes reports compiling, visually inspecting and attaching the unchanged-source PDF in Slack.
+- Draft/review: source checks and existing FEM checks passed; Hermes's PDF review is recorded as reported evidence. Team review of the section and proposed cuts remains pending.
 - Open decisions: confirm plane-stress baseline; obtain the supplied assembly routine or explicit permission for the alternative.
-- Next action: compile this exact source with a working TeX bundle, inspect and attach the PDF, then incorporate team feedback. Do not post it as a final draft yet.
+- Next action: synchronize Hermes's reviewed PDF and build evidence into this folder. Incorporate agreed prose cuts, then rebuild and inspect the exact revised source. When merging bibliographies, retain a single `shewchuk-triangle` entry with its URL in `note` for `amsplain`; see the review note. Do not post it as a final draft yet.
