@@ -1,0 +1,12 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_linear_edge_load_exact_integrals_and_resultants _____________
+
+    def test_linear_edge_load_exact_integrals_and_resultants():
+>       from generate_evidence import linear_edge_load
+E       ModuleNotFoundError: No module named 'generate_evidence'
+
+test_evidence.py:7: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED test_evidence.py::test_linear_edge_load_exact_integrals_and_resultants
+1 failed in 0.26s
