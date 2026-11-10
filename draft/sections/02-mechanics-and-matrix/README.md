@@ -1,6 +1,6 @@
 # Section 2. Displacement, forces and matrix construction
 
-**Status: readability rewrite for team review, 10 November 2026.** Lucas explicitly requested a less technical, connected explanation in the Section 2 Slack thread. That request authorizes applying the revision; the earlier proposed cuts are superseded by this rewrite. The revised source has passed static checks, but no PDF matching it has been built or visually inspected here.
+**Status: simplified for third-year level, 10 November 2026 (AI-assisted, for team review; not final).** Light trims to about 1.6 preview pages of body: precise thickness statement (K and f both proportional to t under traction loading, so d is independent of t), present-tense mesh sentence (structured square mesh in Section 4, Triangle for other objects in Section 5), shorter assembly footnote, eigensolver sentence moved to Section 3. `main.tex` now defines preview labels for Sections 4 and 5 and starts equations at (4). Built with pdflatex/BibTeX and inspected; `preview.pdf` matches the current source. The `scipy-eigsh` entry in `references.bib` is no longer cited here (Section 3 cites it). Build-failure notes below are historical.
 
 Follow the [shared writing rules](../../WRITING_RULES.md) and [Section 2 roadmap](../../ROADMAP.md#2-displacement-forces-and-matrix-construction).
 
