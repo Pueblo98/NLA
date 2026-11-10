@@ -1,0 +1,72 @@
+% AI-assisted working draft for team review, not an approved final section.
+% Requires amsmath and graphicx. Merge references.bib into the report bibliography.
+\section{Building the model}
+\label{sec:building-model}
+
+We study how the geometry of a two-dimensional elastic object and its
+supports affect its response to applied forces. Our unknown is the displacement
+$\mathbf{u}(x,y)$, which tells us how far each point moves horizontally and
+vertically. Differences in movement between nearby points describe local
+stretching and shearing, called strain. The material resists these changes
+through internal forces per unit area, called stress. We assume small
+deformations and a linear relation between strain and stress, leaving the
+material choice to the individual cases~\cite{logg-langtangen-elasticity}.
+
+We look for the shape after the object has settled under the load. Forces
+must then balance in both directions throughout the material:
+\begin{equation}
+ \frac{\partial\sigma_{xx}}{\partial x}
+ +\frac{\partial\sigma_{xy}}{\partial y}+g_x=0,\qquad
+ \frac{\partial\sigma_{xy}}{\partial x}
+ +\frac{\partial\sigma_{yy}}{\partial y}+g_y=0.
+ \label{eq:model-field-balance}
+\end{equation}
+Here the $\sigma$ terms are stress components and $g_x,g_y$ are applied
+forces per unit volume. Since stress depends on strain, and strain depends
+on displacement, Eq.~\eqref{eq:model-field-balance} gives equations for
+$\mathbf{u}$. We also specify where forces act on the boundary and which
+movements the supports prevent.
+
+To make this a finite problem, we divide the region into filled triangles
+as shown in Fig.~\ref{fig:model-triangulation},
+following its boundary and leaving any holes empty~\cite{shewchuk-triangle}.
+Their vertices are the mesh nodes, each with two unknown displacement
+components. Inside each triangle, displacement varies linearly between
+its three vertex values. Adjacent triangles share these values, so their
+displacements agree along the common edge. This represents movement
+throughout the solid; the triangle edges are not physical bars. Smaller
+triangles allow us to capture more variation in the deformation.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/triangulation.pdf}
+ \caption{Triangulation of an illustrative region. The filled triangles
+ cover the same solid area and share nodes along their edges. Displacement
+ is approximated throughout each triangle using its three vertex values.
+ The outline is an example, not a selected project geometry.}
+ \label{fig:model-triangulation}
+\end{figure}
+
+The finite element method applies Eq.~\eqref{eq:model-field-balance}
+by balancing internal and external work, meaning forces acting through
+small allowed displacements. Using the triangle approximation and adding
+contributions at shared nodes gives
+\begin{equation}
+ Kd=f+r,
+ \label{eq:model-full-balance}
+\end{equation}
+where $d$ collects node displacements, $f$ the applied forces and $r$ the
+forces exerted by supports. The stiffness matrix $K$ describes how the
+mesh and material resist displacement. Most entries are zero because
+only nodes in a common triangle interact directly.
+
+Finally, we separate unknown displacements ($F$) from values prescribed
+at supports ($C$). The free rows of Eq.~\eqref{eq:model-full-balance} become
+\begin{equation}
+ Ax=b.
+ \label{eq:model-reduced-system}
+\end{equation}
+Here $A=K_{FF}$, $x=d_F$ and $b=f_F-K_{FC}d_C$; for fixed supports,
+$d_C=0$ and $b=f_F$. Supports must prevent each separate piece from
+freely sliding or turning. Solving Eq.~\eqref{eq:model-reduced-system}
+then gives the displacements used to draw the deformed object.
