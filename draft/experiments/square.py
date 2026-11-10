@@ -19,7 +19,7 @@ Outputs (draft/experiments/results/square/):
   solvers.json, solver_comparison.csv, histories.json
   validation.json, refinement.json, square.log
 Figures (draft/sections/04-square-example/figures/, PDF + PNG):
-  square_setup, square_residuals, square_deformed
+  square_setup (schematic, 2x2 numbering, deformed 20x20), square_residuals
 """
 from pathlib import Path
 import csv
@@ -307,101 +307,104 @@ def figures(small_s, s20, d20, hists, rows):
     from matplotlib.tri import Triangulation
     plt.rcParams.update({"font.size": 8, "axes.titlesize": 8.5, "pdf.fonttype": 42})
 
-    # ---- Figure: setup (schematic) and 2 x 2 mesh numbering ----
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.75), constrained_layout=True)
+    # ---- Figure: setup, 2 x 2 mesh numbering and deformed 20 x 20 plate ----
+    fig, axes = plt.subplots(1, 3, figsize=(6.5, 2.25), constrained_layout=True,
+                             gridspec_kw=dict(width_ratios=[1.0, 1.0, 1.15]))
     ax = axes[0]
     ax.add_patch(Rectangle((0, 0), 1, 1, fc="#e8eef5", ec="black", lw=1))
     ax.add_patch(Rectangle((-0.09, -0.05), 0.09, 1.1, fc="none", ec="none", hatch="////"))
     ax.plot([0, 0], [-0.05, 1.05], color="black", lw=2)
     for y in np.linspace(0.05, 0.95, 7):
-        ax.annotate("", xy=(1.25, y), xytext=(1.0, y),
-                    arrowprops=dict(arrowstyle="->", color="#b2182b", lw=1))
-    ax.text(1.28, 0.5, r"$\bar\tau=(p,0)$" "\n" r"$p=100$ MPa", va="center", fontsize=8,
-            color="#b2182b")
-    ax.text(-0.13, 0.5, r"clamped: $u_x=u_y=0$", rotation=90, va="center", ha="center")
-    ax.text(0.5, 1.04, "traction-free", ha="center", va="bottom")
-    ax.text(0.5, -0.04, "traction-free", ha="center", va="top")
-    ax.annotate("", xy=(0, -0.2), xytext=(1, -0.2), arrowprops=dict(arrowstyle="<->", lw=0.8))
-    ax.text(0.5, -0.23, r"$L=1$ m", ha="center", va="top")
-    ax.text(0.5, 0.5, "E = 200 GPa\n" r"$\nu=0.3$, $t=0.01$ m" "\nplane stress",
-            ha="center", va="center")
-    ax.annotate("", xy=(0.17, 0.08), xytext=(0.05, 0.08), arrowprops=dict(arrowstyle="->", lw=0.7))
-    ax.annotate("", xy=(0.05, 0.2), xytext=(0.05, 0.08), arrowprops=dict(arrowstyle="->", lw=0.7))
-    ax.text(0.18, 0.08, "$x$", va="center")
-    ax.text(0.05, 0.21, "$y$", ha="center", va="bottom")
-    ax.set_xlim(-0.25, 1.75)
+        ax.annotate("", xy=(1.22, y), xytext=(1.0, y),
+                    arrowprops=dict(arrowstyle="->", color="#b2182b", lw=0.9))
+    ax.text(1.1, 1.06, r"$p$", color="#b2182b", ha="center", va="bottom")
+    ax.text(-0.14, 0.5, r"clamped $u_x=u_y=0$", rotation=90, va="center", ha="center",
+            fontsize=7)
+    ax.text(0.5, 1.03, "free", ha="center", va="bottom", fontsize=7)
+    ax.text(0.5, -0.03, "free", ha="center", va="top", fontsize=7)
+    ax.annotate("", xy=(0, -0.2), xytext=(1, -0.2), arrowprops=dict(arrowstyle="<->", lw=0.7))
+    ax.text(0.5, -0.23, r"$L=1$ m", ha="center", va="top", fontsize=7)
+    ax.text(0.53, 0.55, "$E=200$ GPa\n" r"$\nu=0.3$" "\n" r"$t=0.01$ m" "\n" r"$p=100$ MPa",
+            ha="center", va="center", fontsize=7)
+    ax.annotate("", xy=(0.17, 0.08), xytext=(0.05, 0.08), arrowprops=dict(arrowstyle="->", lw=0.6))
+    ax.annotate("", xy=(0.05, 0.2), xytext=(0.05, 0.08), arrowprops=dict(arrowstyle="->", lw=0.6))
+    ax.text(0.18, 0.08, "$x$", va="center", fontsize=7)
+    ax.text(0.05, 0.21, "$y$", ha="center", va="bottom", fontsize=7)
+    ax.set_xlim(-0.22, 1.3)
     ax.set_ylim(-0.35, 1.15)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_title("(a) geometry, supports and load")
+    ax.set_title("(a) geometry, supports, load")
 
     ax = axes[1]
     xy, tri = small_s["nodes"], small_s["triangles"]
-    ax.triplot(Triangulation(xy[:, 0], xy[:, 1], tri), color="0.4", lw=0.8)
+    ax.triplot(Triangulation(xy[:, 0], xy[:, 1], tri), color="0.55", lw=0.7)
     free_nodes = sorted(set((small_s["free"] // 2).tolist()))
     for node, (x, y) in enumerate(xy):
         if node in free_nodes:
             k = free_nodes.index(node)
-            ax.plot(x, y, "o", color="#2166ac", ms=5)
-            lab = rf"$x_{{{2*k+1}}},x_{{{2*k+2}}}$"
-            ax.text(x + 0.03, y + 0.03, f"{node}: " + lab, fontsize=7, color="#2166ac")
+            ax.plot(x, y, "o", color="#2166ac", ms=4)
+            ax.text(x - 0.03, y + 0.04, f"{node}", fontsize=6.5, ha="right", color="#2166ac")
+            ax.text(x + 0.03, y - 0.1, rf"$x_{{{2*k+1}}},x_{{{2*k+2}}}$", fontsize=6.5,
+                    color="#2166ac")
         else:
-            ax.plot(x, y, "s", mfc="white", mec="black", ms=5)
-            ax.text(x - 0.04, y + 0.03, f"{node}", fontsize=7, ha="right")
+            ax.plot(x, y, "s", mfc="white", mec="black", ms=4)
+            ax.text(x - 0.04, y + 0.04, f"{node}", fontsize=6.5, ha="right")
     for y, w in zip((0, 0.5, 1), (0.25, 0.5, 0.25)):
-        ax.annotate("", xy=(1.0 + 0.5 * w + 0.05, y), xytext=(1.0, y),
-                    arrowprops=dict(arrowstyle="->", color="#b2182b", lw=1))
-        ax.text(1.0 + 0.5 * w + 0.07, y - 0.07, f"{w:g} MN", color="#b2182b", fontsize=7)
-    ax.set_xlim(-0.15, 1.55)
-    ax.set_ylim(-0.15, 1.15)
+        ax.annotate("", xy=(1.0 + 0.6 * w + 0.04, y), xytext=(1.0, y),
+                    arrowprops=dict(arrowstyle="->", color="#b2182b", lw=0.9))
+        ax.text(1.0 + 0.6 * w + 0.06, y + 0.05, f"{w:g}", color="#b2182b", fontsize=6.5)
+    ax.text(1.27, -0.2, "MN", color="#b2182b", fontsize=6.5, ha="center")
+    ax.set_xlim(-0.15, 1.5)
+    ax.set_ylim(-0.3, 1.15)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_title(r"(b) $2\times2$ cells: nodes, unknowns, nodal loads")
+    ax.set_title(r"(b) $2\times2$ cells: unknowns, $b$")
+
+    ax = axes[2]
+    U = d20.reshape(-1, 2)
+    xy = s20["nodes"]
+    dxy = xy + SCALE * U
+    mag = np.linalg.norm(U, axis=1) * 1e3
+    tr = Triangulation(dxy[:, 0], dxy[:, 1], s20["triangles"])
+    pc = ax.tripcolor(tr, mag, shading="gouraud", cmap="viridis")
+    ax.triplot(tr, color="white", lw=0.15, alpha=0.5)
+    ax.plot([0, 1, 1, 0, 0], [0, 0, 1, 1, 0], "k--", lw=0.8)
+    ax.plot([0, 0], [0, 1], color="black", lw=2)
+    fig.colorbar(pc, ax=ax, label=r"$|\mathbf{u}|$ [mm]", shrink=0.85, pad=0.02)
+    ax.set_aspect("equal")
+    ax.set_xlabel("$x$ [m]", labelpad=1)
+    ax.set_ylabel("$y$ [m]", labelpad=1)
+    ax.set_xlim(-0.05, 1.15)
+    ax.set_ylim(-0.05, 1.05)
+    ax.tick_params(labelsize=6.5)
+    ax.set_title(rf"(c) deformed $20\times20$, $\times{SCALE}$")
     save(fig, "square_setup")
 
     # ---- Figure: residual histories ----
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.5), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(6.5, 2.05), constrained_layout=True)
     styles = {"Jacobi": ("#999999", "-"), "Damped Jacobi": ("#a6761d", "-"),
               "Gauss-Seidel": ("#1b9e77", "-"), "SD": ("#e6ab02", "-"),
               "CG": ("#d95f02", "-"), "PCG (diagonal)": ("#7570b3", "--"),
               "MINRES": ("#e7298a", ":"), "GMRES (full)": ("#1f78b4", "-.")}
     labels = {"SD": "steepest descent", "PCG (diagonal)": "PCG (diag.)",
-              "Gauss-Seidel": "Gauss–Seidel", "Damped Jacobi": r"damped Jacobi ($\omega$=0.5)"}
+              "Gauss-Seidel": "Gauss–Seidel", "Damped Jacobi": r"damped Jacobi"}
     for ax, xmax in zip(axes, (CAP, 300)):
         for m in pb.METHODS:
             h = np.asarray(hists[m])
             c, ls = styles[m]
-            ax.semilogy(np.arange(len(h)), h, color=c, ls=ls, lw=1.1, label=labels.get(m, m))
-        ax.axhline(TOL, color="black", ls="--", lw=0.7)
+            ax.semilogy(np.arange(len(h)), h, color=c, ls=ls, lw=1.0, label=labels.get(m, m))
+        ax.axhline(TOL, color="black", ls="--", lw=0.6)
         ax.set_xlim(0, xmax)
-        ax.set_xlabel("iteration $k$ (GMRES: inner Arnoldi step)")
+        ax.set_xlabel("iteration $k$ (GMRES: inner Arnoldi step)", labelpad=1)
         ax.grid(alpha=0.25, lw=0.5)
     axes[0].set_ylim(1e-9, 1e11)
     axes[1].set_ylim(1e-9, 1e3)
     axes[0].set_ylabel(r"relative residual $\eta(x_k)$")
-    axes[0].set_title("(a) full budget, 20 000 iterations")
+    axes[0].set_title("(a) full budget")
     axes[1].set_title("(b) first 300 iterations")
-    axes[0].legend(fontsize=6.5, ncol=2, loc="upper right", frameon=False)
+    axes[0].legend(fontsize=6, ncol=2, loc="upper right", frameon=False)
     save(fig, "square_residuals")
-
-    # ---- Figure: original vs deformed ----
-    U = d20.reshape(-1, 2)
-    xy = s20["nodes"]
-    dxy = xy + SCALE * U
-    mag = np.linalg.norm(U, axis=1) * 1e3
-    fig, ax = plt.subplots(figsize=(3.3, 2.7), constrained_layout=True)
-    tr = Triangulation(dxy[:, 0], dxy[:, 1], s20["triangles"])
-    pc = ax.tripcolor(tr, mag, shading="gouraud", cmap="viridis")
-    ax.triplot(tr, color="white", lw=0.2, alpha=0.5)
-    ax.plot([0, 1, 1, 0, 0], [0, 0, 1, 1, 0], "k--", lw=0.9, label="original")
-    ax.plot([0, 0], [0, 1], color="black", lw=2.5)
-    fig.colorbar(pc, ax=ax, label=r"$|\mathbf{u}|$ [mm]", shrink=0.9)
-    ax.set_aspect("equal")
-    ax.set_xlabel("$x$ [m]")
-    ax.set_ylabel("$y$ [m]")
-    ax.set_xlim(-0.05, 1.18)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.13), frameon=False, fontsize=7)
-    save(fig, "square_deformed")
 
 
 def save(fig, name):
