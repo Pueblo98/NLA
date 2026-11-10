@@ -1,25 +1,26 @@
-# Section 3. Numerical Methods and Comparison Protocol
+# Section 3: Numerical methods and comparison protocol
 
-**Status, 10 November 2026: drafting reported in Slack; Section 3 source and PDF are not yet present here. Implementation review available below.**
+Status: Hermes working draft for Codex/team review. Not approved final prose.
 
-## Scope
+The source is `section.tex`; `main.tex` is a standalone A4, 11 pt preview with 25 mm margins. It uses amsmath, amssymb and url, plus the amsplain bibliography style. Include section.tex and merge references.bib into the final report. The wrapper is not the final course template; the combined ten-page limit remains to be checked there.
 
-Use [the Section 3 roadmap entry](../../ROADMAP.md#3-numerical-methods-and-comparison-protocol) as the source of truth for this section's purpose, required contents, boundaries and expected output. Do not duplicate or silently redefine that scope here.
+Run `sh build.sh` with Tectonic or pdfLaTeX/BibTeX installed. Alternatively set TECTONIC_BIN to a Tectonic executable. The script creates preview.pdf from the exact source.
 
-Follow [the shared writing rules](../../WRITING_RULES.md), including the review of all previous sections after each section is completed. Existing full progress reports are [reference material](../../reference/), not an approved replacement for this section.
+## Basis and scope
 
-## Files to add when this section is requested
+Read draft/WRITING_RULES.md and the Section 3 entry of draft/ROADMAP.md. Read current Sections 1 and 2 and solvers/progress_benchmark.py at base revision d67eb5f. Applied the implementation findings in review-2026-11-10.md. No results table is imported into this methods section and no numerical benchmark was rerun for drafting.
 
-- `section.tex`: only this section's body, suitable for later inclusion in the combined report.
-- `main.tex`: standalone preview wrapper.
-- `references.bib` and `figures/`: references and assets actually used by this section.
-- `preview.pdf`: compiled and visually checked against the current source.
+This describes the current eight-method implementation, not the historical 3,000-step/restarted-GMRES plan. Timings include iterative setup and stopping checks; the sparse LU reference is untimed. The current cap is 20,000, GMRES restart equals the number of free unknowns, damping is 0.5, and PCG uses inverse diagonal scaling.
 
-Do not create these as empty report stubs or claim the section is completed. Record the agreed section owner, review status and unresolved decisions below when the section thread starts.
+## Remaining review decisions
 
-## Handoff status
+- Codex/team paragraph-level review is pending. The existing review file audits implementation and saved results, not this new prose.
+- Confirm that all eight iterative methods remain in the final report; this draft explains those currently implemented rather than silently changing the method set.
+- Section 2 is evolving. Recheck the transition after any newer Section 2 revision; this draft leaves earlier sections unchanged.
+- Separate setup/solve timings are not available in the existing benchmark. Any future split-cost comparison requires fresh measurements.
+- Preserve Section 2's unresolved course assembly-routine permission. This draft does not resolve it.
+- Add member contributions and the required AI-use disclosure when assembling the report. This section was drafted with Hermes assistance; team review is required.
 
-- Thread roles: Hermes is drafting; darius-codex reports an existing draft. Coordinate against one identified source before integrating edits. Lucas's Codex has completed an implementation and saved-results audit.
-- Review: [implementation and integration review](review-2026-11-10.md), covering actual stopping rules, preconditioning, timing scope, reference calculations, failure classification and error measures. This does not approve unavailable prose or PDF layout.
-- Availability check: this checkout and read-only GitHub checks of `main` and `docs/section-draft-workspace` contain only this folder's README, before the addition of the present review. The source reported by darius-codex may be in another workspace or revision.
-- Next action: darius-codex supplies the existing source path and branch/commit; Hermes coordinates edits and builds the exact source. Then review prose against Sections 1–2 and inspect the PDF before publishing `preview.pdf`. No Section 3 compilation or visual review has been performed here.
+## Deliverables
+
+section.tex, main.tex, references.bib, build.sh and compiled preview.pdf. Verification details accompany delivery. This module contains no external images or private path dependency.
