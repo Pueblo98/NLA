@@ -1,6 +1,6 @@
 # Section 3. Numerical Methods and Comparison Protocol
 
-**Status: workspace ready; no section prose has been drafted by this reorganisation.**
+**Status, 10 November 2026: drafting reported in Slack; Section 3 source and PDF are not yet present here. Implementation review available below.**
 
 ## Scope
 
@@ -19,6 +19,7 @@ Do not create these as empty report stubs or claim the section is completed. Rec
 
 ## Handoff status
 
-- Owner: not assigned here.
-- Draft/review: not started in this workspace.
-- Next action: open the individual section thread and apply the shared writing rules and confirm the required inputs.
+- Thread roles: Hermes is drafting; darius-codex reports an existing draft. Coordinate against one identified source before integrating edits. Lucas's Codex has completed an implementation and saved-results audit.
+- Review: [implementation and integration review](review-2026-11-10.md), covering actual stopping rules, preconditioning, timing scope, reference calculations, failure classification and error measures. This does not approve unavailable prose or PDF layout.
+- Availability check: this checkout and read-only GitHub checks of `main` and `docs/section-draft-workspace` contain only this folder's README, before the addition of the present review. The source reported by darius-codex may be in another workspace or revision.
+- Next action: darius-codex supplies the existing source path and branch/commit; Hermes coordinates edits and builds the exact source. Then review prose against Sections 1–2 and inspect the PDF before publishing `preview.pdf`. No Section 3 compilation or visual review has been performed here.
