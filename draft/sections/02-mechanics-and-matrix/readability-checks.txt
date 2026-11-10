@@ -1,0 +1,12 @@
+Section 2 readability revision — 10 November 2026
+Static checks only; these do not establish compilation or layout quality.
+12 unique labels across Sections 1 and 2; 5 reference uses resolve.
+5 distinct citation keys across Sections 1 and 2 resolve.
+LaTeX environments are balanced in both section bodies.
+Both standalone bibliographies contain shewchuk-triangle; retain one URL-bearing entry when merging.
+Section 1 was reread after the rewrite, including its closing paragraph beside the revised opening.
+Expanded triangle, work-balance, support-block and sensitivity algebra retained in derivation-notes.md.
+No numerical code or new results changed. Element ordering, shear convention, thickness and reaction sign checked against fem/elasticity.py and the existing formulation.
+PDF build exited 101: missing Tectonic resource bundle and failed download. See readability-build-status.txt.
+No revised PDF was produced or visually reviewed. Hermes's earlier PDF describes the earlier source.
+PASS: source reference, citation and environment checks.
