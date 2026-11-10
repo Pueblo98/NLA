@@ -1,20 +1,18 @@
 \documentclass[a4paper,11pt]{article}
 \usepackage[margin=25mm]{geometry}
 \usepackage{amsmath}
+\usepackage{booktabs}
 \usepackage{url}
 \pagestyle{plain}
-% Preview only: labels and equation numbers from Sections 1--2 and later
-% sections of the combined report (Sections 1--2 contain nine equations).
+% Preview only: labels and equation numbers from Section 2 of the combined
+% report (Sections 1--2 contain nine equations).
 \makeatletter
 \newcommand{\externallabel}[2]{\begingroup\def\@currentlabel{#2}\label{#1}\endgroup}
 \makeatother
 \begin{document}
 \externallabel{sec:mechanics-matrix}{2}
-\externallabel{eq:mechanics-energy}{8}
 \externallabel{eq:mechanics-reactions}{7}
-\externallabel{eq:mechanics-conditioning}{9}
-\externallabel{sec:square}{4}
-\externallabel{sec:results}{6}
+\externallabel{eq:mechanics-energy}{8}
 \setcounter{section}{2}
 \setcounter{equation}{9}
 \input{section.tex}

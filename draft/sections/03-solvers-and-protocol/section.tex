@@ -1,134 +1,111 @@
 % AI-assisted working draft for team review, not an approved final section.
-% Requires amsmath. Merge references.bib into the report bibliography.
+% Requires amsmath and booktabs. Merge references.bib into the report bibliography.
 \section{Numerical methods and comparison protocol}
 \label{sec:solvers}
 
-Section~\ref{sec:mechanics-matrix} showed that the supported matrix $A$ is
-sparse, symmetric and positive definite, with sensitivity measured by
-$\kappa_2(A)$. We now use these properties to choose solvers and fix one
-protocol for comparing them. Let $N=|F|$ be the number of unknowns, $x_k$
-the $k$-th iterate, $e_k=x-x_k$ its error and $r_k=b-Ax_k$ its residual.
+Section~\ref{sec:mechanics-matrix} showed that $A$ is sparse, symmetric
+and positive definite, with sensitivity measured by $\kappa_2(A)$. These
+properties decide which solvers apply and how fast they converge. Let
+$N=|F|$ be the number of unknowns, $x_k$ the $k$-th iterate,
+$e_k=x-x_k$ its error and $r_k=b-Ax_k$ its residual.
 
-\subsection{Direct methods}
-A direct method factorizes $A$ into triangular factors: $PA=LU$ with a row
-permutation $P$, or, for symmetric positive definite $A$, Cholesky
-$A=LL^T$ without pivoting at half the cost~\cite{trefethen-bau}. Dense
-factorization costs $O(N^3)$ operations but each later solve only $O(N^2)$;
-forming the inverse costs more and is less accurate. In sparse $A$,
-elimination creates \emph{fill-in}, nonzeros of the factors where $A$ has
-zeros. SciPy's \texttt{splu} limits it with a column ordering (COLAMD) before
-LU with partial pivoting~\cite{scipy-splu}; factorization dominates the cost,
-and each solve is two triangular substitutions.
+\subsection{Methods}
+A direct method factorizes $A$ into triangular factors, $PA=LU$ or, since
+$A$ is symmetric positive definite, Cholesky $A=LL^T$ at half the
+cost~\cite{trefethen-bau}, and then solves by two triangular
+substitutions. Forming $A^{-1}$ costs more and is less accurate. For
+sparse $A$ the factors gain extra nonzeros (fill-in), so memory and work
+grow faster than the number of nonzeros of $A$. Iterative methods
+instead only multiply by $A$, which is cheap because $A$ is sparse.
 
-\subsection{Stationary iterations}
-Iterative methods need only products with $A$. A stationary method
-corrects the iterate with the residual, using an easily inverted
-approximation $M$ of $A$:
-\begin{equation}
- x_{k+1}=x_k+M^{-1}(b-Ax_k),\qquad e_{k+1}=(I-M^{-1}A)\,e_k.
- \label{eq:solvers-splitting}
-\end{equation}
-It converges for every $x_0$ if and only if the spectral radius
-$\rho(I-M^{-1}A)$ is below one~\cite{saad-iterative}. \emph{Jacobi} uses
-$M=D_A$, the diagonal of $A$. Its iteration matrix is similar to $I-S$,
-where $S=D_A^{-1/2}AD_A^{-1/2}$, so
+A stationary iteration corrects $x_k$ with the residual, using an easily
+inverted approximation $M$ of $A$:
+\[
+ x_{k+1}=x_k+M^{-1}r_k,\qquad e_{k+1}=(I-M^{-1}A)\,e_k.
+\]
+It therefore converges for every $x_0$ if and only if the spectral radius
+$\rho(I-M^{-1}A)$ is below one~\cite{saad-iterative}. Jacobi uses
+$M=D_A$, the diagonal of $A$. Its iteration matrix is similar to $I-S$
+with $S=D_A^{-1/2}AD_A^{-1/2}$, so
 \begin{equation}
  \rho_J=\max_i\,|1-\lambda_i(S)|.
  \label{eq:solvers-jacobi-radius}
 \end{equation}
-Positive definiteness only gives $\lambda_i(S)>0$, so Jacobi diverges when
-$\lambda_{\max}(S)>2$. \emph{Damped Jacobi}, $M=D_A/\omega$, converges if and
-only if $0<\omega<2/\lambda_{\max}(S)$; we use $\omega=0.5$ and check this
-bound for each system. \emph{Gauss--Seidel} takes $M$ as the lower triangle of
-$A$, including the diagonal, so each sweep is one forward substitution. It
-converges for every symmetric positive definite $A$~\cite{saad-iterative}.
+Positive definiteness gives only $\lambda_i(S)>0$, so Jacobi diverges
+when $\lambda_{\max}(S)>2$.
 
-\subsection{Krylov methods}
-For symmetric positive definite $A$, the solution of $Ax=b$ minimizes
-$\phi(y)=\tfrac12y^TAy-b^Ty$, the elastic energy of
-Eq.~\eqref{eq:mechanics-energy} minus the work of the loads, and
-$r=-\nabla\phi$. \emph{Steepest descent} (SD) moves along $r_k$ to the minimum
-of $\phi$ on that line. Each step multiplies its error in the energy norm
-$\|e\|_A=(e^TAe)^{1/2}$ by at most $(\kappa-1)/(\kappa+1)$, where
-$\kappa=\kappa_2(A)$~\cite{shewchuk-cg}. The \emph{conjugate gradient} (CG)
-method instead minimizes $\|e_k\|_A$ over all of $x_0+\mathcal{K}_k$, where
-$\mathcal{K}_k=\mathrm{span}\{r_0,Ar_0,\ldots,$ $A^{k-1}r_0\}$ is the Krylov
-space. It needs one product with $A$ per iteration and satisfies~\cite{shewchuk-cg}
+Krylov methods build $x_k$ from the space
+$\mathcal{K}_k=\mathrm{span}\{r_0,Ar_0,\ldots,A^{k-1}r_0\}$. For symmetric
+positive definite $A$, solving $Ax=b$ is the same as minimizing the
+energy $\phi(y)=\tfrac12y^TAy-b^Ty$ (Eq.~\eqref{eq:mechanics-energy} minus
+the work of the loads). The conjugate gradient (CG) method minimizes the
+energy norm $\|e_k\|_A=(e_k^TAe_k)^{1/2}$ over $x_0+\mathcal{K}_k$ with one
+product by $A$ per step, and~\cite{shewchuk-cg}
 \begin{equation}
  \|e_k\|_A\leq2\left(\frac{\sqrt\kappa-1}{\sqrt\kappa+1}\right)^k\|e_0\|_A,
+ \qquad \kappa=\kappa_2(A).
  \label{eq:solvers-cg-bound}
 \end{equation}
-so its iteration count grows with $\sqrt\kappa$ rather than $\kappa$. This
-matters because, as for the model Poisson problem, $\kappa$ grows like
-$h^{-2}$ on quasi-uniform meshes of size $h$~\cite{elman-silvester-wathen}.
+Its iteration count therefore grows like $\sqrt\kappa$, whereas for
+steepest descent it grows like $\kappa$. Table~\ref{tab:solvers-methods}
+lists the eight iterative methods we compare.
 
-\emph{Diagonally preconditioned CG} (PCG) uses $D_A$ as preconditioner and is
-equivalent to CG on $S$, so $\kappa_2(S)$ replaces $\kappa$ in
-Eq.~\eqref{eq:solvers-cg-bound}. If the diagonal is nearly constant, $S$ is
-nearly a multiple of $A$ and nothing is gained. Two-dimensional element
-stiffness does not scale with element size, so the diagonal varies only with
-the number and shape of elements at a node and with material or thickness. \emph{MINRES} minimizes
-$\|r_k\|_2$ over $x_0+\mathcal{K}_k$ for symmetric
-$A$~\cite{paige-saunders-minres}; \emph{GMRES} does so for general
-$A$~\cite{saad-schultz-gmres}, but must store and orthogonalize against all
-$k$ basis vectors, costing $O(kN)$ memory and work at step $k$. For symmetric
-$A$ both give the same iterates in exact arithmetic, so full GMRES (restart
-length $N$) measures the cost of ignoring symmetry. CG, PCG and MINRES
-exploit this structure; the other methods are baselines predicted by
-$\rho_J$ and $\kappa$.
+\begin{table}[htbp]
+ \centering
+ \caption{Iterative methods compared, for symmetric positive definite $A$.}
+ \label{tab:solvers-methods}
+ \small
+ \begin{tabular}{@{}lll@{}}
+ \toprule
+ Method & Idea & Converges when \\
+ \midrule
+ Jacobi & $M=D_A$ & $\rho_J<1$, i.e.\ $\lambda_{\max}(S)<2$ \\
+ Damped Jacobi & $M=D_A/\omega$, we use $\omega=0.5$ & $0<\omega<2/\lambda_{\max}(S)$ \\
+ Gauss--Seidel & $M=$ lower triangle of $A$ & always~\cite{saad-iterative} \\
+ Steepest descent & exact line search along $r_k$ & always; error factor $\le(\kappa-1)/(\kappa+1)$ per step \\
+ CG & minimizes $\|e_k\|_A$ over $x_0+\mathcal{K}_k$ & always; Eq.~\eqref{eq:solvers-cg-bound} \\
+ Diagonal PCG & CG preconditioned by $D_A$ & always; $\kappa_2(S)$ replaces $\kappa$ \\
+ MINRES & minimizes $\|r_k\|_2$, uses symmetry~\cite{paige-saunders-minres} & always \\
+ Full GMRES & minimizes $\|r_k\|_2$, any $A$~\cite{saad-schultz-gmres} & always; stores all $k$ basis vectors \\
+ \bottomrule
+ \end{tabular}
+\end{table}
 
 \subsection{Comparison protocol}
-Every method receives the same $A$ and $b$ and starts from $x_0=0$. A
-returned vector $\hat x$ is accepted only if its recomputed relative
-residual satisfies
+Every method receives the same $A$ and $b$, starts from $x_0=0$ and is
+accepted only if its recomputed relative residual satisfies
 \begin{equation}
  \eta(\hat x)=\frac{\|b-A\hat x\|_2}{\|b\|_2}<10^{-8}.
  \label{eq:solvers-residual}
 \end{equation}
-Native solver flags are recorded but never replace this test, since SciPy's
-Krylov solvers stop on internal residual
-estimates~\cite{scipy-gmres,scipy-minres}; MINRES gets native tolerance zero
-and stops once Eq.~\eqref{eq:solvers-residual} holds. An iteration is
-a sweep for the stationary methods, a search direction for SD, CG, PCG and
-MINRES, and an inner Arnoldi step for GMRES, which never restarts. The cap is
-20{,}000 iterations, and ordinary Jacobi also stops if $\eta>10^{10}$ or
-becomes non-finite. Hitting the cap or this divergence guard counts as
-failure; the status, iteration count and final $\eta$ are still reported.
+Reaching the cap of 20{,}000 iterations, or $\eta>10^{10}$ for ordinary
+Jacobi, counts as failure. Accuracy is the relative error
+$\|\hat x-x_{\mathrm{ref}}\|_2/\|x_{\mathrm{ref}}\|_2$ against the sparse
+LU solution $x_{\mathrm{ref}}$ of the same system~\cite{scipy-splu}. Times
+are the best of three runs, excluding assembly and diagnostics. The
+extreme eigenvalues behind $\kappa_2(A)$ and $\rho_J$ are computed densely
+for small systems and with SciPy's \texttt{eigsh} for large
+ones~\cite{scipy-eigsh}.
 
-Accuracy is the relative error
-$\|\hat x-x_{\mathrm{ref}}\|_2/\|x_{\mathrm{ref}}\|_2$ against the sparse LU
-solution $x_{\mathrm{ref}}$ of the same system. As $\hat x$ solves the system
-with load perturbed by its residual, the standard bound~\cite{trefethen-bau}
+The computed $\hat x$ solves exactly the system whose load is perturbed by
+its residual. The standard bound~\cite{trefethen-bau}
 \begin{equation}
  \frac{\|\delta x\|_2}{\|x\|_2}\leq\kappa_2(A)\frac{\|\delta b\|_2}{\|b\|_2}
  \label{eq:solvers-perturbation}
 \end{equation}
-limits this error to $\kappa_2(A)\,\eta$. This \emph{algebraic} error
-measures how well one mesh's equations are solved. \emph{Discretization}
-error, between finite element and continuum displacements, does not shrink
-with the tolerance; we assess it by comparing meshes at matched physical
-points under the same physical load.
+therefore limits its relative error to $\kappa_2(A)\,\eta$. This
+\emph{algebraic} error measures how well one mesh's equations are solved.
+\emph{Discretization} error, between finite element and continuum
+displacements, does not shrink with the tolerance; we estimate it by
+comparing meshes at matched physical points.
 
-Times are the best of three wall-clock runs (\texttt{perf\_counter}). Sparse
-LU factorization and solve are timed separately. Iterative times include
-method-specific setup and stopping checks, but exclude assembly, reduction, eigenvalue diagnostics, the reference solve
-and residual histories, which come from a separate run. They compare these
-SciPy implementations on one machine, not intrinsic algorithm costs. The
-small worked system also compares dense $PA=LU$, the explicit inverse and
-Cholesky. The eigenvalues in Eq.~\eqref{eq:mechanics-conditioning} come from
-dense \texttt{eigvalsh} for small systems, otherwise from \texttt{eigsh} with
-tolerance $10^{-10}$: \texttt{which=\textquotesingle LA\textquotesingle} for $\lambda_{\max}$ and
-shift-invert about zero for $\lambda_{\min}$~\cite{scipy-eigsh}. Applied to
-$S$, they give $\rho_J$ and the damped-Jacobi bound.
-
-Sections~\ref{sec:square} and~\ref{sec:results} also check that applied
-loads and the reactions of Eq.~\eqref{eq:mechanics-reactions} have zero
-resultant force and moment, up to rounding, and that $d_C$ equals the
-prescribed values. An affine patch test restrains the left edge only
-horizontally and the corner at the origin vertically, with uniform
-traction $p$ on the
-opposite edge; the plane-stress solution $u_x=px/E$, $u_y=-\nu py/E$ is
-linear, so the computed nodal values must match it to rounding on any mesh.
-This verifies assembly, loading and reduction, not discretization error.
-Finally, the displacement change caused by a seeded random load
-perturbation is compared with the bound in Eq.~\eqref{eq:solvers-perturbation}.
+Finally, later sections check that the prescribed values $d_C$ are
+reproduced; that applied loads and the reactions of
+Eq.~\eqref{eq:mechanics-reactions} have zero resultant force and moment;
+that the displacement change caused by a random load perturbation obeys
+Eq.~\eqref{eq:solvers-perturbation}; and a patch test. In the patch test
+the left edge is restrained only horizontally and the corner at the
+origin vertically, and the opposite edge carries uniform traction $p$.
+The exact plane-stress solution $u_x=px/E$, $u_y=-\nu py/E$ is linear,
+so linear triangles must reproduce it to rounding on any mesh. This
+verifies assembly, loading and reduction.

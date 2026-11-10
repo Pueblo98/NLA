@@ -3,18 +3,16 @@
 \section{Displacement, forces and matrix construction}
 \label{sec:mechanics-matrix}
 
-The preceding section introduced $Ax=b$ as the system that determines
-how the object moves. We now build it by describing the material's
-response, calculating each triangle's contribution and applying the
-supports.
+We now build the system $Ax=b$ of the preceding section in three steps:
+the material's response, each triangle's contribution and the supports.
 
 \subsection{From displacement to internal forces}
 We model a thin sheet of constant thickness $t>0$, made of one material
 with the same properties everywhere and in every direction. Loads act in
 its plane and its faces are free, so we use \emph{plane stress}: stresses
-through the thickness are neglected. We consider the settled shape under
-static loading, with strains and rotations small enough for a linear
-approximation. Bending and permanent deformation are excluded.
+through the thickness are neglected. Loading is static, and strains and rotations are
+small enough for a linear model; bending and permanent deformation are
+excluded.
 
 The material resists stretching and changes of angle. For displacement
 $\mathbf{u}=(u_x,u_y)^T$, these changes form the strain vector
@@ -31,8 +29,8 @@ $\mathbf{u}=(u_x,u_y)^T$, these changes form the strain vector
  \label{eq:mechanics-material}
 \end{equation}
 The first two entries measure stretching in the coordinate directions;
-the third measures the change of a right angle, called engineering
-shear. The stress vector
+the third measures the change of a right angle (engineering
+shear). The stress vector
 $\sigma=(\sigma_{xx},\sigma_{yy},\sigma_{xy})^T$ contains the corresponding
 internal forces per unit area. Young's modulus $E>0$ controls resistance
 to stretching, while Poisson's ratio $-1<\nu<1/2$ describes the sideways
@@ -111,14 +109,13 @@ $K$ singular. If the supports prevent both translations and the rotation
 of every connected piece, the energy is positive for every nonzero free
 displacement. Thus $A$ is symmetric positive definite.
 
-Even with a unique solution, small load changes may affect the computed
-movement. For the supported matrix, the condition number is
+How strongly the displacement reacts to small load changes is measured
+by the condition number
 \begin{equation}
  \kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)},
  \label{eq:mechanics-conditioning}
 \end{equation}
 the ratio of its largest and smallest eigenvalues. A large ratio means
 a small percentage change in load can cause a much larger percentage
-change in displacement. Geometry, mesh and supports all affect
-$\kappa_2(A)$. These properties guide the solver choices and accuracy
+change in displacement. These properties guide the solver choices and accuracy
 checks in the next section.

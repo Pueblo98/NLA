@@ -5,8 +5,7 @@
 
 We now apply the construction of Section~\ref{sec:mechanics-matrix} and the
 protocol of Section~\ref{sec:solvers} to the simplest case we can check by
-hand: a square plate pulled uniformly at one end. A uniform bar under stress
-$p$ stretches by $pL/E$, which gives a physical check on every result.
+hand: a square plate pulled uniformly at one end.
 
 The plate occupies $0\le x,y\le L$ with $L=1$~m, thickness $t=0.01$~m,
 $E=200$~GPa and $\nu=0.3$, in plane stress
@@ -15,8 +14,8 @@ the right edge carries the uniform traction $\bar\tau=(p,0)$ with
 $p=100$~MPa, a total force of $ptL=1$~MN. The top and bottom edges are free.
 The mesh has $m\times m$ square cells, each cut along one diagonal, giving
 $(m+1)^2$ nodes and $2m^2$ triangles. The clamp fixes $2(m+1)$ displacement
-components, leaving $N=2m(m+1)$ unknowns. Then $pL/E=0.5$~mm, so we expect
-the right edge to move by about this amount.
+components, leaving $N=2m(m+1)$ unknowns. A free bar under this load would stretch by
+$pL/E=0.5$~mm, so we expect the right edge to move by about this amount.
 
 \begin{figure}[htb]
  \centering
@@ -46,9 +45,9 @@ eigenvalues range from $1.07\times10^8$ to $1.03\times10^{10}$~N/m, so
 $\kappa_2(A)=95.8$ and the system is well conditioned.
 
 Pivoted $PA=LU$, the explicit inverse and Cholesky all give relative
-residuals $\eta$ (Eq.~\eqref{eq:solvers-residual}) below $10^{-15}$, that is,
-at rounding level. The right-edge nodes move $u_x=0.511$, $0.482$ and
-$0.468$~mm from bottom to top, already close to $pL/E=0.5$~mm on this
+residuals $\eta$ (Eq.~\eqref{eq:solvers-residual}) below $10^{-15}$, at
+rounding level. The right-edge nodes move $u_x=0.511$, $0.482$ and
+$0.468$~mm from bottom to top, already close to $0.5$~mm on this
 coarse mesh.
 
 \subsection{A larger system and the iterative methods}
@@ -84,11 +83,11 @@ Fig.~\ref{fig:square-residuals} compare all methods on this system.
 
 \begin{figure}[htb]
  \centering
- \includegraphics[width=0.8\linewidth]{figures/square_residuals.pdf}
+ \includegraphics[width=0.72\linewidth]{figures/square_residuals.pdf}
  \caption{Relative residual $\eta(x_k)$ over the first 300 iterations on the
- $840$-unknown system. The dashed line is the target $10^{-8}$; the Krylov
- methods reach it after 226--242 iterations, while the stationary methods
- and steepest descent have barely started.}
+ $840$-unknown system, with the target $10^{-8}$ dashed. The Krylov
+ methods reach it in 226--242 iterations; the other methods have barely
+ started.}
  \label{fig:square-residuals}
 \end{figure}
 
@@ -114,7 +113,7 @@ method.
 
 \subsection{Deformation and validation}
 Figure~\ref{fig:square-setup}c shows the $20\times20$ solution. The right
-edge moves between $0.492$ and $0.497$~mm, close to $pL/E=0.5$~mm. Near the
+edge moves between $0.492$ and $0.497$~mm, close to the expected $0.5$~mm. Near the
 loaded end the top and bottom edges move inwards by about $0.08$~mm each,
 matching the free lateral contraction $\nu pL/E=0.15$~mm of the whole
 width. The clamp prevents this contraction at $x=0$, which gives the
@@ -128,5 +127,4 @@ with LU to a relative error of at most $1.7\times10^{-7}$. Finally, the
 patch test of Section~\ref{sec:solvers} on the same mesh reproduces the
 exact linear field to a relative error of $2.6\times10^{-14}$, which
 confirms assembly, loading and reduction. The clamped plate has no exact
-solution, so Section~\ref{sec:results} estimates the discretization error
-by refining the mesh.
+solution; Section~\ref{sec:results} estimates its discretization error.
