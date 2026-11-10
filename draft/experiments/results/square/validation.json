@@ -1,0 +1,86 @@
+{
+  "balance": {
+    "applied_force_N": [
+      1000000.0,
+      0.0
+    ],
+    "reaction_force_N": [
+      -1000000.0000000038,
+      -2.5684130378067493e-09
+    ],
+    "force_imbalance_N": [
+      -4.019966581836343e-09,
+      -2.5684130378067493e-09
+    ],
+    "applied_moment_Nm": -500000.0,
+    "reaction_moment_Nm": 500000.0000000044,
+    "moment_imbalance_Nm": 4.452886059880257e-09,
+    "free_row_residual_max_N": 1.6334524843841791e-09
+  },
+  "max_abs_prescribed_displacement_m": 0.0,
+  "constrained_dofs": 42,
+  "sparse_lu_relative_residual": 3.46803264680554e-14,
+  "accepted_methods": [
+    "Gauss-Seidel",
+    "CG",
+    "GMRES (full)",
+    "MINRES",
+    "PCG (diagonal)"
+  ],
+  "relative_difference_to_lu": {
+    "Gauss-Seidel": 1.7398523738386315e-07,
+    "CG": 9.644986617810867e-10,
+    "GMRES (full)": 5.9652708956125285e-09,
+    "MINRES": 5.92004716539208e-09,
+    "PCG (diagonal)": 4.938584440629559e-10
+  },
+  "max_abs_difference_to_lu_mm": {
+    "Gauss-Seidel": 8.347671506944362e-08,
+    "CG": 7.185125975098239e-10,
+    "GMRES (full)": 2.7380005543625047e-09,
+    "MINRES": 2.7196814407753206e-09,
+    "PCG (diagonal)": 3.5599794596594125e-10
+  },
+  "max_right_ux_mm": 0.4966831765713881,
+  "min_right_ux_mm": 0.4915989892039077,
+  "top_right_ux_mm": 0.49550874507056314,
+  "bottom_right_ux_mm": 0.4966831765713881,
+  "mid_right_ux_mm": 0.4915989892039077,
+  "max_inward_uy_top_mm": 0.0765110124935132,
+  "max_inward_uy_bottom_mm": 0.07897839318768206,
+  "max_displacement_mm": 0.50292321926866,
+  "pL_over_E_mm": 0.5,
+  "amplification": 200,
+  "patch_test": {
+    "mesh": "20x20 cells, roller: u_x=0 on left edge, u_y=0 at (0,0)",
+    "unknowns": 860,
+    "relative_error": 2.644116014137118e-14,
+    "max_abs_error_m": 1.3986208025063007e-17,
+    "balance": {
+      "applied_force_N": [
+        1000000.0,
+        0.0
+      ],
+      "reaction_force_N": [
+        -1000000.0000000125,
+        -1.899024937301874e-09
+      ],
+      "force_imbalance_N": [
+        -1.2692908057942986e-08,
+        -1.899024937301874e-09
+      ],
+      "applied_moment_Nm": -500000.0,
+      "reaction_moment_Nm": 500000.0000000115,
+      "moment_imbalance_Nm": 1.1539668776094913e-08,
+      "free_row_residual_max_N": 1.5570549294352531e-09
+    }
+  },
+  "perturbation": {
+    "seed": 2026,
+    "relative_load_perturbation": 1e-06,
+    "relative_displacement_change": 4.512469545013646e-07,
+    "kappa2": 9103.94094529288,
+    "kappa_bound": 0.009103940945292878,
+    "amplification_observed": 0.45124695450136465
+  }
+}

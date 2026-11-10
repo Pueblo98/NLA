@@ -1,0 +1,122 @@
+{
+  "environment": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64"
+  },
+  "case": "force_driven clamp, 1 m square, traction 100 MPa, bl-tr diagonals",
+  "notes": "kappa2 via eigsh LA / shift-invert sigma=0, tol 1e-10; CG/PCG under the common protocol (x0=0, eta<1e-8, cap 20000); displacements from splu",
+  "meshes": [
+    {
+      "cells_per_side": 5,
+      "unknowns": 60,
+      "stored_nnz": 672,
+      "lambda_min": 23495627.461921,
+      "lambda_max": 15791414264.01755,
+      "eig_residuals": [
+        6.663612055689297e-14,
+        3.7552249822632533e-14
+      ],
+      "kappa2": 672.1001296777646,
+      "rho_J": 1.9166820023858673,
+      "kappa_S": 456.41470142668504,
+      "cg_iterations": 55,
+      "cg_status": "native_info=0",
+      "pcg_iterations": 48,
+      "pcg_status": "native_info=0",
+      "top_right_ux_mm": 0.48875721250511545,
+      "max_right_ux_mm": 0.5013066852851116
+    },
+    {
+      "cells_per_side": 10,
+      "unknowns": 220,
+      "stored_nnz": 2752,
+      "lambda_min": 6914251.989982315,
+      "lambda_max": 17074578013.48829,
+      "eig_residuals": [
+        2.197659993921652e-13,
+        6.519198512294105e-13
+      ],
+      "kappa2": 2469.4758071049073,
+      "rho_J": 1.951326628144522,
+      "kappa_S": 1959.5691383170556,
+      "cg_iterations": 119,
+      "cg_status": "native_info=0",
+      "pcg_iterations": 108,
+      "pcg_status": "native_info=0",
+      "top_right_ux_mm": 0.4938485633526277,
+      "max_right_ux_mm": 0.49769422582215733
+    },
+    {
+      "cells_per_side": 20,
+      "unknowns": 840,
+      "stored_nnz": 11112,
+      "lambda_min": 1916521.0022542702,
+      "lambda_max": 17447894024.936398,
+      "eig_residuals": [
+        1.0204853474528243e-12,
+        2.7404550050901528e-11
+      ],
+      "kappa2": 9103.94094529288,
+      "rho_J": 1.9600502426261661,
+      "kappa_S": 8029.068197049721,
+      "cg_iterations": 242,
+      "cg_status": "native_info=0",
+      "pcg_iterations": 226,
+      "pcg_status": "native_info=0",
+      "top_right_ux_mm": 0.49550874507056314,
+      "max_right_ux_mm": 0.4966831765713881
+    },
+    {
+      "cells_per_side": 40,
+      "unknowns": 3280,
+      "stored_nnz": 44632,
+      "lambda_min": 507931.71206626255,
+      "lambda_max": 17547851553.030827,
+      "eig_residuals": [
+        4.1947058429748985e-12,
+        5.025249811141768e-11
+      ],
+      "kappa2": 34547.65893951825,
+      "rho_J": 1.9622345797722165,
+      "kappa_S": 32360.384669003808,
+      "cg_iterations": 469,
+      "cg_status": "native_info=0",
+      "pcg_iterations": 446,
+      "pcg_status": "native_info=0",
+      "top_right_ux_mm": 0.4960729842293594,
+      "max_right_ux_mm": 0.4964423671073412
+    },
+    {
+      "cells_per_side": 80,
+      "unknowns": 12960,
+      "stored_nnz": 178872,
+      "lambda_min": 131000.05872548831,
+      "lambda_max": 17573660322.2814,
+      "eig_residuals": [
+        1.7641998516007974e-11,
+        7.010011832367365e-11
+      ],
+      "kappa2": 134150.0186584431,
+      "rho_J": 1.9627808551977934,
+      "kappa_S": 129748.16637017079,
+      "cg_iterations": 877,
+      "cg_status": "native_info=0",
+      "pcg_iterations": 852,
+      "pcg_status": "native_info=0",
+      "top_right_ux_mm": 0.49626774077492847,
+      "max_right_ux_mm": 0.49638747032122926
+    }
+  ],
+  "perturbation_20x20": {
+    "seed": 2026,
+    "relative_load_perturbation": 1e-06,
+    "relative_displacement_change": 4.512469545013646e-07,
+    "kappa2": 9103.94094529288,
+    "kappa_bound": 0.009103940945292878,
+    "amplification_observed": 0.45124695450136465
+  }
+}

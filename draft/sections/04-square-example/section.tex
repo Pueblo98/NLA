@@ -1,0 +1,217 @@
+% AI-assisted working draft for team review, not an approved final section.
+% Requires amsmath, graphicx and booktabs. Merge references.bib into the report bibliography.
+\section{Simple square demonstration}
+\label{sec:square}
+
+Sections~\ref{sec:mechanics-matrix} and~\ref{sec:solvers} built the system
+$Ax=b$ and fixed how its solvers are compared. We now apply both to the
+simplest controlled case: a square plate pulled uniformly at one end. A
+uniformly stretched bar of length $L$ extends by about $pL/E$, so every
+computed number can be checked against a physical expectation.
+
+\subsection{Case specification}
+The plate is the square $0\le x,y\le L$ with $L=1$~m, thickness
+$t=0.01$~m, $E=200$~GPa and $\nu=0.3$, modelled in plane stress without
+body forces (Fig.~\ref{fig:square-setup}a). The left edge is clamped,
+$u_x=u_y=0$. The right edge carries the uniform traction
+$\bar\tau=(p,0)$ with $p=100$~MPa, so $q=tp=10^6$~N/m and the resultant
+is $ptL=10^6$~N in the $x$-direction. The top and bottom edges are free.
+The load is therefore a prescribed traction, not a prescribed
+displacement. Units are metres, pascals and newtons. The mesh has
+$n\times n$ square cells of side $h=L/n$, each cut along its
+bottom-left to top-right diagonal into two triangles. It has $(n+1)^2$
+nodes and $2n^2$ triangles; the clamp prescribes $2(n+1)$ components and
+leaves $2n(n+1)$ unknowns. The case is \texttt{force\_driven} in
+\texttt{fem/plate.py}; all numbers below come from
+\texttt{draft/experiments/square.py}.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/square_setup.pdf}
+ \caption{(a) Square plate, supports and load. (b) The $2\times2$-cell
+ mesh: clamped nodes (squares) and free nodes (dots) with their unknowns
+ $x_1,\dots,x_{12}$ and the nodal forces that make up $b$.}
+ \label{fig:square-setup}
+\end{figure}
+
+\subsection{A small system solved directly}
+With $n=2$ there are 9 nodes, 8 triangles and 18 displacement components.
+Clamping nodes 0, 3 and 6 leaves the 12 unknowns of
+Fig.~\ref{fig:square-setup}b, ordered node by node as
+$x=(u_{x,1},u_{y,1},u_{x,2},\dots,u_{y,8})^T$. Since $d_C=0$, we have
+$b=f_F$. Each loaded edge of length $0.5$~m carries $0.5$~MN, shared
+equally by its two end nodes, so only the horizontal components of the
+right-edge nodes are nonzero. For $\nu=0.3$ every entry of $A$ is an
+integer multiple of $Et/(40(1-\nu^2))=5.495\times10^7$~N/m:
+\begin{equation}
+ A=\frac{Et}{40(1-\nu^2)}
+ \left[\begin{array}{@{}*{12}{r}@{}}
+ 54 & -13 & -20 & 6 & -14 & 13 & \cdot & -13 & \cdot & \cdot & \cdot & \cdot \\
+ -13 & 54 & 7 & -7 & 13 & -40 & -13 & \cdot & \cdot & \cdot & \cdot & \cdot \\
+ -20 & 7 & 27 & -13 & \cdot & \cdot & -7 & 6 & \cdot & \cdot & \cdot & \cdot \\
+ 6 & -7 & -13 & 27 & \cdot & \cdot & 7 & -20 & \cdot & \cdot & \cdot & \cdot \\
+ -14 & 13 & \cdot & \cdot & 108 & -26 & -40 & 13 & -14 & 13 & \cdot & -13 \\
+ 13 & -40 & \cdot & \cdot & -26 & 108 & 13 & -14 & 13 & -40 & -13 & \cdot \\
+ \cdot & -13 & -7 & 7 & -40 & 13 & 54 & -13 & \cdot & \cdot & -7 & 6 \\
+ -13 & \cdot & 6 & -20 & 13 & -14 & -13 & 54 & \cdot & \cdot & 7 & -20 \\
+ \cdot & \cdot & \cdot & \cdot & -14 & 13 & \cdot & \cdot & 54 & -13 & -20 & 7 \\
+ \cdot & \cdot & \cdot & \cdot & 13 & -40 & \cdot & \cdot & -13 & 54 & 6 & -7 \\
+ \cdot & \cdot & \cdot & \cdot & \cdot & -13 & -7 & 7 & -20 & 6 & 27 & \cdot \\
+ \cdot & \cdot & \cdot & \cdot & -13 & \cdot & 6 & -20 & 7 & -7 & \cdot & 27
+ \end{array}\right],\quad
+ b=2.5\times10^5
+ \begin{bmatrix}0\\0\\1\\0\\0\\0\\2\\0\\0\\0\\1\\0\end{bmatrix}\text{N}.
+ \label{eq:square-small-system}
+\end{equation}
+Dots mark zero entries: unknowns at nodes without a common triangle,
+such as nodes 1 and 7, do not interact, and a few other pairs cancel
+between triangles. The matrix is exactly symmetric. Its eigenvalues are
+all positive, from $\lambda_{\min}=1.073\times10^8$ to
+$\lambda_{\max}=1.028\times10^{10}$~N/m, so $\kappa_2(A)=95.80$ by
+Eq.~\eqref{eq:mechanics-conditioning}. The full-precision arrays are
+stored as CSV files in \texttt{draft/experiments/results/square/}.
+
+We solve Eq.~\eqref{eq:square-small-system} three ways: pivoted
+factorization $PA=LU$, the explicit inverse $x=A^{-1}b$, and Cholesky
+factorization $A=CC^T$ with $C$ lower triangular, which exists because
+$A$ is symmetric positive definite~\cite{trefethen-bau}. The relative
+residuals $\eta$ of Eq.~\eqref{eq:solvers-residual} are
+$6.2\times10^{-16}$, $8.4\times10^{-16}$ and $9.2\times10^{-16}$, and the
+three solutions differ by at most $6.3\times10^{-16}$ relative to their
+norm. The explicit inverse is shown only for this exercise; it costs more
+than a factorization and is not used for large systems. From bottom to
+top, the right-edge nodes move $u_x=0.5112$, $0.4822$ and $0.4678$~mm,
+close to $pL/E=0.5$~mm, and $u_y=+0.1045$, $+0.0294$ and $-0.0461$~mm.
+The continuum problem is symmetric about $y=L/2$, which would make $u_y$
+antisymmetric; the deviation comes from the coarse mesh and its single
+diagonal direction.
+
+\subsection{A larger system and the iterative methods}
+With $n=20$ the mesh has 441 nodes, 800 triangles and 840 unknowns.
+The sparse matrix stores 11{,}112 entries, of which 9{,}590 are
+numerically nonzero. Its asymmetry from rounding in the assembly is
+$4\times10^{-17}$ relative to its largest entry. Sparse eigenvalue
+estimates give $\lambda_{\min}=1.917\times10^6$ and
+$\lambda_{\max}=1.745\times10^{10}$~N/m, hence $\kappa_2(A)=9104$; a dense
+eigenvalue computation agrees to within $10^{-14}$. The scaled matrix
+$S=D_A^{-1/2}AD_A^{-1/2}$ has eigenvalues in $[3.687\times10^{-4},\,2.960]$,
+so the Jacobi diagnostic is $\rho_J=1.960$. Table~\ref{tab:square-solvers}
+and Fig.~\ref{fig:square-residuals} report all methods under the protocol
+of Section~\ref{sec:solvers}.
+
+\begin{table}[htbp]
+ \centering
+ \caption{All methods on the 840-unknown system ($20\times20$ cells).
+ Final $\eta$ is the recomputed relative residual; the error is relative
+ to the sparse LU solution. Time is the best of three runs on one
+ Linux x86-64 machine (Python 3.13, SciPy 1.18.1). An asterisk marks a
+ failure to reach $\eta<10^{-8}$.}
+ \label{tab:square-solvers}
+ \small
+ \begin{tabular}{@{}lrrrrl@{}}
+ \toprule
+ Method & Iterations & Final $\eta$ & Error vs LU & Time (ms) & Stop \\
+ \midrule
+ Sparse LU (\texttt{splu}) & -- & $3.5\times10^{-14}$ & -- & $2.62+0.16$ & factor + solve \\
+ Jacobi* & 49 & $1.3\times10^{10}$ & $3.4\times10^{7}$ & 0.74 & divergence guard \\
+ Damped Jacobi ($\omega=0.5$)* & 20{,}000 & $4.8\times10^{-6}$ & $8.7\times10^{-5}$ & 279 & iteration cap \\
+ Gauss--Seidel & 19{,}136 & $1.0\times10^{-8}$ & $1.7\times10^{-7}$ & 7{,}543 & target \\
+ Steepest descent* & 20{,}000 & $3.1\times10^{-6}$ & $4.2\times10^{-5}$ & 515 & iteration cap \\
+ CG & 242 & $8.8\times10^{-9}$ & $9.6\times10^{-10}$ & 6.2 & target \\
+ Diagonal PCG & 226 & $8.8\times10^{-9}$ & $4.9\times10^{-10}$ & 7.1 & target \\
+ MINRES & 236 & $9.4\times10^{-9}$ & $5.9\times10^{-9}$ & 14.4 & target \\
+ Full GMRES & 228 & $9.5\times10^{-9}$ & $6.0\times10^{-9}$ & 188 & target \\
+ \bottomrule
+ \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/square_residuals.pdf}
+ \caption{Relative residual $\eta(x_k)$ of every method on the
+ 840-unknown system; the dashed line is the target $10^{-8}$. (a) Whole
+ budget. (b) First 300 iterations. GMRES shows its Arnoldi residual
+ estimate; all other curves are recomputed residuals.}
+ \label{fig:square-residuals}
+\end{figure}
+
+The stationary methods behave as their diagnostics predict. Because
+$\lambda_{\max}(S)>2$, ordinary Jacobi multiplies the matching error
+component by about $\rho_J=1.96$ per sweep, and the guard stops it after
+49 sweeps~\cite{saad-iterative}. Damping with $\omega=0.5$, below the
+limit $2/\lambda_{\max}(S)=0.676$, restores convergence, but the slowest
+component shrinks only by $1-\omega\lambda_{\min}(S)=0.99982$ per sweep,
+a factor of $0.025$ over the whole budget. Steepest descent is limited in
+the same way: its energy-norm error contracts by at most
+$(\kappa_2-1)/(\kappa_2+1)$ per step, about $0.012$ over 20{,}000
+steps~\cite{shewchuk-cg}. Gauss--Seidel converges for symmetric positive
+definite $A$~\cite{saad-iterative} and meets the target, but needs 19{,}136 sweeps; its time
+mainly reflects one sparse triangular solve per sweep in this
+implementation.
+
+The Krylov methods reach the target in 226--242 iterations. For CG, the
+bound $\|e_k\|_A\le2\bigl((\sqrt{\kappa_2}-1)/(\sqrt{\kappa_2}+1)\bigr)^k\|e_0\|_A$
+on the energy-norm error $e_k=x-x_k$ guarantees a reduction by $10^{-8}$
+within $\tfrac12\sqrt{\kappa_2}\ln(2\times10^{8})\approx912$
+iterations~\cite{shewchuk-cg}. CG needs about a quarter of this, since
+the bound uses only the extreme eigenvalues. Diagonal preconditioning
+helps little here: $S$ has condition number 8029, only 12\% below
+$\kappa_2(A)$, and PCG, which behaves like CG applied to $S$, saves 16
+iterations. MINRES needs a similar count.
+Full GMRES uses the fewest iterations but is the slowest Krylov method,
+because each new basis vector is orthogonalized against all previous
+ones, whereas CG and MINRES use short recurrences that exploit
+symmetry~\cite{saad-iterative}. At this size the sparse LU factorization
+and solve take 2.8~ms together, less than any iterative method.
+
+Equal residual targets do not give equal accuracy. Gauss--Seidel and CG
+both satisfy $\eta<10^{-8}$, yet their errors against LU differ by more
+than two orders of magnitude. Both stay below the bound
+$\|x-x_{\mathrm{LU}}\|_2/\|x_{\mathrm{LU}}\|_2\le\kappa_2(A)\,\eta\approx9.1\times10^{-5}$~\cite{trefethen-bau}.
+The iteration index counts algebraic corrections towards one static
+equilibrium; intermediate iterates are not physical states, and solver
+iterations are not time steps.
+
+\subsection{Deformation and validation}
+Figure~\ref{fig:square-deformed} shows the 840-unknown solution. The
+right edge moves between $0.4916$~mm (mid-height) and $0.4967$~mm
+(bottom corner), close to $pL/E=0.5$~mm. Near the loaded end the top and
+bottom edges move inwards by up to $0.077$ and $0.079$~mm. Together this
+matches the free lateral contraction $\nu pL/E=0.15$~mm of a uniformly
+stretched plate. The clamp
+prevents this contraction at $x=0$, which produces the tapered shape. The
+small difference between top and bottom again reflects the diagonal
+direction.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=0.55\linewidth]{figures/square_deformed.pdf}
+ \caption{Original outline (dashed) and deformed $20\times20$-cell plate,
+ with displacements amplified by a factor of 200. Colour gives the actual
+ displacement magnitude $|\mathbf{u}|$ in mm; the thick line marks the
+ clamp.}
+ \label{fig:square-deformed}
+\end{figure}
+
+We check this solution in three ways. First, all 42 prescribed
+components are exactly zero in the reconstructed $d$, confirming the
+support bookkeeping. Second, the reactions of
+Eq.~\eqref{eq:mechanics-reactions} sum to $-1.000\times10^6$~N in $x$
+and balance the applied load: the remaining force imbalance is
+$(-4.0,\,-2.6)\times10^{-9}$~N and the moment imbalance about the origin
+is $4.5\times10^{-9}$~N\,m, against an applied moment of
+$5\times10^5$~N\,m. Third, the five methods that met the target agree
+with LU to a relative difference of at most $1.7\times10^{-7}$, or
+$8.3\times10^{-8}$~mm in any component.
+
+These checks concern the discrete system only. As an exact test of the
+assembly, loads and supports, we replace the clamp by rollers: $u_x=0$ on
+the left edge and $u_y=0$ at the origin. These remove rigid motion
+without resisting lateral contraction, so the plane-stress solution is
+the affine field $u_x=px/E$, $u_y=-\nu py/E$. Linear triangles represent
+affine fields exactly, so the finite element solution should reproduce it
+up to rounding. On the same $20\times20$ mesh (860 unknowns) its relative
+error is $2.6\times10^{-14}$. The clamped plate has no such closed-form
+solution; Section~\ref{sec:results} estimates its discretization error by
+comparing meshes from $5\times5$ to $80\times80$ cells, together with the
+growth of $\kappa_2(A)$ and of the iteration counts under refinement.

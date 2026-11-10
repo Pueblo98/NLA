@@ -1,0 +1,26 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\pagestyle{plain}
+\numberwithin{equation}{section}
+% Preview-only stand-ins for labels defined in Sections 2, 3 and 6.
+% The combined report uses the real labels; remove these lines there.
+\makeatletter
+\newcommand{\stublabel}[2]{\protected@edef\@currentlabel{#2}\label{#1}}
+\makeatother
+\begin{document}
+\stublabel{sec:mechanics-matrix}{2}%
+\stublabel{eq:mechanics-reactions}{2.4}%
+\stublabel{eq:mechanics-conditioning}{2.6}%
+\stublabel{sec:solvers}{3}%
+\stublabel{eq:solvers-residual}{3.1}%
+\stublabel{sec:results}{6}%
+\setcounter{section}{3}
+\input{section.tex}
+\clearpage
+\bibliographystyle{amsplain}
+\bibliography{references}
+\end{document}

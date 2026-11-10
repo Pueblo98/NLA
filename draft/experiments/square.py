@@ -171,6 +171,7 @@ def benchmark():
                 unknowns=n, stored_nnz=int(A.nnz),
                 numeric_nnz=int(np.count_nonzero(np.abs(A.data) > 1e-12 * np.abs(A.data).max())),
                 symmetry_max_abs=float(abs(A - A.T).max()),
+                symmetry_relative=float(abs(A - A.T).max() / np.abs(A.data).max()),
                 lambda_min=lo, lambda_max=hi, eig_residual_min=rlo, eig_residual_max=rhi,
                 lambda_min_dense=float(ev_dense[0]), lambda_max_dense=float(ev_dense[-1]),
                 kappa2=kappa, kappa2_dense=float(ev_dense[-1] / ev_dense[0]),
