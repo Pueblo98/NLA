@@ -1,0 +1,353 @@
+{
+  "status": "PROPOSED, NOT APPROVED OR EXECUTED",
+  "units": {
+    "length": "m",
+    "force": "N",
+    "stress": "Pa"
+  },
+  "baseline": {
+    "model": "plane stress, homogeneous isotropic linear elasticity",
+    "E_Pa": 200000000000.0,
+    "nu": 0.3,
+    "thickness_m": 0.01,
+    "body_force": [
+      0,
+      0
+    ],
+    "prescribed_displacement_m": [
+      0,
+      0
+    ],
+    "support": "ux=uy=0 along the whole left edge",
+    "loaded_edge": "whole right edge",
+    "traction_Pa": [
+      100000000.0,
+      0
+    ],
+    "total_force_N": [
+      1000000.0,
+      0
+    ],
+    "other_edges": "traction free, including hole"
+  },
+  "objects": [
+    {
+      "id": "S",
+      "name": "square control",
+      "outer_ccw_m": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "holes_cw_m": [],
+      "hole_seeds_m": [],
+      "left_x_m": 0.0,
+      "right_x_m": 1.0,
+      "left_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.75,
+        1.0
+      ],
+      "right_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        1.0
+      ]
+    },
+    {
+      "id": "R",
+      "name": "long rectangle",
+      "outer_ccw_m": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          2.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "holes_cw_m": [],
+      "hole_seeds_m": [],
+      "left_x_m": 0.0,
+      "right_x_m": 2.0,
+      "left_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.75,
+        1.0
+      ],
+      "right_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        1.0
+      ]
+    },
+    {
+      "id": "H",
+      "name": "square with central opening",
+      "outer_ccw_m": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "holes_cw_m": [
+        [
+          [
+            0.4,
+            0.4
+          ],
+          [
+            0.4,
+            0.6
+          ],
+          [
+            0.6,
+            0.6
+          ],
+          [
+            0.6,
+            0.4
+          ]
+        ]
+      ],
+      "hole_seeds_m": [
+        [
+          0.5,
+          0.5
+        ]
+      ],
+      "left_x_m": 0.0,
+      "right_x_m": 1.0,
+      "left_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.75,
+        1.0
+      ],
+      "right_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        1.0
+      ]
+    }
+  ],
+  "meshing": {
+    "generator": "Python triangle interface, constrained polygon triangulation",
+    "implementation_status": "not yet implemented or executed by this drafting task",
+    "minimum_angle_requested_deg": 25,
+    "max_triangle_area_m2": [
+      0.005,
+      0.00125,
+      0.0003125
+    ],
+    "options": [
+      "pq25a0.005",
+      "pq25a0.00125",
+      "pq25a0.0003125"
+    ],
+    "default_max_triangle_area_m2": 0.00125,
+    "notes": [
+      "Insert all listed boundary split points as constrained segment endpoints on every mesh, even for baseline cases.",
+      "Preserve polygon vertices and empty holes; permit boundary subdivision.",
+      "Refinements are not assumed nested. Archive generated nodes, elements, markers, mesher version, options and actual quality.",
+      "Reuse identical nodes/elements for load and support variants."
+    ]
+  },
+  "studies": {
+    "geometry": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "fixed": "baseline physical settings and middle mesh-area limit"
+    },
+    "mesh": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "areas_m2": [
+        0.005,
+        0.00125,
+        0.0003125
+      ],
+      "fixed": "baseline physical case on each object"
+    },
+    "magnitude": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "force_factors": [
+        0.5,
+        1,
+        1.5
+      ],
+      "fixed": "same mesh, full right edge and full clamp"
+    },
+    "location": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "right_edge_intervals_y_m": [
+        [
+          0,
+          0.25
+        ],
+        [
+          0.375,
+          0.625
+        ],
+        [
+          0.75,
+          1
+        ]
+      ],
+      "force_N": [
+        1000000.0,
+        0
+      ],
+      "patch_traction_Pa": [
+        400000000.0,
+        0
+      ],
+      "fixed": "same mesh, full clamp and equal patch length"
+    },
+    "supports": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "left_clamp_intervals_y_m": [
+        [
+          0,
+          1
+        ],
+        [
+          0.25,
+          0.75
+        ]
+      ],
+      "constrained_components": [
+        "ux",
+        "uy"
+      ],
+      "fixed": "same mesh and full-edge baseline load"
+    }
+  },
+  "observables": {
+    "mean_right_ux": "Integral of ux over the entire right edge divided by its length; integrate the piecewise linear boundary trace.",
+    "right_midpoint": "Evaluate ux and uy at (right_x, 0.5) m.",
+    "solver_metrics": "Reuse current Section 3 without changing timing, stopping, method set or counting conventions.",
+    "conditioning": "Section 2 eigenvalue estimates and defects; report failures.",
+    "validation": "Mesh geometry, supported symmetry/positive definiteness, prescribed values, constrained reactions, global force and moment balance, same-mesh reference residual.",
+    "not_results": "No mesh, displacement, timing or convergence output is supplied by this specification.",
+    "solution_source": "Checked same-mesh sparse-LU reference, not an unconverged iterative approximation; deformed outlines use this reference too.",
+    "refinement_comparison": {
+      "outputs": [
+        "mean right-edge ux",
+        "right-midpoint ux",
+        "right-midpoint uy"
+      ],
+      "statistic": "Absolute differences in metres between consecutive area-limit levels; retain both signed values as well.",
+      "relative_difference": "Not used by default, avoiding division by zero or nearly zero midpoint components. Any optional scaled metric must state its nonzero physical scale.",
+      "algebraic_uncertainty": "For each scalar observable w^T x, estimate uncertainty as ||w||_2 ||b-Ax_ref||_2 / lambda_min_est using its actual interpolation or edge-integration weights. Compare the mesh difference with the sum of estimates from the two meshes. This estimate is not a certified bound unless lambda_min has a certified lower bound; it omits assembly and modelling uncertainty.",
+      "resolution_rule": "Report differences at or below the summed algebraic estimates as unresolved; do not infer a convergence rate from them. A missing/unreliable eigenvalue estimate leaves this resolution check unverified. If the comparison depends on differences near these estimates, confirm with a higher-precision reference before drawing a conclusion."
+    }
+  },
+  "proposed_acceptance": {
+    "status": "Proposed execution criteria, not implemented or passed tests; not derived from Section 4 observed imbalances.",
+    "symmetry": {
+      "metric": "||A-A^T||_F / ||A||_F",
+      "threshold": 1e-12,
+      "guard": "Require finite positive denominator."
+    },
+    "positive_definiteness": {
+      "structural": "Check positive thickness, admissible material, nondegenerate conforming triangles, edge-connected solid and constraints removing all three planar rigid motions. This supplies the structural SPD argument.",
+      "small_systems": "For at most 2000 free components, additionally require successful dense Cholesky of the supported matrix after symmetry check.",
+      "large_systems": "Compute smallest algebraic eigenpair with eigsh(which=SA). Require reported convergence, normalized eigenpair defect <= 1e-8, and lambda_est > 10*||A v-lambda_est v||_2/||v||_2. This is a diagnostic supporting the structural argument, not a certified proof of lambda_min.",
+      "defect": "||A v-lambda_est v||_2 / (||A||_inf ||v||_2)",
+      "failure": "Failed/nonconverged diagnostics mean unverified; do not silently treat them as passed or automatically equate eigensolver failure with indefiniteness."
+    },
+    "reference_residual": {
+      "metric": "||b-A x_ref||_2 / ||b||_2",
+      "threshold_strict": 1e-08,
+      "guard": "All proposed cases have nonzero b; use original unrounded arrays."
+    },
+    "supports": {
+      "metric": "max absolute prescribed displacement discrepancy, metres",
+      "threshold_m": 1e-12,
+      "scope": "All prescribed components, which are zero in these cases."
+    },
+    "force_balance": {
+      "metric": "||sum_i(f_i+r_i)||_2 / sum_i ||f_i||_2",
+      "threshold": 1e-08,
+      "reaction_scope": "r is nonzero only at constrained components; include all original applied loads, including those at constrained components."
+    },
+    "moment_balance": {
+      "origin_m": [
+        0,
+        0
+      ],
+      "metric": "|sum_i [x_i*(f_yi+r_yi)-y_i*(f_xi+r_xi)]| / (L_char * sum_i ||f_i||_2)",
+      "L_char": "Bounding-box diagonal in metres of the undeformed object.",
+      "threshold": 1e-08,
+      "guard": "Do not normalize by the net applied moment, which can vanish. Force scale must be positive."
+    },
+    "outcome": "Record each check separately. Do not admit a failed or unverified reference into physical/refinement plots as validated. Solver failure records still belong in solver comparisons."
+  }
+}
