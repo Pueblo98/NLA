@@ -1,0 +1,300 @@
+{
+  "status": "PROPOSED, NOT APPROVED OR EXECUTED",
+  "units": {
+    "length": "m",
+    "force": "N",
+    "stress": "Pa"
+  },
+  "baseline": {
+    "model": "plane stress, homogeneous isotropic linear elasticity",
+    "E_Pa": 200000000000.0,
+    "nu": 0.3,
+    "thickness_m": 0.01,
+    "body_force": [
+      0,
+      0
+    ],
+    "prescribed_displacement_m": [
+      0,
+      0
+    ],
+    "support": "ux=uy=0 along the whole left edge",
+    "loaded_edge": "whole right edge",
+    "traction_Pa": [
+      100000000.0,
+      0
+    ],
+    "total_force_N": [
+      1000000.0,
+      0
+    ],
+    "other_edges": "traction free, including hole"
+  },
+  "objects": [
+    {
+      "id": "S",
+      "name": "square control",
+      "outer_ccw_m": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "holes_cw_m": [],
+      "hole_seeds_m": [],
+      "left_x_m": 0.0,
+      "right_x_m": 1.0,
+      "left_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.75,
+        1.0
+      ],
+      "right_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        1.0
+      ]
+    },
+    {
+      "id": "R",
+      "name": "long rectangle",
+      "outer_ccw_m": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          2.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "holes_cw_m": [],
+      "hole_seeds_m": [],
+      "left_x_m": 0.0,
+      "right_x_m": 2.0,
+      "left_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.75,
+        1.0
+      ],
+      "right_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        1.0
+      ]
+    },
+    {
+      "id": "H",
+      "name": "square with central opening",
+      "outer_ccw_m": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "holes_cw_m": [
+        [
+          [
+            0.4,
+            0.4
+          ],
+          [
+            0.4,
+            0.6
+          ],
+          [
+            0.6,
+            0.6
+          ],
+          [
+            0.6,
+            0.4
+          ]
+        ]
+      ],
+      "hole_seeds_m": [
+        [
+          0.5,
+          0.5
+        ]
+      ],
+      "left_x_m": 0.0,
+      "right_x_m": 1.0,
+      "left_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.75,
+        1.0
+      ],
+      "right_boundary_splits_y_m": [
+        0.0,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        1.0
+      ]
+    }
+  ],
+  "meshing": {
+    "generator": "Python triangle interface, constrained polygon triangulation",
+    "implementation_status": "not yet implemented or executed by this drafting task",
+    "minimum_angle_requested_deg": 25,
+    "max_triangle_area_m2": [
+      0.005,
+      0.00125,
+      0.0003125
+    ],
+    "options": [
+      "pq25a0.005",
+      "pq25a0.00125",
+      "pq25a0.0003125"
+    ],
+    "default_max_triangle_area_m2": 0.00125,
+    "notes": [
+      "Insert all listed boundary split points as constrained segment endpoints on every mesh, even for baseline cases.",
+      "Preserve polygon vertices and empty holes; permit boundary subdivision.",
+      "Refinements are not assumed nested. Archive generated nodes, elements, markers, mesher version, options and actual quality.",
+      "Reuse identical nodes/elements for load and support variants."
+    ]
+  },
+  "studies": {
+    "geometry": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "fixed": "baseline physical settings and middle mesh-area limit"
+    },
+    "mesh": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "areas_m2": [
+        0.005,
+        0.00125,
+        0.0003125
+      ],
+      "fixed": "baseline physical case on each object"
+    },
+    "magnitude": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "force_factors": [
+        0.5,
+        1,
+        1.5
+      ],
+      "fixed": "same mesh, full right edge and full clamp"
+    },
+    "location": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "right_edge_intervals_y_m": [
+        [
+          0,
+          0.25
+        ],
+        [
+          0.375,
+          0.625
+        ],
+        [
+          0.75,
+          1
+        ]
+      ],
+      "force_N": [
+        1000000.0,
+        0
+      ],
+      "patch_traction_Pa": [
+        400000000.0,
+        0
+      ],
+      "fixed": "same mesh, full clamp and equal patch length"
+    },
+    "supports": {
+      "objects": [
+        "S",
+        "R",
+        "H"
+      ],
+      "left_clamp_intervals_y_m": [
+        [
+          0,
+          1
+        ],
+        [
+          0.25,
+          0.75
+        ]
+      ],
+      "constrained_components": [
+        "ux",
+        "uy"
+      ],
+      "fixed": "same mesh and full-edge baseline load"
+    }
+  },
+  "observables": {
+    "mean_right_ux": "Integral of ux over the entire right edge divided by its length; integrate the piecewise linear boundary trace.",
+    "right_midpoint": "Evaluate ux and uy at (right_x, 0.5) m.",
+    "solver_metrics": "Reuse current Section 3 without changing timing, stopping, method set or counting conventions.",
+    "conditioning": "Section 2 eigenvalue estimates and defects; report failures.",
+    "validation": "Mesh geometry, supported symmetry/positive definiteness, prescribed values, constrained reactions, global force and moment balance, same-mesh reference residual.",
+    "not_results": "No mesh, displacement, timing or convergence output is supplied by this specification."
+  }
+}

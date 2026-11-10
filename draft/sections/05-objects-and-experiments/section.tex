@@ -1,0 +1,112 @@
+% AI-assisted initial working draft for team review, not agreed experiments.
+% Requires amsmath, graphicx, booktabs, tabularx and array.
+\section{Additional objects and experimental design}
+\label{sec:objects-experiments}
+
+The square demonstrated one equilibrium solution. We now propose
+comparisons of geometry, mesh size, loading and supports to test how
+widely its behaviour applies. These are experiment specifications,
+not findings or an agreed final selection of objects.
+
+\subsection{Objects and shared physical settings}
+We retain the unit square as a control and propose two additional
+objects (Fig.~\ref{fig:experiments-objects}). The longer rectangle tests
+the effect of increasing the distance between support and load. The
+perforated square tests removing material while keeping the outer
+boundary fixed. We compare both deformation and solver effort.
+Both changes also alter material area, so neither isolates shape at
+constant area.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/objects.pdf}
+ \caption{Proposed geometries at a common scale, in metres, not meshes
+ or deformations. Blue edges are clamped in both directions; arrows
+ indicate uniform rightward traction on red edges. Other edges are free.}
+ \label{fig:experiments-objects}
+\end{figure}
+
+Coordinates are in metres. The square's outer boundary is
+$(0,0),(1,0),(1,1),(0,1)$; the rectangle's is
+$(0,0),(2,0),(2,1),(0,1)$. The perforated square retains the first
+boundary and adds the opening
+$(0.4,0.4),(0.4,0.6),(0.6,0.6),(0.6,0.4)$.
+Outer vertices run counterclockwise, hole vertices clockwise, and each
+list closes back to its first vertex. The opening is empty space, not
+a softer material.
+
+All baseline cases retain Section 4's plane-stress settings:
+$E=200$ GPa, $\nu=0.3$, $t=0.01$ m, no body force and zero displacement
+in both directions along the whole left edge. Uniform rightward
+traction $p=100$ MPa acts on the whole right edge. Each edge is one metre
+high, giving the same total force $F_0=10^6$ N. Other boundaries are
+traction-free. Material and thickness stay fixed throughout.
+
+\subsection{Meshes that preserve the physical case}
+We propose Triangle's boundary-constrained meshing through its Python
+interface, as introduced in Section 2~\cite{shewchuk-triangle}.
+All three objects, including the square control, will use this route;
+Section 4's structured mesh is therefore a separate demonstration, not
+a matched-mesh geometry comparison. We request a minimum triangle angle
+of $25^\circ$ and maximum triangle areas of $0.005$, $0.00125$ and
+$0.0003125$ m$^2$. These are area limits, not guaranteed edge lengths
+or error bounds. Equal area limits need not give equal numbers of unknowns.
+
+Boundary segments, holes and load/support endpoints must be preserved.
+Edge forces are integrated as in Section 2, not assigned equally per node,
+so refinement preserves the physical loading. Before solving, we check
+positive triangle areas, boundary coverage, an empty opening and one
+connected solid region. Both support choices below fix at least two
+distinct points in both directions, preventing translations and rotation.
+We check the supported matrix and record element counts, free unknowns
+and mesh quality. The companion case specification supplies boundary
+splits, a hole seed and mesher options.
+
+\subsection{Controlled comparisons and recorded responses}
+Table~\ref{tab:experiments-register} defines the comparisons. Except
+under refinement, we use the middle area limit. Load and support studies
+reuse each object's mesh, changing only the named factor from the baseline.
+
+\begin{table}[htbp]
+ \centering
+ \caption{Proposed case register, using fixed material and thickness
+ and Section 3's protocol. Outcomes belong in Section 6.}
+ \label{tab:experiments-register}
+ \begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+ \toprule
+ Study & Changed factor & Question and fixed quantities\\
+ \midrule
+ Geometry & Square, rectangle, perforated square & How do response and solver cost change at fixed traction, clamp and mesh-area limit?\\
+ Mesh & Three area limits, on each object & Do displacement measures settle under refinement of the same physical case?\\
+ Magnitude & $0.5F_0$, $F_0$, $1.5F_0$ on each object & Does displacement scale with load when its location, mesh and supports are fixed?\\
+ Location & Lower, middle or upper right-edge patch on each object & How does moving the same total force affect deformation at fixed mesh and clamp?\\
+ Supports & Full left clamp or central half-clamp on each object & How does releasing part of the boundary affect response at fixed mesh and full-edge load?\\
+ \bottomrule
+ \end{tabularx}
+\end{table}
+
+For the location study, each patch is $0.25$ m high: its vertical interval
+is $[0,0.25]$, $[0.375,0.625]$ or $[0.75,1]$ m. Each carries $F_0$
+rightward, so its uniform traction is $F_0/(0.25\,\mathrm{m}\,t)=400$ MPa; the rest
+of the edge is unloaded. Comparing these three equal-length patches
+isolates location. Comparing a patch with the full-edge baseline would
+also change load concentration. The shorter clamp fixes both components
+on the left-edge interval $[0.25,0.75]$ m and leaves the rest of that
+edge traction-free. Its physical length stays fixed under refinement,
+not its number of nodes.
+
+We record mean horizontal displacement along the whole right edge
+and displacement at its midpoint, comparing the same physical locations
+across meshes. The mean is edge-length weighted, not a node average.
+Deformed outlines will state units and amplification. Solver measurements
+follow Section 3; conditioning estimates follow Section 2 and are not
+inferred from displacement size. Magnitude scaling at fixed stiffness
+checks linearity, not directional load sensitivity, which requires a
+separately specified perturbation test.
+
+Each case needs Section 4's support and force/moment-balance checks.
+Refinement measures mesh dependence, not error against an exact solution.
+Sharp corners and boundary-condition changes can concentrate stress;
+peak corner stresses are therefore excluded as convergence measures.
+Physical interpretation still requires checking the small-strain assumptions.
+Object selection and Section 2's assembly-routine permission remain open.
