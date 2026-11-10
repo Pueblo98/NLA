@@ -1,0 +1,16 @@
+{
+  "commit": "7cca2b8e1d180a39679e89ce31e70cd9478c554c",
+  "pr": "https://github.com/Pueblo98/NLA/pull/5",
+  "files": [
+    {
+      "name": "preview.pdf",
+      "git_blob_sha": "9f07f6b0644b087e9183147a94db5e873729a42c",
+      "url": "https://github.com/Pueblo98/NLA/blob/7cca2b8e1d180a39679e89ce31e70cd9478c554c/draft/sections/03-solvers-and-protocol/preview.pdf"
+    },
+    {
+      "name": "section.tex",
+      "git_blob_sha": "bb24d43741cea10bd1abd392fd967a367f4dde0a",
+      "url": "https://github.com/Pueblo98/NLA/blob/7cca2b8e1d180a39679e89ce31e70cd9478c554c/draft/sections/03-solvers-and-protocol/section.tex"
+    }
+  ]
+}

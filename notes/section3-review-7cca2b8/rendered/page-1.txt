@@ -1,0 +1,57 @@
+3
+Numerical methods and comparison protocol
+Section 2 established that suﬀicient supports give a sparse, symmetric positive-definite system
+Ax = b. These properties guide how we solve for the free displacements: direct methods factor
+the matrix, while iterative methods improve an approximation without forming its inverse. We
+compare methods on the same supported system. Iterations approach one static equilibrium;
+they are not steps in physical time.
+3.1
+Direct and iterative solutions
+For a small system, Cholesky factorization uses positive definiteness to write A = LLT , where
+L is lower triangular. We first solve Ly = b for an intermediate vector y, then LT x = y for
+the displacement.
+Pivoted LU instead factors a row-permuted matrix into lower and upper
+triangular factors. Both avoid explicitly forming A−1. The small example also evaluates A−1b
+for illustration only. For larger systems, sparse LU supplies a numerical reference xref on the
+identical mesh. It is an untimed reference, not a measured competitor in the current iterative
+timing comparison.
+The simpler iterative methods correct the current force imbalance, called the residual. Let
+xk be the displacement approximation after k iterations, rk = b −Axk, and P = diag(A) the
+diagonal matrix containing the diagonal entries of A. Jacobi updates all components from their
+previous values; damped Jacobi scales that update:
+xk+1 = xk + ωP −1rk.
+(1)
+Our comparison uses ω = 1 for Jacobi and ω = 0.5 for damped Jacobi. Gauss–Seidel instead
+updates components sequentially, using the newest values already available. Positive definiteness
+guarantees Gauss–Seidel convergence in exact arithmetic, but does not guarantee ordinary Jacobi
+convergence.
+Damping can help, although its chosen weight is not a universal convergence
+guarantee [1].
+Steepest descent also follows rk, but selects the step that minimizes the quadratic energy
+1
+2xT Ax −bT x along that direction:
+xk+1 = xk + αkrk,
+αk = rT
+k rk
+rT
+k Ark
+.
+(2)
+Conjugate gradients (CG) improves on this by retaining information from previous corrections.
+Its search directions are mutually conjugate with respect to A, meaning pT
+i Apj = 0 for distinct
+directions pi, pj in exact arithmetic. Each step minimizes the same energy over the search space
+built so far. This makes CG a natural choice for our supported positive-definite matrix [1].
+Diagonal preconditioned CG (PCG) uses zk = P −1rk to scale the residual before constructing
+its search direction.
+The positive diagonal makes this scaling compatible with CG without
+changing the solution. It need not resolve poor conditioning; any benefit must outweigh setup
+and application costs. In SciPy the argument M receives the inverse action P −1, not P itself [2].
+We also include GMRES and MINRES as comparisons, not because the matrix requires a
+nonsymmetric or indefinite solver. Both seek a small Euclidean residual in a growing space
+generated from the initial residual by repeated multiplication by A. GMRES constructs and
+stores an orthogonal basis of that space; MINRES exploits symmetry through a short recurrence.
+Our unpreconditioned GMRES uses a restart length equal to the number of free unknowns,
+allowing a full search space before any restart. This full-GMRES choice can become expensive
+in memory and orthogonalization as the mesh grows [1, 3].
+1

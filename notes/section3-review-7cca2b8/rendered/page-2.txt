@@ -1,0 +1,56 @@
+3.2
+Common stopping and timing rules
+All eight iterative methods receive the same A, b and start from x0 = 0. For nonzero b, we
+accept a computed solution only when an independently recomputed relative residual satisfies
+ρ(x) = ∥b −Ax∥2
+∥b∥2
+< 10−8,
+(3)
+where ∥·∥2 denotes the Euclidean vector norm. The common budget is 20 000 iterations. One
+iteration means one complete stationary sweep or one Krylov step; for GMRES we count inner
+Arnoldi steps, not restart cycles. Counts represent different work per step and do not alone
+establish speed. If b = 0, the supported system has x = 0 and we report zero iterations and zero
+absolute residual without dividing by ∥b∥2.
+We retain both the solver’s return status and the independent acceptance flag. CG and PCG
+use relative tolerance 10−8 and zero absolute tolerance. MINRES uses native relative tolerance
+zero and a callback that stops when the true residual meets Eq. (3); its native stopping test
+is not treated as an equivalent criterion. GMRES uses SciPy’s legacy callback convention so
+its budget counts inner steps. Its recorded history contains Arnoldi residual estimates, whereas
+final acceptance always uses b −Ax. Other recorded histories use explicitly computed residuals.
+Budget exhaustion or breakdown is reported rather than removed from the comparison; the
+stationary and steepest-descent runs also stop if the relative residual is nonfinite or exceeds
+1010. An unsuccessful run’s time is not a time to the requested accuracy.
+The current benchmark records three timed calls per method and reports the minimum,
+retaining all three values. Residual histories are collected in a separate run. Each timed call
+includes iterative setup, such as the diagonal preconditioner or Gauss–Seidel splitting, and re-
+quired stopping checks. MINRES therefore still computes a true residual at each timed iteration.
+Assembly, condition estimation, the sparse-LU reference and final independent error checks are
+outside the timer. These are setup-inclusive iterative times, not separately measured setup and
+solve costs. Software and machine details accompany the data. Small timing differences do not
+establish a general ranking. Separating setup or factorization from solves would require new
+measurements.
+3.3
+Accuracy and validation
+Alongside runtime, iteration count and ρ(x), we report agreement with the direct reference
+through
+eref(x) = ∥x −xref∥2
+∥xref∥2
+.
+(4)
+We check the reference’s residual: it is a numerical solution, not an exact answer. Conditioning,
+introduced in Section 2, explains why a small force imbalance need not imply an equally small
+displacement error. Residuals, reference agreement and termination behaviour provide practical
+checks on solver reliability. A separate load-perturbation experiment probes sensitivity at fixed
+A.
+Each perturbation test records its magnitude and direction; one test does not establish
+worst-case sensitivity.
+These checks address the solution of one mesh’s equations, not the error introduced by
+approximating a continuous body with triangles. To investigate that separate discretization
+error, we refine the mesh while preserving geometry, material, physical loads and support regions,
+and compare displacements at matching locations or consistently defined observables. Agreement
+between solvers on one mesh is not evidence of continuum accuracy.
+In Sections 4 and 6, we reconstruct the full displacement, verify prescribed values and use
+Section 2’s reactions to check total force and moment balance. Free-row residuals are not sup-
+port reactions. A separate exact aﬀine-displacement test uses roller supports, not the clamped
+benchmark conditions. Section 4 now applies this protocol to the square example.
+2

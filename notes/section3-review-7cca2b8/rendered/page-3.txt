@@ -1,0 +1,10 @@
+References
+[1] Yousef Saad, Iterative methods for sparse linear systems, second ed., SIAM, 2003.
+[2] SciPy developers, scipy.sparse.linalg.cg, https://docs.scipy.org/doc/scipy/reference/
+generated/scipy.sparse.linalg.cg.html, API documentation.
+[3]
+,
+scipy.sparse.linalg.gmres,
+https://docs.scipy.org/doc/scipy/reference/
+generated/scipy.sparse.linalg.gmres.html, API documentation.
+3
