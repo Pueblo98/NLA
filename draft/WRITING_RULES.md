@@ -26,13 +26,14 @@ This is the **only shared writing guide** for the report. Edit this file when th
 - Identify illustrative meshes as examples, separate from computed project results. Support numerical claims with reproducible evidence and state limitations.
 - Write in our own words and cite sources where ideas, equations, algorithms, figures, data or code are used. Use the template's `amsplain` bibliography and `\cite{...}` commands; check that citations and bibliography entries match. Include member contributions and the required AI-use disclosure. Keep full code listings outside the report.
 
-## Review after each section
+## Review before and after each section
 
 1. Read the section's scope in [ROADMAP.md](ROADMAP.md) before writing. Work in its folder under [sections/](sections/).
-2. After drafting or revising Section \(n\), reread **every earlier section, 1 through \(n-1\)** before calling it complete. For Section 2, this means rereading Section 1. Remove overlapping explanations and repeated derivations; use cross-references and check that notation, assumptions and claims remain consistent. Keep detailed mechanics in Section 2 rather than repeating the introduction.
-3. Check concision, paragraph flow, definitions, evidence, citations and figure references. Record unresolved questions in the section's README.
-4. Compile the exact revised source and inspect its PDF before claiming the layout is checked. Check figures, references, pagination and readability, and keep the source and preview synchronized.
-5. Keep section drafts subject to team review. This consolidation does not reopen the introduction or mark any report section final.
+2. **Before writing Section \(n>1\), read the preceding section**, especially its closing paragraphs. Open the new section with a clear bridge from what the reader has just learned to the next topic, explaining why that next step follows. Build on established ideas without repeating their explanations.
+3. After drafting or revising Section \(n\), reread **every earlier section, 1 through \(n-1\)** before calling it complete. For Section 2, this means rereading Section 1. Read the preceding section's ending together with the new section's opening to check that the transition is smooth. Remove overlapping explanations and repeated derivations; use cross-references and check that notation, assumptions and claims remain consistent. Keep detailed mechanics in Section 2 rather than repeating the introduction.
+4. Check concision, paragraph flow, definitions, evidence, citations and figure references. Record unresolved questions in the section's README.
+5. Compile the exact revised source and inspect its PDF before claiming the layout is checked. Check figures, references, pagination and readability, and keep the source and preview synchronized.
+6. Keep section drafts subject to team review. This consolidation does not reopen the introduction or mark any report section final.
 
 ## Consolidation record
 
