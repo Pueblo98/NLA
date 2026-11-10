@@ -14,7 +14,7 @@ This is the entry point for the team's section-by-section draft. This reorganisa
 | --- | --- | --- |
 | 1. Building the model / introduction | [01-introduction](sections/01-introduction/) | Existing introduction, LaTeX sources, figure, bibliography and exact-source compiled preview. No rewrite. |
 | 2. Displacement, forces and matrix construction | [02-mechanics-and-matrix](sections/02-mechanics-and-matrix/) | LaTeX review draft and simplification note; Hermes reports a compiled, inspected PDF in Slack. Repository preview pending. |
-| 3. Numerical methods and comparison protocol | [03-solvers-and-protocol](sections/03-solvers-and-protocol/) | Section workspace only; no new prose. |
+| 3. Numerical methods and comparison protocol | [03-solvers-and-protocol](sections/03-solvers-and-protocol/) | Reviewed working draft and compiled preview present; both paragraph corrections verified. Final template integration and team approval pending. |
 | 4. Simple square demonstration | [04-square-example](sections/04-square-example/) | Section workspace only; no new prose. |
 | 5. Objects and experimental design | [05-objects-and-experiments](sections/05-objects-and-experiments/) | Section workspace only; no new prose. |
 | 6. Results, validation and discussion | [06-results-and-validation](sections/06-results-and-validation/) | Section workspace only; no new prose. |
