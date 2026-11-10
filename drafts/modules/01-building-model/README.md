@@ -1,125 +1,104 @@
-# Building the model: equation-led revision
+# Building the model: prose revision
 
-Lucas's Codex, 10 November 2026. Working proposal for Lucas, Simon, Darius,
-Hermes and Frambuesa. AI-assisted, awaiting team review.
+Lucas's Codex, 10 November 2026. AI-assisted working draft for team review;
+not an approved final section.
 
-## What changed
+## Current revision
 
-The opening now uses five explanatory bullets and six numbered, labelled
-`equation` environments. Its progression is displacement and relative motion,
-strain and stress, field equilibrium, interpolation over filled triangles,
-element stiffness, full nodal equilibrium, and the reduced linear system.
-It keeps geometries, material values, load locations and support choices for
-later case descriptions. Uniform positive thickness, small displacement
-gradients, linear elasticity and static in-plane loading are modelling
-assumptions; a particular plane stress/plane strain law is not selected here.
+Lucas's latest instruction supersedes the earlier requests for bullet points.
+`section.tex` now uses connected paragraphs and three numbered equations.
+It explains displacement, strain and stress in words before introducing
+force balance, a filled triangular mesh, assembly and the constrained system.
+The separate strain, interpolation and element-stiffness formulas have been
+removed from the opening. Material parameters, particular shapes, solver
+properties and the detailed finite element derivation belong in later modules.
+The opening stays general across geometries, loads and support arrangements.
 
-The mesh explanation starts with boundary segments, includes holes and
-interior nodes, and explains that triangles cover an area. It does not imply
-that triangulation changes a wire frame into a physical solid. Shared nodal
-values give continuous displacement along shared edges; strain and stress
-can jump between elements. Constrained Delaunay triangulation is the planned
-meshing approach, not a claim that every shape is already implemented.
-
-## Equation references for subsequent modules
+The retained labels are:
 
 | Label | Meaning |
 | --- | --- |
-| `eq:model-strain-stress` | Engineering strain and linear material law |
-| `eq:model-field-balance` | Two scalar static equilibrium PDEs |
-| `eq:model-interpolation` | Linear displacement inside a triangle |
-| `eq:model-element-stiffness` | Constant-strain triangle stiffness |
-| `eq:model-full-balance` | Full nodal balance including reactions |
-| `eq:model-reduced-system` | Free displacement system `Ax=b` |
+| `eq:model-field-balance` | Force balance inside the material |
+| `eq:model-full-balance` | Full nodal equilibrium, including support forces |
+| `eq:model-reduced-system` | System for the unknown displacements |
 
-Use `\eqref{eq:model-field-balance}` and
-`\eqref{eq:model-full-balance}` when explaining the physical origin of the
-matrix equations. The displayed third strain component is engineering shear
-`gamma_xy`, not tensor shear `epsilon_xy`; the implemented `D` and `B` use
-this same convention. Subscripts on `u_x,u_y` denote components, not derivatives.
+The old labels `eq:model-strain-stress`, `eq:model-interpolation` and
+`eq:model-element-stiffness` are removed. No other current repository `.tex`
+file references them. Later modules should use the retained labels to refer
+back to the physical and matrix balances.
 
-## Derivation behind the short opening
+## Technical details for later modules
 
-Let `v` be a hypothetical displacement that vanishes in prescribed
-components. Multiply the field equilibrium equations by `v`, integrate over
-the domain and integrate by parts. For constant thickness `t`, this gives
+The opening assumes static, in-plane linear elasticity with small displacement
+gradients, including small rotations. A particular plane-stress or plane-strain
+law is not selected. Material and thickness assumptions must be specified in
+the individual cases. Subscripts on displacement components denote directions,
+not derivatives.
+
+Triangulation partitions the existing solid region; it does not turn a set of
+edges into material. Linear displacement interpolation throughout each filled
+triangle agrees along a shared edge because both triangles use the same
+endpoint values. Strain and stress may still jump between triangles.
+
+For a more detailed derivation, multiply field equilibrium by a hypothetical
+displacement `v` that is zero in prescribed components, integrate and integrate
+by parts. With constant thickness `t`, the work balance is
 
 \[
-\int_\Omega t\,\boldsymbol{\varepsilon}(v)^T D
-                  \boldsymbol{\varepsilon}(u)\,dA
+\int_\Omega t\,\varepsilon(v)^T D\varepsilon(u)\,dA
 =\int_\Omega t\,v\cdot g\,dA
- +\int_{\Gamma_T}t\,v\cdot\bar{\tau}\,ds.
+ +\int_{\Gamma_T}t\,v\cdot\bar\tau\,ds.
 \]
 
-Here `g` is body force per unit volume, `bar(tau)` is prescribed traction
-(force per unit area), and the strain vector uses engineering shear. In
-physical terms, internal and external work agree for every permitted small
-change in displacement. This is integrated equilibrium, rather than exact
-pointwise enforcement of the PDE inside each triangle.
+Here the strain vector uses engineering shear, `g` is force per unit volume,
+and `bar(tau)` is the prescribed boundary force per unit area. Substituting
+linear nodal interpolation for `u` and `v` gives the triangle coefficients.
+For constant material properties within an element, these are
+`K_e = t * area(T_e) * B_e.T * D_e * B_e`, as in
+`fem/elasticity.py`. Adding contributions at shared nodes gives the full
+matrix. This is an integrated force balance; the approximation need not
+satisfy the field equations pointwise.
 
-Insert the linear nodal interpolation for `u` and `v`. Its derivatives form
-`B_e`, constant on a straight triangle. With `D_e` constant on that triangle,
-the integral becomes `t * area(T_e) * B_e.T * D_e * B_e`. This is the formula
-in `fem/elasticity.py`, `element_stiffness`. In the assembly step, local node
-indices are mapped to global indices and contributions at shared nodes are
-added. The load vector is formed by integrating body forces and boundary
-tractions with the same shape functions, so its entries are forces, not
-tractions.
+For prescribed components `C` and free components `F`, the free equations are
+`K_FF d_F + K_FC d_C = f_F`, since support reactions are zero in free
+components. This gives `A = K_FF`, `x = d_F` and
+`b = f_F - K_FC d_C`. Reactions are recovered from the constrained rows as
+`r_C = K_CF d_F + K_CC d_C - f_C`.
 
-The free equations are `K_FF d_F + K_FC d_C = f_F`. Constrained equations
-recover reactions as `r_C = K_CF d_F + K_CC d_C - f_C`. Thus `Kd=f+r`
-includes the complete nodal balance, whereas `Ax=b` solves only for unknown
-components. Zero prescribed displacement gives `b=f_F`; nonzero prescribed
-displacements also contribute to `b`.
+Matrix symmetry, positive definiteness and solver choices are intentionally
+left for the methods discussion. Positive definiteness requires a valid,
+nondegenerate mesh, positive thickness, a symmetric positive-definite material
+law and supports eliminating rigid motions on every connected component.
+No new numerical experiments are claimed in this prose revision.
 
-The unconstrained matrix is positive semidefinite. Positive definiteness
-of `K_FF` assumes a conforming nondegenerate mesh, a symmetric positive-definite
-material matrix, positive thickness and constraints eliminating rigid
-motions on every connected component. Each connected two-dimensional
-component has two translations and one infinitesimal rotation. These facts
-are consistent with the earlier square-benchmark review; no new numerical
-experiments are claimed in this writing revision.
+## Sources and disclosure
 
-## Sources
-
-The equilibrium and integrated formulation were checked against
-[Logg and Langtangen, The equations of linear elasticity, FEniCSx tutorial](https://github.com/jorgensd/dolfinx-tutorial/blob/main/chapter2/linearelasticity.md).
-The boundary-conforming mesh and hole description were checked against
-[Shewchuk, Triangle: Generating Delaunay triangulations](https://www.cs.cmu.edu/~quake/triangle.delaunay.html).
-Accessed 10 November 2026. The first source illustrates an isotropic law;
-our general `D` notation leaves the two-dimensional law to the case definitions.
-`references.bib` contains both entries and `section.tex` cites both. Retain
-source attribution and the required AI-use disclosure in the combined report.
+The existing citations to the FEniCSx elasticity tutorial and Shewchuk's
+Triangle documentation remain in `section.tex` and `references.bib`.
+Retain them and the course-required AI-use disclosure when combining modules.
 No AI detector was used in this revision and no detector score is claimed.
 
-## Build, verification and handoff
+## Build and verification
 
-Run from this directory:
+Run `sh build.sh` from this directory. The standalone wrapper `main.tex`
+uses A4 paper, 11 pt text and 25 mm margins, with references on a separate
+page. Include `section.tex` once in the combined course template and merge
+the bibliography entries; do not shrink its fonts, margins or spacing.
 
-```sh
-sh build.sh
-```
+A fresh build of this prose revision was attempted on 10 November 2026.
+It failed with exit code 101 because the bundled Tectonic compiler could not
+open or download its missing TeX resource bundle. The local ignored
+`compile.log` records the error. No PDF was produced for this revision;
+page count, visual layout and resolved reference numbers remain unverified.
+Hermes's earlier PDF builds correspond to the superseded source.
 
-The script supports Tectonic or `pdflatex` plus BibTeX and produces `main.pdf`.
-It performs the extra LaTeX passes needed to resolve labels and citations.
-The preview is A4, 11 pt, with 25 mm margins. References start on a separate
-page so that the opening's length can be assessed independently. Include
-`section.tex` once through `\input` in the combined report, merge the
-bibliography entries, and use the course template with `clean,onecolumn`.
+Static checks confirmed exactly three numbered equations, matching equation
+labels and references, no list environments, no em dashes, and no remaining
+uses of the three removed labels in repository LaTeX files. Citation keys,
+environment pairing, brace pairing and shell syntax were also checked.
+These checks do not establish that LaTeX compilation succeeds.
 
-Compilation was attempted here on 10 November 2026. A bundled Tectonic
-executable exists outside PATH, but the default TeX resource bundle is
-absent. Both an offline attempt and `sh build.sh` failed while opening that
-bundle; the network cannot fetch it. The cache was redirected inside the
-module directory to respect workspace permissions. No new PDF was produced.
-Consequently page count, typesetting, resolved reference numbers and visual
-layout remain unverified; the earlier one-page PDF claim does not apply to
-this revision. Static checks verify source label/reference consistency,
-citation keys, matched environments and shell syntax only.
-
-Hermes: compile this exact version in your working LaTeX environment, inspect
-the PDF and attach it to the thread. Check the half-to-one-page target in the
-course template; the extra equations may require shortening the prose or
-moving the element stiffness formula to the methods module. Preserve the
-field equilibrium, full reaction-inclusive balance and reduced-system labels.
-Frambuesa: keep specific shapes and loading diagrams for later case modules.
+Hermes: compile this exact revised source using `sh build.sh`, check that
+paragraphs and equations fit comfortably within the half-to-one-page opening
+target, and attach the PDF. Keep the three numbered physical-to-matrix
+balances; do not restore bullet points or squeeze the template spacing.
