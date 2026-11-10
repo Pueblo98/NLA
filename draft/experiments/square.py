@@ -382,29 +382,27 @@ def figures(small_s, s20, d20, hists, rows):
     ax.set_title(rf"(c) $20\times20$ cells, deformed $\times{SCALE}$")
     save(fig, "square_setup")
 
-    # ---- Figure: residual histories ----
-    fig, axes = plt.subplots(1, 2, figsize=(6.5, 1.85), constrained_layout=True)
+    # ---- Figure: residual histories (first 300 iterations) ----
+    fig, ax = plt.subplots(figsize=(5.6, 2.3), constrained_layout=True)
     styles = {"Jacobi": ("#999999", "-"), "Damped Jacobi": ("#a6761d", "-"),
               "Gauss-Seidel": ("#1b9e77", "-"), "SD": ("#e6ab02", "-"),
               "CG": ("#d95f02", "-"), "PCG (diagonal)": ("#7570b3", "--"),
               "MINRES": ("#e7298a", ":"), "GMRES (full)": ("#1f78b4", "-.")}
-    labels = {"SD": "steepest descent", "PCG (diagonal)": "PCG (diag.)",
-              "Gauss-Seidel": "Gauss–Seidel", "Damped Jacobi": r"damped Jacobi"}
-    for ax, xmax in zip(axes, (CAP, 300)):
-        for m in pb.METHODS:
-            h = np.asarray(hists[m])
-            c, ls = styles[m]
-            ax.semilogy(np.arange(len(h)), h, color=c, ls=ls, lw=1.0, label=labels.get(m, m))
-        ax.axhline(TOL, color="black", ls="--", lw=0.6)
-        ax.set_xlim(0, xmax)
-        ax.set_xlabel("iteration $k$ (GMRES: inner Arnoldi step)", labelpad=1)
-        ax.grid(alpha=0.25, lw=0.5)
-    axes[0].set_ylim(1e-9, 1e11)
-    axes[1].set_ylim(1e-9, 1e3)
-    axes[0].set_ylabel(r"relative residual $\eta(x_k)$")
-    axes[0].set_title("(a) full budget")
-    axes[1].set_title("(b) first 300 iterations")
-    axes[0].legend(fontsize=6, ncol=2, loc="upper right", frameon=False)
+    labels = {"SD": "steepest descent", "PCG (diagonal)": "diagonal PCG",
+              "Gauss-Seidel": "Gauss–Seidel", "Damped Jacobi": r"damped Jacobi",
+              "GMRES (full)": "full GMRES"}
+    for m in pb.METHODS:
+        h = np.asarray(hists[m])
+        c, ls = styles[m]
+        ax.semilogy(np.arange(len(h)), h, color=c, ls=ls, lw=1.1, label=labels.get(m, m))
+    ax.axhline(TOL, color="black", ls="--", lw=0.6)
+    ax.text(298, TOL * 2, r"target $10^{-8}$", ha="right", va="bottom", fontsize=6.5)
+    ax.set_xlim(0, 300)
+    ax.set_ylim(1e-9, 1e3)
+    ax.set_xlabel("iteration $k$", labelpad=1)
+    ax.set_ylabel(r"relative residual $\eta(x_k)$")
+    ax.grid(alpha=0.25, lw=0.5)
+    ax.legend(fontsize=6.5, loc="center left", bbox_to_anchor=(1.01, 0.5), frameon=False)
     save(fig, "square_residuals")
 
 

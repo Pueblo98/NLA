@@ -9,13 +9,12 @@ response, calculating each triangle's contribution and applying the
 supports.
 
 \subsection{From displacement to internal forces}
-Our working model is a thin sheet of constant thickness $t>0$, with the
-same material properties everywhere and in every direction. Forces act
-within its plane, and its front and back faces are free of applied
-forces. We use \emph{plane stress}: stresses through the thickness are
-neglected, although the thickness may change. We consider the settled
-shape under static loading, with strains and rotations small enough for
-a linear approximation. The model excludes bending and permanent deformation.
+We model a thin sheet of constant thickness $t>0$, made of one material
+with the same properties everywhere and in every direction. Loads act in
+its plane and its faces are free, so we use \emph{plane stress}: stresses
+through the thickness are neglected. We consider the settled shape under
+static loading, with strains and rotations small enough for a linear
+approximation. Bending and permanent deformation are excluded.
 
 The material resists stretching and changes of angle. For displacement
 $\mathbf{u}=(u_x,u_y)^T$, these changes form the strain vector
@@ -37,9 +36,8 @@ shear. The stress vector
 $\sigma=(\sigma_{xx},\sigma_{yy},\sigma_{xy})^T$ contains the corresponding
 internal forces per unit area. Young's modulus $E>0$ controls resistance
 to stretching, while Poisson's ratio $-1<\nu<1/2$ describes the sideways
-response~\cite{bleyer-plane-stress}. Lengths and displacements are in
-metres, strain is dimensionless, and stress and $E$ are in pascals.
-Each case specifies the material values.
+response~\cite{bleyer-plane-stress}. Lengths are in metres and stress
+and $E$ in pascals.
 
 \subsection{From triangles to the stiffness matrix}
 Inside triangle $e$, we write displacement as
@@ -65,23 +63,21 @@ for $n$ nodes. Contributions at shared nodes are added together. Nodes
 without a common triangle have no direct interaction, so most entries
 are zero and we store $K$ sparsely.
 
-For general objects, we plan to mesh ordered outer and hole boundaries
-using Python's \texttt{triangle} interface to
-Triangle~\cite{shewchuk-triangle}. Current rectangular examples instead
-use rectangles split into triangles. Meshes must have positive-area
-triangles, matching shared edges and empty holes. The current assembly
-code is \texttt{fem/elasticity.py:assemble}.\footnote{The course-provided
-routine has not been located; permission to substitute the team's
-implementation remains unconfirmed.}
+The square of Section~\ref{sec:square} uses a structured mesh of squares
+cut along a diagonal; the other objects are meshed with
+Triangle~\cite{shewchuk-triangle} (Section~\ref{sec:objects}). Every mesh
+has positive-area triangles, matching shared edges and empty
+holes.\footnote{We use our own assembly routine
+(\texttt{fem/elasticity.py}); the course-provided routine was not
+available.}
 
 External forces are distributed to nodes using the same weights $N_i$.
 For example, a constant boundary force per unit area $\bar\tau$, called
 traction, gives a force per unit edge length $q=t\bar\tau$. An edge of
 length $\ell$ contributes $\ell q/2$ to each endpoint~\cite{alberta-triangles}.
-Forces acting throughout the material are integrated over each triangle.
-The resulting load vector $f$ is in newtons and $K$ is in N/m. Thickness
-enters each construction once. Refinement must preserve the physical
-loaded boundary and its applied traction.
+The load vector $f$ is in newtons and $K$ in N/m. Under traction loading
+both $K$ and $f$ are proportional to $t$, so the displacement does not
+depend on the thickness.
 
 \subsection{From supports to a solvable system}
 The supports prescribe displacement components indexed by $C$; the
@@ -97,12 +93,11 @@ The subscripts select rows and columns, respectively. This recovers
 $Ax=b$ from Section 1; fixed supports have $d_C=0$ and $b=f_F$.
 After solving, the forces exerted by supports, called reactions, are
 \begin{equation}
- r_C=K_{CF}d_F+K_{CC}d_C-f_C.
+ r_C=K_{CF}d_F+K_{CC}d_C-f_C,
  \label{eq:mechanics-reactions}
 \end{equation}
-We retain the original loads, including any applied at supports, to
-calculate these reactions. Applied forces and reactions should together
-balance total force and moment.
+using the original loads, including any applied at supports. Applied
+forces and reactions together must balance total force and moment.
 
 The construction also explains why supports are essential. Since $D$
 is symmetric and positive definite, $K$ is symmetric and
@@ -112,12 +107,9 @@ is symmetric and positive definite, $K$ is symmetric and
 \end{equation}
 Half this quantity is the stored elastic energy. An unsupported piece
 can slide or rotate without straining, giving zero energy and making
-$K$ singular. Supports must prevent both translations and rotation on
-every piece. For positive-area triangles connected across shared edges,
-removing these motions makes the energy positive for every nonzero free
-displacement. Thus $A$ is symmetric positive definite. Three arbitrary
-constraints need not suffice; pieces joined only at a node require
-additional care.
+$K$ singular. If the supports prevent both translations and the rotation
+of every connected piece, the energy is positive for every nonzero free
+displacement. Thus $A$ is symmetric positive definite.
 
 Even with a unique solution, small load changes may affect the computed
 movement. For the supported matrix, the condition number is
@@ -125,12 +117,8 @@ movement. For the supported matrix, the condition number is
  \kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)},
  \label{eq:mechanics-conditioning}
 \end{equation}
-where the numerator and denominator are its largest and smallest
-eigenvalues. A large ratio means a small percentage change in load can cause a much
-larger percentage change in displacement. The effect depends on the
-direction of the load change. We will estimate these eigenvalues using
-dense routines for small systems and sparse \texttt{eigsh} for larger
-ones~\cite{scipy-eigsh}, checking convergence and whether the estimates
-satisfy their eigenvalue equations. Geometry, mesh and supports can all affect
-conditioning. These properties guide the solver choices and accuracy
+the ratio of its largest and smallest eigenvalues. A large ratio means
+a small percentage change in load can cause a much larger percentage
+change in displacement. Geometry, mesh and supports all affect
+$\kappa_2(A)$. These properties guide the solver choices and accuracy
 checks in the next section.

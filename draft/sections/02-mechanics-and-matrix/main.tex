@@ -3,8 +3,15 @@
 \usepackage{amsmath}
 \usepackage{url}
 \pagestyle{plain}
+% Preview only: section numbers of later sections in the combined report.
+\makeatletter
+\newcommand{\externallabel}[2]{\begingroup\def\@currentlabel{#2}\label{#1}\endgroup}
+\makeatother
 \begin{document}
+\externallabel{sec:square}{4}
+\externallabel{sec:objects}{5}
 \setcounter{section}{1}
+\setcounter{equation}{3}
 \input{section.tex}
 \bibliographystyle{amsplain}
 \bibliography{references}

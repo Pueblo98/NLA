@@ -6,7 +6,7 @@
 \usepackage{url}
 \pagestyle{plain}
 \numberwithin{equation}{section}
-% Preview-only stand-ins for labels defined in Sections 2, 3 and 6 (numbers as in their standalone previews).
+% Preview-only stand-ins for labels defined in Sections 2, 3 and 6 (needed only for this standalone preview) (numbers as in their standalone previews).
 % The combined report uses the real labels; remove these lines there.
 \makeatletter
 \newcommand{\stublabel}[2]{\protected@edef\@currentlabel{#2}\label{#1}}
@@ -18,7 +18,6 @@
 \stublabel{eq:solvers-jacobi-radius}{3.2}%
 \stublabel{eq:solvers-cg-bound}{3.3}%
 \stublabel{eq:solvers-residual}{3.4}%
-\stublabel{eq:solvers-perturbation}{3.5}%
 \stublabel{sec:results}{6}%
 \setcounter{section}{3}
 \input{section.tex}
