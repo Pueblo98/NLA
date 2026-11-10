@@ -1,0 +1,34 @@
+{
+  "commit": "81cbef470047c21096ef83c7fc6924344fadb6d7",
+  "pr": "https://github.com/Pueblo98/NLA/pull/4",
+  "files": [
+    {
+      "name": "section.tex",
+      "git_blob_sha": "26042696280ce71f6946102441cbfcb6145e1f11"
+    },
+    {
+      "name": "main.tex",
+      "git_blob_sha": "0a9ff4d0cf9069593d5fb699ef82ee698abbcd79"
+    },
+    {
+      "name": "references.bib",
+      "git_blob_sha": "04171f86c6367197fca34523191789c15c7ad047"
+    },
+    {
+      "name": "build.sh",
+      "git_blob_sha": "b041683321137f52e23bcc362b6db2516df445e3"
+    },
+    {
+      "name": "verification.md",
+      "git_blob_sha": "8af70398c4a74ec2d298f473e9aea57a958b6c7a"
+    },
+    {
+      "name": "README.md",
+      "git_blob_sha": "e50527ffc014a8ae98bb0c1bfb853f4a481563d4"
+    },
+    {
+      "name": "preview.pdf",
+      "git_blob_sha": "2ffcfbad1489a4f5c46104b1da1ab55edc2684c6"
+    }
+  ]
+}
