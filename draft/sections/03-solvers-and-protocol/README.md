@@ -1,6 +1,6 @@
 # Section 3: Numerical methods and comparison protocol
 
-Status: reviewed working draft. Hermes reports PR #5 merged; the local source and PDF match the reviewed `7cca2b8` snapshot byte for byte. Both Codex paragraph corrections are closed. Not approved final prose.
+Status: readability revision for team review, based on the reviewed working draft at `98b90b8`. Methods now have separate short headings with an explanation and selection rationale. The earlier Codex corrections are preserved; that review does not approve this newer wording. Not approved final prose.
 
 The source is `section.tex`; `main.tex` is a standalone A4, 11 pt preview with 25 mm margins. It uses amsmath, amssymb and url, plus the amsplain bibliography style. Include section.tex and merge references.bib into the final report. The wrapper is not the final course template; the combined ten-page limit remains to be checked there.
 
@@ -14,7 +14,7 @@ This describes the current eight-method implementation, not the historical 3,000
 
 ## Remaining review decisions
 
-- Lucas's Codex reviewed the initial prose/PDF at 81cbef4 and verified both corrections and the revised PDF at 7cca2b8; see follow-up-review-7cca2b8.md. A subsequent local comparison confirms that the canonical source and PDF match that reviewed snapshot. Final team approval remains pending.
+- Lucas's Codex reviewed the previous prose/PDF at 7cca2b8; see follow-up-review-7cca2b8.md. This method-by-method readability revision awaits fresh review. The zero-reference fallback remains absent and load sensitivity remains separate from solver reliability.
 - Confirm that all eight iterative methods remain in the final report; this draft explains those currently implemented rather than silently changing the method set.
 - Section 2 is evolving. Recheck the transition after any newer Section 2 revision; this draft leaves earlier sections unchanged.
 - Separate setup/solve timings are not available in the existing benchmark. Any future split-cost comparison requires fresh measurements.

@@ -1,18 +1,21 @@
-# Section 3 build and review record
+# Section 3 readability revision: verification
 
-Hermes drafted this module against base d67eb5f and incorporated the implementation corrections in review-2026-11-10.md. This is not Codex approval of the new prose.
+Based on main at 98b90b8. This supersedes the earlier build record for the current source; earlier build/review evidence remains in Git history and the linked review notes.
 
-- Compiler: Tectonic 0.17.0.
-- Command: `TECTONIC_BIN=/path/to/tectonic sh build.sh`.
-- Exit status: 0, including BibTeX and cross-reference reruns.
-- Preview: A4, 11 pt article, 25 mm margins, unchanged from Section 2's preview conventions. Two pages of section prose, followed by one bibliography page.
-- All three final pages were rendered with PyMuPDF and visually inspected. Equations, section numbering and citations render correctly; no clipped text or overlapping material was found.
-- No overfull boxes, undefined-reference warnings or missing-character warnings. One underfull bibliography box remains due to the long GMRES URL and repeated-author bibliography formatting; it is cosmetic and was visually checked.
-- Section 1 was reread after drafting. Section 2 was read in full before drafting and its support/conditioning ending was reread afterwards. The opening continues that argument without repeating the mechanics derivation. Earlier section files remain unchanged.
-- Protocol checked against solvers/progress_benchmark.py: eight iterative methods, zero guess, strict independently recomputed residual target, 20,000-step budget, full GMRES, diagonal PCG, damping 0.5, minimum of three setup-inclusive calls, untimed sparse-LU reference.
-- No FEM experiment or timing benchmark was rerun for this document. Numerical-result validation is not implied by successful compilation.
-- The final report's course-template pagination and final team approval remain pending.
+## Requested change
 
-## Follow-up to Lucas's paragraph review
+The user asked for shorter, easier-to-read method explanations, split by method, with a quick intuitive reason for trying each. Solution methods now have ten separately labelled subsections: Cholesky, LU/reference, Jacobi, damped Jacobi, Gauss–Seidel, steepest descent, CG, diagonal PCG, GMRES and MINRES. Each states its mechanism and role. The eight measured iterative methods remain unchanged. The two main displayed equations are the common residual threshold and reference difference; simple method updates remain inline.
 
-Applied both edits from notes/section3-review-81cbef4/suggested-edits.patch: removed the unimplemented zero-reference fallback claim and separated input-load sensitivity from practical solver-reliability checks. Rebuilt with Tectonic 0.17.0 (exit 0) and rendered/visually checked all three revised pages. The PDF remains two prose pages plus references, with the same cosmetic bibliography underfull-box warning and no missing characters, undefined references or overfull boxes. No solver code or numerical results were changed or rerun.
+## Checks executed
+
+- Built exact revised source using `TECTONIC_BIN=/path/to/tectonic sh build.sh`, Tectonic 0.17.0, exit 0, including BibTeX and reference reruns.
+- All three final pages rendered with PyMuPDF and visually inspected: headings, equations and citations are legible, without clipping or overlap.
+- No overfull boxes, undefined references or missing characters. The existing underfull bibliography URL box remains cosmetic.
+- Same A4, 11 pt type and 25 mm margins. No font or spacing reduction. Preview remains three pages; the added method headings use some of the saved space. The closing validation paragraph and bibliography occupy page 3.
+- Body text extracted from the PDFs before the References heading decreased from 1,091 to 908 whitespace-separated tokens (16.8%). This includes mathematical tokens/headings and is a consistent comparison, not a linguistic prose-word count.
+- Earlier sections are unchanged. Reread their existing text in conversation and checked the transition from Section 2's positive-definiteness/conditioning ending.
+- Preserved the reviewed protocol: 20,000-step cap, zero initial guess, strict independently recomputed residual target, full unpreconditioned GMRES, diagonal PCG, damping 0.5, minimum of three setup-inclusive times, and untimed LU reference.
+- Preserved separation of load sensitivity from solver reliability. No zero-reference fallback is claimed; solver-level zero-RHS handling is explicitly separated from outer benchmark divisions.
+- No solver code, numerical outcomes or timing measurements changed or rerun.
+
+The previous Codex approval applies to the earlier revision, not this new wording. Fresh readability review and final course-template pagination remain pending. The shared section remains a working draft.

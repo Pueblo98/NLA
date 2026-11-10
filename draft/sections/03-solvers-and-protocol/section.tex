@@ -1,133 +1,128 @@
-% AI-assisted working draft for team review. Requires amsmath and amssymb.
+% AI-assisted readability revision for team review. Requires amsmath and amssymb.
 \section{Numerical methods and comparison protocol}
 \label{sec:solvers-protocol}
 
-Section 2 established that sufficient supports give a sparse, symmetric
-positive-definite system $Ax=b$. These properties guide how we solve for
-the free displacements: direct methods factor the matrix, while iterative
-methods improve an approximation without forming its inverse. We compare methods on the same supported system. Iterations approach one
-static equilibrium; they are not steps in physical time.
+Section 2 gave a sparse, symmetric positive-definite system $Ax=b$ for
+the free displacements. We now compare ways to solve it. Direct methods
+factor the matrix; iterative methods improve a displacement estimate.
+Each iteration approaches the same static equilibrium, not a later time.
 
-\subsection{Direct and iterative solutions}
-For a small system, Cholesky factorization uses positive definiteness to
-write $A=LL^T$, where $L$ is lower triangular. We first solve $Ly=b$ for
-an intermediate vector $y$, then $L^Tx=y$ for the displacement. Pivoted
-LU instead factors a row-permuted matrix into lower and upper triangular
-factors. Both avoid explicitly forming $A^{-1}$. The small example also evaluates $A^{-1}b$ for illustration only. For larger systems, sparse LU supplies a numerical reference
-$x_{\mathrm{ref}}$ on the identical mesh. It is an \emph{untimed reference},
-not a measured competitor in the current iterative timing comparison.
+\subsection{Solution methods}
+For an iterate $x_k$, the residual $r_k=b-Ax_k$ measures the remaining
+force imbalance. We write $P=\operatorname{diag}(A)$ for the diagonal
+stiffness entries. The following methods offer different ways to reduce
+that imbalance~\cite{saad-iterative}.
 
-The simpler iterative methods correct the current force imbalance,
-called the residual. Let $x_k$ be the displacement approximation after
-$k$ iterations, $r_k=b-Ax_k$, and $P=\operatorname{diag}(A)$ the diagonal
-matrix containing the diagonal entries of $A$. Jacobi updates all
-components from their previous values; damped Jacobi scales that update:
-\begin{equation}
- x_{k+1}=x_k+\omega P^{-1}r_k.
- \label{eq:solvers-jacobi}
-\end{equation}
-Our comparison uses $\omega=1$ for Jacobi and $\omega=0.5$ for damped
-Jacobi. Gauss--Seidel instead updates components sequentially, using the
-newest values already available. Positive definiteness guarantees
-Gauss--Seidel convergence in exact arithmetic, but does not guarantee
-ordinary Jacobi convergence. Damping can help, although its chosen weight
-is not a universal convergence guarantee~\cite{saad-iterative}.
+\subsubsection*{Cholesky}
+Cholesky uses positive definiteness to write $A=LL^T$, with $L$ lower
+triangular. Solving $Ly=b$ and then $L^Tx=y$ gives the displacement.
+We use it in the small example because it directly exploits our matrix's
+structure; $y$ is only an intermediate vector.
 
-Steepest descent also follows $r_k$, but selects the step that minimizes
-the quadratic energy $\tfrac12 x^TAx-b^Tx$ along that direction:
-\begin{equation}
- x_{k+1}=x_k+\alpha_k r_k,\qquad
- \alpha_k=\frac{r_k^Tr_k}{r_k^TAr_k}.
- \label{eq:solvers-sd}
-\end{equation}
-Conjugate gradients (CG) improves on this by retaining information from
-previous corrections. Its search directions are mutually conjugate with
-respect to $A$, meaning $p_i^TAp_j=0$ for distinct directions $p_i,p_j$
-in exact arithmetic. Each step minimizes the same energy over the search
-space built so far. This makes CG a natural choice for our supported
-positive-definite matrix~\cite{saad-iterative}.
+\subsubsection*{LU and the direct reference}
+Pivoted LU factors a row-permuted matrix into lower and upper triangular
+factors, then solves the resulting triangular systems. Sparse LU provides
+$x_{\mathrm{ref}}$, a comparison solution on the same mesh. It is
+\emph{untimed}, not a competitor in the iterative timing table. The small
+example also forms $A^{-1}b$ for illustration, not as the recommended method.
 
-Diagonal preconditioned CG (PCG) uses $z_k=P^{-1}r_k$ to scale the residual
-before constructing its search direction. The positive diagonal makes this scaling compatible with CG without
-changing the solution. It need not resolve poor conditioning; any benefit
-must outweigh setup and application costs. In SciPy the argument
-\texttt{M} receives the inverse action $P^{-1}$, not $P$ itself~\cite{scipy-cg}.
+\subsubsection*{Jacobi}
+Jacobi corrects every component using only the previous iterate:
+$x_{k+1}=x_k+P^{-1}r_k$. We try it as a simple baseline with inexpensive
+updates. Positive definiteness alone does not guarantee its convergence.
 
-We also include GMRES and MINRES as comparisons, not because the matrix
-requires a nonsymmetric or indefinite solver. Both seek a small Euclidean
-residual in a growing space generated from the initial residual by
-repeated multiplication by $A$. GMRES constructs and stores an orthogonal
-basis of that space; MINRES exploits symmetry through a short recurrence.
-Our unpreconditioned GMRES uses a restart length equal to the number of
-free unknowns, allowing a full search space before any restart. This
-full-GMRES choice can become expensive in memory and orthogonalization
-as the mesh grows~\cite{saad-iterative,scipy-gmres}.
+\subsubsection*{Damped Jacobi}
+Damped Jacobi takes a smaller correction,
+$x_{k+1}=x_k+\omega P^{-1}r_k$. We use $\omega=0.5$ to test whether
+reducing the step improves convergence. This weight is not guaranteed
+to work for every positive-definite matrix.
+
+\subsubsection*{Gauss--Seidel}
+Gauss--Seidel updates components sequentially, immediately reusing the
+newest values. Comparing it with Jacobi tests the benefit of using fresh
+information. It converges for our positive-definite system in exact
+arithmetic, though it may still require many sweeps.
+
+\subsubsection*{Steepest descent}
+Steepest descent moves along the residual, choosing the step that minimizes
+$\tfrac12 x^TAx-b^Tx$ in that direction:
+$x_{k+1}=x_k+\alpha_k r_k$, where
+$\alpha_k=(r_k^Tr_k)/(r_k^TAr_k)$. We include it to test whether choosing
+the step from the matrix improves on fixed-step corrections.
+
+\subsubsection*{Conjugate gradients (CG)}
+CG combines the residual with previous search information rather than
+starting afresh at every step. It minimizes the same quadratic energy
+over an expanding search space. We expect it to suit this problem because
+it exploits both symmetry and positive definiteness~\cite{saad-iterative}.
+
+\subsubsection*{Diagonal preconditioned CG (PCG)}
+PCG scales the residual by $P^{-1}$ before constructing its search
+direction. We test whether accounting for different diagonal stiffnesses
+reduces the work needed by CG. The scaling preserves the solution, but
+its benefit must outweigh its cost. SciPy receives the inverse action
+$P^{-1}$ as its \texttt{M} argument~\cite{scipy-cg}.
+
+\subsubsection*{GMRES}
+GMRES chooses the smallest Euclidean residual in a space built by repeated
+multiplication by $A$. We include this more general method as a comparison
+with CG. Our unpreconditioned run uses a restart length equal to the number
+of free unknowns: full GMRES, whose stored basis and orthogonalization can
+become expensive on larger meshes~\cite{scipy-gmres}.
+
+\subsubsection*{MINRES}
+MINRES also minimizes the residual, but uses symmetry to update the
+solution through a short recurrence. It provides a symmetry-aware
+comparison with GMRES and CG. We do not need it because of indefiniteness:
+our supported matrix is positive definite~\cite{saad-iterative}.
 
 \subsection{Common stopping and timing rules}
-All eight iterative methods receive the same $A,b$ and start from $x_0=0$.
-For nonzero $b$, we accept a computed solution only when an independently
-recomputed relative residual satisfies
+All eight iterative methods use identical $A,b$, start from $x_0=0$ and
+have a 20\,000-iteration budget. For nonzero $b$, acceptance requires the
+independently recomputed relative residual
 \begin{equation}
  \rho(x)=\frac{\lVert b-Ax\rVert_2}{\lVert b\rVert_2}<10^{-8},
  \label{eq:solvers-acceptance}
 \end{equation}
-where $\lVert\cdot\rVert_2$ denotes the Euclidean vector norm. The common
-budget is 20\,000 iterations. One iteration means one complete stationary
-sweep or one Krylov step; for GMRES we count inner Arnoldi steps, not
-restart cycles. Counts represent different work per step and do not alone establish speed. If $b=0$, the supported
-system has $x=0$ and we report zero iterations and zero absolute residual
-without dividing by $\lVert b\rVert_2$.
+where $\lVert\cdot\rVert_2$ is the Euclidean norm. One iteration is a full
+stationary sweep or a Krylov step; GMRES counts inner Arnoldi steps, not
+restart cycles. Different work per step prevents ranking speed by counts
+alone. The solver handles $b=0$ by returning $x=0$ immediately; the current
+benchmark's outer relative-error calculations require nonzero denominators.
 
-We retain both the solver's return status and the independent acceptance
-flag. CG and PCG use relative tolerance $10^{-8}$ and zero absolute
-tolerance. MINRES uses native relative tolerance zero and a callback
-that stops when the true residual meets Eq.~\eqref{eq:solvers-acceptance};
-its native stopping test is not treated as an equivalent criterion.
-GMRES uses SciPy's legacy callback convention so its budget counts inner
-steps. Its recorded history contains Arnoldi residual estimates, whereas
-final acceptance always uses $b-Ax$. Other recorded histories use explicitly
-computed residuals. Budget exhaustion or breakdown is reported rather
-than removed from the comparison; the stationary and steepest-descent
-runs also stop if the relative residual is nonfinite or exceeds $10^{10}$.
-An unsuccessful run's time is not a time to the requested accuracy.
+CG and PCG use relative tolerance $10^{-8}$ and absolute tolerance zero.
+MINRES uses native tolerance zero and an explicit true-residual stopping
+callback. GMRES uses the legacy callback convention for inner-step counting;
+its history contains Arnoldi residual estimates, unlike the explicitly
+computed histories of the other methods. Final acceptance always uses
+Eq.~\eqref{eq:solvers-acceptance}. We retain native status and acceptance
+separately, including breakdowns and budget exhaustion. Stationary and
+steepest-descent runs stop if $\rho$ is nonfinite or exceeds $10^{10}$.
+Failed-run times are not times to the requested accuracy.
 
-The current benchmark records three timed calls per method and reports
-the minimum, retaining all three values. Residual histories are collected
-in a separate run. Each timed call includes iterative setup, such as the
-diagonal preconditioner or Gauss--Seidel splitting, and required stopping
-checks. MINRES therefore still computes a true residual at each timed
-iteration. Assembly, condition estimation, the sparse-LU reference and
-final independent error checks are outside the timer. These are
-\emph{setup-inclusive iterative times}, not separately measured setup and
-solve costs. Software and machine details accompany the data. Small timing differences
-do not establish a general ranking. Separating setup or factorization
-from solves would require new measurements.
+We retain three timed runs and report their minimum, collecting histories
+separately. Timings include iterative setup and required stopping checks,
+including MINRES's per-step true residual. They exclude assembly,
+conditioning diagnostics, the LU reference and final independent checks.
+Thus they are \emph{setup-inclusive iterative times}, not separate setup
+and solve measurements. Machine and software details accompany the data;
+small timing differences do not establish general rankings.
 
 \subsection{Accuracy and validation}
-Alongside runtime, iteration count and $\rho(x)$, we report agreement with
-the direct reference through
+We report time, iterations, residual and the relative reference difference
 \begin{equation}
  e_{\mathrm{ref}}(x)=
  \frac{\lVert x-x_{\mathrm{ref}}\rVert_2}{\lVert x_{\mathrm{ref}}\rVert_2}.
  \label{eq:solvers-reference-error}
 \end{equation}
-We check the reference's residual: it is a numerical solution, not an
-exact answer. Conditioning, introduced in Section 2, explains why a small
-force imbalance need not imply an equally small displacement error.
-Residuals, reference agreement and termination behaviour provide practical
-checks on solver reliability. A separate load-perturbation experiment
-probes sensitivity at fixed $A$. Each perturbation test records its
-magnitude and direction; one test does not establish worst-case sensitivity.
+\nopagebreak[4]
+We check the reference's residual too. Poor conditioning can leave
+appreciable displacement error despite a small residual. These are
+solver-reliability checks; load perturbations at fixed $A$ instead test
+input sensitivity, with magnitude and direction recorded.
 
-These checks address the solution of one mesh's equations, not the error
-introduced by approximating a continuous body with triangles. To investigate
-that separate discretization error, we refine the mesh while preserving
-geometry, material, physical loads and support regions, and compare
-displacements at matching locations or consistently defined observables.
-Agreement between solvers on one mesh is not evidence of continuum accuracy.
-
-In Sections 4 and 6, we reconstruct the full displacement, verify prescribed
-values and use Section 2's reactions to check total force and moment balance.
-Free-row residuals are not support reactions. A separate exact
-affine-displacement test uses roller supports, not the clamped benchmark
-conditions. Section 4 now applies this protocol to the square example.
+Solver agreement does not establish continuum accuracy. Refinement must
+preserve the physical case and compare matching locations or observables.
+Section 4 also checks prescribed displacements and force/moment balance
+using Section 2's support reactions, not free-row residuals. Its separate
+exact affine test uses roller supports, not the clamped benchmark.
