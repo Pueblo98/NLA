@@ -1,24 +1,26 @@
 # Section 7. Conclusion
 
-**Status: workspace ready; no section prose has been drafted by this reorganisation.**
+**Status:** AI-assisted working draft for team review (not approved). Label `sec:conclusion`.
+Body is about 0.45 page in the 11pt/25 mm preview (`preview.pdf`), three short paragraphs.
 
-## Scope
+## Contents
+1. Physical answers: hole softens the plate; holes and inner corners concentrate stress;
+   load location moves the peak; fewer supports raise kappa_2 more than displacement;
+   bending is the hardest case for accuracy.
+2. Matrix properties and solvers: SPD + sparse, kappa_2 ~ N, CG iterations ~ N^(1/2), CG best
+   iterative method, diagonal PCG little gain, Jacobi diverges, Gauss-Seidel impractical,
+   MINRES stall on the beam, sparse LU fastest.
+3. Refinement and validation, then limitations (one sentence, pointing to Section 6) and
+   next steps (one sentence).
 
-Use [the Section 7 roadmap entry](../../ROADMAP.md#7-conclusion) as the source of truth for this section's purpose, required contents, boundaries and expected output. Do not duplicate or silently redefine that scope here.
+## Numbers
+No new results. The only numbers repeated are from Section 6's text: 0.7% (finest beam mesh
+vs beam theory with shear), 119 to 178 MPa (corner peak), 1e-9 (CG algebraic error).
 
-Follow [the shared writing rules](../../WRITING_RULES.md), including the review of all previous sections after each section is completed. Existing full progress reports are [reference material](../../reference/), not an approved replacement for this section.
+## Files
+`section.tex`, `main.tex` (preview stub for `sec:results`), `build.sh` (pdflatex, no bibtex),
+`.gitignore`, `preview.pdf`. No `references.bib`: the section cites nothing.
 
-## Files to add when this section is requested
-
-- `section.tex`: only this section's body, suitable for later inclusion in the combined report.
-- `main.tex`: standalone preview wrapper.
-- `references.bib` and `figures/`: references and assets actually used by this section.
-- `preview.pdf`: compiled and visually checked against the current source.
-
-Do not create these as empty report stubs or claim the section is completed. Record the agreed section owner, review status and unresolved decisions below when the section thread starts.
-
-## Handoff status
-
-- Owner: not assigned here.
-- Draft/review: not started in this workspace.
-- Next action: open the individual section thread and apply the shared writing rules and confirm the required inputs.
+## Open decisions
+- Section 1 does not state explicit objectives or mention the numerical effort; this section
+  answers the questions as phrased in Sections 1 and 5.
