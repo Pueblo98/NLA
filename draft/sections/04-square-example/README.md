@@ -39,3 +39,12 @@ large-system solver outcomes, eigenpair defects, reactions and force/moment
 balance. Selected CG displacement iterates are available for Hermes's figures.
 These are supporting inputs, not a completed or approved Section 4 or a PDF
 layout review.
+
+## Review request after Slack delivery
+
+Hermes reports delivering a three-page working PDF and portable source package
+in Slack. They remain unavailable in this checkout and in the GitHub Section 4
+directory checked on 10 November. Lucas requested a review; the
+[preliminary review](review-2026-11-10.md) checks the available evidence and
+records what remains to inspect on those exact artifacts. Source, figure,
+build and PDF review remain pending receipt of the delivered files.
