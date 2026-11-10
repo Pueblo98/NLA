@@ -17,15 +17,17 @@ of sparse factors and only multiply by $A$.
 
 A stationary iteration corrects $x_k$ with the residual, using an easily
 inverted approximation $M$ of $A$: $x_{k+1}=x_k+M^{-1}r_k$, so
-$e_{k+1}=(I-M^{-1}A)\,e_k$. It therefore converges for every $x_0$ if and only if the spectral radius
-$\rho(I-M^{-1}A)$ is below one~\cite{saad-iterative}. Jacobi uses
+$e_{k+1}=(I-M^{-1}A)\,e_k$. It therefore converges for every $x_0$ if
+and only if the spectral radius $\rho(I-M^{-1}A)$ is below
+one~\cite{saad-iterative}. Jacobi uses
 $M=D_A$, the diagonal of $A$. Its iteration matrix is similar to $I-S$
 with $S=D_A^{-1/2}AD_A^{-1/2}$, so
 \begin{equation}
  \rho_J=\max_i\,|1-\lambda_i(S)|.
  \label{eq:solvers-jacobi-radius}
 \end{equation}
-As $\lambda_i(S)>0$, Jacobi diverges exactly when $\lambda_{\max}(S)>2$. Damped Jacobi, $M=D_A/\omega$, converges if and
+As $\lambda_i(S)>0$, Jacobi converges if and only if
+$\lambda_{\max}(S)<2$. Damped Jacobi, $M=D_A/\omega$, converges if and
 only if $0<\omega<2/\lambda_{\max}(S)$; we use $\omega=0.5$. Gauss--Seidel
 takes $M$ as the lower triangle of $A$ and converges for every symmetric
 positive definite $A$~\cite{saad-iterative}.
@@ -33,9 +35,11 @@ positive definite $A$~\cite{saad-iterative}.
 The remaining methods exploit that $x$ minimizes
 $\phi(y)=\tfrac12y^TAy-b^Ty$, the elastic energy of
 Eq.~\eqref{eq:mechanics-energy} minus the work of the loads. Steepest
-descent minimizes $\phi$ along $r_k=-\nabla\phi(x_k)$; each step multiplies the energy norm of the error, $\|e\|_A=(e^TAe)^{1/2}$,
-by at most $(\kappa-1)/(\kappa+1)$, where $\kappa=\kappa_2(A)$. The conjugate
-gradient (CG) method instead minimizes $\|e_k\|_A$ over $x_0+\mathcal{K}_k$, where
+descent minimizes $\phi$ along $r_k=-\nabla\phi(x_k)$; each step
+multiplies the energy norm of the error, $\|e\|_A=(e^TAe)^{1/2}$, by at
+most $(\kappa-1)/(\kappa+1)$, where $\kappa=\kappa_2(A)$. The conjugate
+gradient (CG) method instead minimizes $\|e_k\|_A$ over
+$x_0+\mathcal{K}_k$, where 
 $\mathcal{K}_k=\mathrm{span}\{r_0,Ar_0,\ldots,A^{k-1}r_0\}$ is the Krylov
 space. It needs one product by $A$ per step and satisfies~\cite{shewchuk-cg}
 \begin{equation}
@@ -43,14 +47,16 @@ space. It needs one product by $A$ per step and satisfies~\cite{shewchuk-cg}
  \label{eq:solvers-cg-bound}
 \end{equation}
 so its iteration count grows like $\sqrt\kappa$ rather than $\kappa$.
-Diagonally preconditioned CG (PCG) is equivalent to CG applied to $S$, so $\kappa_2(S)$
-replaces $\kappa$; it helps only if the diagonal of $A$ varies strongly.
+Diagonally preconditioned CG (PCG) is equivalent to CG applied to $S$,
+so $\kappa_2(S)$ replaces $\kappa$;
+it helps only if the diagonal of $A$ varies strongly.
 MINRES minimizes $\|r_k\|_2$ over the same space~\cite{paige-saunders-minres}.
 Full GMRES does so for any $A$ but stores all $k$ basis
 vectors~\cite{saad-schultz-gmres}, so it shows the cost of ignoring symmetry.
 
-\paragraph{Comparison protocol.} Every method receives the same $A$ and $b$, starts from $x_0=0$ and is
-accepted only if its recomputed relative residual satisfies
+\paragraph{Comparison protocol.} Every method receives the same $A$ and
+$b$, starts from $x_0=0$ and is accepted
+only if its recomputed relative residual satisfies
 \begin{equation}
  \eta(\hat x)=\frac{\|b-A\hat x\|_2}{\|b\|_2}<10^{-8}.
  \label{eq:solvers-residual}
