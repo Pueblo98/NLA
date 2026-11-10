@@ -1,0 +1,98 @@
+{"method": "Jacobi", "iterations": 49, "status": "divergence_guard", "accepted": false, "relative_residual": 13242379570.65668, "reference_difference": 33780965.64416606, "timing_runs_seconds": [0.0005585849285125732, 0.0005633141845464706, 0.0005606617778539658], "best_seconds": 0.0005585849285125732}
+{"method": "Damped Jacobi", "iterations": 20000, "status": "iteration_limit", "accepted": false, "relative_residual": 4.757935226422867e-06, "reference_difference": 8.726718512137396e-05, "timing_runs_seconds": [0.2273351401090622, 0.22882196679711342, 0.2291796337813139], "best_seconds": 0.2273351401090622}
+{"method": "Gauss-Seidel", "iterations": 19136, "status": "target", "accepted": true, "relative_residual": 9.996300070193786e-09, "reference_difference": 1.739852298164392e-07, "timing_runs_seconds": [5.971484087407589, 5.937728112563491, 5.939966779202223], "best_seconds": 5.937728112563491}
+{"method": "SD", "iterations": 20000, "status": "iteration_limit", "accepted": false, "relative_residual": 3.0814369597271085e-06, "reference_difference": 4.221305303885009e-05, "timing_runs_seconds": [0.3873689603060484, 0.38409194350242615, 0.3840091098099947], "best_seconds": 0.3840091098099947}
+{"method": "CG", "iterations": 242, "status": "native_info=0", "accepted": true, "relative_residual": 9.506901058557069e-09, "reference_difference": 9.793195091732832e-10, "timing_runs_seconds": [0.004313396289944649, 0.004343509674072266, 0.00436905212700367], "best_seconds": 0.004313396289944649}
+{"method": "GMRES (full)", "iterations": 228, "status": "native_info=0", "accepted": true, "relative_residual": 9.476102543327846e-09, "reference_difference": 5.965273737811242e-09, "timing_runs_seconds": [0.1457569133490324, 0.14969171397387981, 0.1463000886142254], "best_seconds": 0.1457569133490324}
+{"method": "MINRES", "iterations": 236, "status": "callback_target", "accepted": true, "relative_residual": 9.494809923171353e-09, "reference_difference": 5.98541829229086e-09, "timing_runs_seconds": [0.010025529190897942, 0.01003200188279152, 0.01001662202179432], "best_seconds": 0.01001662202179432}
+{"method": "PCG (diagonal)", "iterations": 226, "status": "native_info=0", "accepted": true, "relative_residual": 9.013693649785303e-09, "reference_difference": 5.013778151377469e-10, "timing_runs_seconds": [0.005031414330005646, 0.004987472668290138, 0.004990501329302788], "best_seconds": 0.004987472668290138}
+SMALL: {
+  "params": {
+    "Lx": 1.0,
+    "Ly": 1.0,
+    "nx": 2,
+    "ny": 2,
+    "E": 200000000000.0,
+    "nu": 0.3,
+    "t": 0.01,
+    "p": 100000000.0,
+    "diagonal": "bl-tr",
+    "support": "clamp"
+  },
+  "unknowns": 12,
+  "condition_number": 95.79921703641884,
+  "eigenvalues_min_max": [
+    107306409.69746545,
+    10279870032.006372
+  ],
+  "scaled_first_row": [
+    2.967032967032967,
+    -0.7142857142857143,
+    -1.098901098901099,
+    0.32967032967032966,
+    -0.7692307692307692,
+    0.7142857142857143,
+    0.0,
+    -0.7142857142857143,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "free_nodes": [
+    1,
+    2,
+    4,
+    5,
+    7,
+    8
+  ],
+  "displacements_mm": [
+    [
+      0.2613487090848565,
+      0.07605838944340713
+    ],
+    [
+      0.51119474075692,
+      0.10452849607926087
+    ],
+    [
+      0.23162918646457134,
+      0.007486929393545474
+    ],
+    [
+      0.4821527517601593,
+      0.029374527751324497
+    ],
+    [
+      0.2244507093753071,
+      -0.054134248520948614
+    ],
+    [
+      0.46779990106702846,
+      -0.04608671247291956
+    ]
+  ],
+  "direct_residuals": {
+    "Cholesky": 6.82519470748195e-16,
+    "Pivoted LU": 4.920828627338318e-16,
+    "Explicit inverse": 7.71571765788444e-16
+  },
+  "max_direct_difference": 4.69631697294735e-16,
+  "validation": {
+    "relative_residual": 4.728812727050367e-16,
+    "maximum_support_displacement_m": 0.0,
+    "reaction_sum_N": [
+      -999999.9999999995,
+      -1.4551915228366852e-11
+    ],
+    "force_imbalance_N": [
+      4.0745362639427185e-10,
+      -1.4551915228366852e-11
+    ],
+    "moment_imbalance_Nm": -1.4551915228366852e-10
+  }
+}
+LARGE VALIDATION: {"relative_residual": 3.8338007936838075e-14, "maximum_support_displacement_m": 0.0, "reaction_sum_N": [-1000000.0000000014, -3.27054294757545e-09], "force_imbalance_N": [-1.4151737559586763e-09, -3.27054294757545e-09], "moment_imbalance_Nm": 1.69893610291183e-09}
+ENVIRONMENT: {"python": "3.14.4", "numpy": "2.5.4", "scipy": "1.18.1", "matplotlib": "3.11.2", "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43", "cpu": "13th Gen Intel(R) Core(TM) i7-1355U", "thread_variables": {"OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": null}}
+PASS: positive triangle areas, unit area, exact nodal load pattern, supports, force/moment equilibrium, direct residuals, solver repeat consistency.

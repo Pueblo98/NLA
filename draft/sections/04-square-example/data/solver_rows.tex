@@ -1,0 +1,14 @@
+\begin{tabular}{lrrrrl}
+\toprule
+Method & Iterations & $\rho$ & $e_{\rm ref}$ & Time [s] & Outcome\\
+\midrule
+Jacobi & 49 & $1.324\times10^{10}$ & $3.378\times10^{7}$ & 0.000559 & Guard \\
+Damped Jacobi & 20000 & $4.758\times10^{-6}$ & $8.727\times10^{-5}$ & 0.227 & Cap \\
+Gauss--Seidel & 19136 & $9.996\times10^{-9}$ & $1.740\times10^{-7}$ & 5.94 & Pass \\
+SD & 20000 & $3.081\times10^{-6}$ & $4.221\times10^{-5}$ & 0.384 & Cap \\
+CG & 242 & $9.507\times10^{-9}$ & $9.793\times10^{-10}$ & 0.00431 & Pass \\
+GMRES (full) & 228 & $9.476\times10^{-9}$ & $5.965\times10^{-9}$ & 0.146 & Pass \\
+MINRES & 236 & $9.495\times10^{-9}$ & $5.985\times10^{-9}$ & 0.01 & Pass \\
+Diagonal PCG & 226 & $9.014\times10^{-9}$ & $5.014\times10^{-10}$ & 0.00499 & Pass \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,146 @@
+% AI-assisted working draft for team review. Requires amsmath, graphicx, booktabs.
+\section{A simple square demonstration}
+\label{sec:square-example}
+
+Section 3 established how to compare solutions of the supported system.
+We now apply that protocol to one square, first with a mesh small enough
+to inspect its equations, then with a larger mesh on which iterative
+methods behave differently. Both use the same material, loading and
+supports. This is a controlled demonstration, not a selection of the
+objects for the later study.
+
+\subsection{The square and its small system}
+The square occupies $[0,1]\times[0,1]$ metres, with thickness
+$t=0.01$ m, Young's modulus $E=200$ GPa and Poisson's ratio $\nu=0.3$.
+We use Section 2's plane-stress model. The whole left edge is fixed in
+both directions. A uniform rightward traction $p=100$ MPa acts on the
+right edge; the top and bottom are traction-free and there are no body
+forces. Thus the line load is $tp=10^6$ N/m and the total applied force
+is $10^6$ N, not a prescribed displacement. These are the repository's
+force-driven example settings~\cite{nla-square-code}.
+
+The small mesh has two cells in each direction, each split from its
+bottom-left to its top-right corner, giving nine nodes and eight
+triangles (Fig.~\ref{fig:square-geometry}a). Nodes 0, 3 and 6 are fixed.
+Using Section 2's interleaved component order, the remaining unknowns are
+\begin{equation}
+ x=(u_{x,1},u_{y,1},u_{x,2},u_{y,2},u_{x,4},u_{y,4},
+     u_{x,5},u_{y,5},u_{x,7},u_{y,7},u_{x,8},u_{y,8})^T.
+ \label{eq:square-order}
+\end{equation}
+Each loaded half-metre edge contributes equally to its endpoints, so
+nodes 2, 5 and 8 receive horizontal forces of $250$, $500$ and $250$ kN.
+Consequently, the reduced system has a $12\times12$ matrix and
+\begin{equation}
+ b=10^6\,\mathrm{N}\,(0,0,0.25,0,0,0,0.50,0,0,0,0.25,0)^T.
+ \label{eq:square-load}
+\end{equation}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/square_geometry.pdf}
+ \caption{The same clamped, traction-loaded square on two meshes.
+ (a) Node numbers identify the small system's unknowns.
+ (b) The 800-triangle direct-reference solution is overlaid on the
+ original mesh. Coordinates are in metres; displacement is amplified
+ by 200 for visibility, not for the calculation.}
+ \label{fig:square-geometry}
+\end{figure}
+
+The matrix couples horizontal and vertical movements rather than
+representing independent springs. For example, dividing its first row
+by $10^9/91$ N/m gives the force-balance equation at node 1,
+\begin{equation}
+ \begin{split}
+ 270u_{x,1}-65u_{y,1}-100u_{x,2}+30u_{y,2}\\
+ {}-70u_{x,4}+65u_{y,4}-65u_{y,5}=0.
+ \end{split}
+ \label{eq:square-row}
+\end{equation}
+We solve all twelve equations together using the Cholesky steps from
+Section 3. Table~\ref{tab:square-small} gives the resulting free
+components. The complete $A$, $b$, Cholesky factor, intermediate vector
+and solution are supplied as CSV files with the source, so the worked
+system can be reproduced without rounding the displayed values.
+
+\begin{table}[htbp]
+ \centering
+ \caption{Small-mesh Cholesky solution, rounded to five decimal places.
+ All components at the three fixed nodes are zero.}
+ \label{tab:square-small}
+ \begin{tabular}{lrrrrrr}
+ \toprule
+ Node & 1 & 2 & 4 & 5 & 7 & 8\\
+ \midrule
+ $u_x$ [mm] & 0.26135 & 0.51119 & 0.23163 & 0.48215 & 0.22445 & 0.46780\\
+ $u_y$ [mm] & 0.07606 & 0.10453 & 0.00749 & 0.02937 & -0.05413 & -0.04609\\
+ \bottomrule
+ \end{tabular}
+\end{table}
+
+The supported matrix is positive definite, with $\kappa_2(A)\approx95.8$.
+Cholesky, pivoted LU and explicit inversion all give relative residuals
+below $8\times10^{-16}$; their differences from the Cholesky solution
+are below $5\times10^{-16}$ in relative norm. Inversion is included
+only for this tiny example, not as the procedure for larger meshes.
+
+\subsection{Iterative solutions on a larger mesh}
+Keeping the physical case fixed, we use 20 cells per direction: 441
+nodes, 800 triangles and 840 free components. Table~\ref{tab:square-solvers}
+reports a fresh execution of the Section 3 protocol, including its
+zero initial guess, $20\,000$-iteration budget and strict true-residual
+target $\rho<10^{-8}$. Sparse LU provides the untimed same-mesh
+reference. Times are the minimum of three setup-inclusive calls, with
+histories collected separately; machine details and all repeats
+accompany the data.
+
+\begin{table}[htbp]
+ \centering
+ \caption{Large-square results. $\rho$ is the relative residual and
+ $e_{\rm ref}$ the relative difference from sparse LU, as defined in
+ Section 3. ``Cap'' and ``guard'' indicate unsuccessful runs, so their
+ times are not times to the requested accuracy. Acceptance uses
+ unrounded residuals.}
+ \label{tab:square-solvers}
+ \input{data/solver_rows.tex}
+\end{table}
+
+CG and diagonal PCG reach the target in 242 and 226 steps respectively,
+whereas Gauss--Seidel needs 19\,136 sweeps. Ordinary Jacobi diverges;
+damping prevents that rapid growth here but does not reach the target
+within the budget. Figure~\ref{fig:square-convergence} connects these
+residual histories to selected CG displacement approximations. The
+iterates approach one static solution, not successive physical shapes
+in time. Fewer steps also need not mean a faster implementation:
+orthogonalization and setup costs differ between methods. This single
+case does not establish a general solver ranking.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/square_convergence.pdf}
+ \caption{Large-square convergence. (a) Selected true relative residuals,
+ including the failed Jacobi run; the iteration axis is logarithmic
+ beyond the first step. The dashed line is the acceptance threshold. (b) Horizontal displacement along the right edge at selected
+ CG iterations $k$, without amplification. The final curve overlaps the
+ LU reference; residuals need not decrease at every CG step.}
+ \label{fig:square-convergence}
+\end{figure}
+
+\subsection{Equilibrium checks and limits}
+In the large-mesh direct solution, right-edge horizontal displacements
+range from approximately $0.492$ to $0.497$ mm. The clamp prevents
+movement at the left edge while the material contracts sideways
+(Fig.~\ref{fig:square-geometry}b). The full displacement has exactly zero
+prescribed components. Using only constrained components for reactions,
+the summed support force is approximately $(-10^6,0)$ N; the remaining
+net-force norm is below $4\times10^{-9}$ N and the moment imbalance
+about the lower-left corner is below $2\times10^{-9}$ N\,m.
+The reference's relative residual is $3.83\times10^{-14}$.
+
+These checks support the assembly and algebraic solution of this case.
+They do not establish continuum accuracy: the coarse mesh's unequal
+corner movements also warn against interpreting its deformation as a
+mesh-independent prediction. A systematic refinement study and comparisons
+between different objects remain for the later sections. The team's
+assembly implementation is used here; permission to substitute it for
+the course-provided routine remains unresolved, as noted in Section 2.

@@ -1,8 +1,26 @@
 # Section 4. Simple Square Demonstration
 
-**Status: Hermes is drafting the section in its Slack thread. Numerical support
-has been verified here; section prose and a compiled preview are not yet in
-this checkout.**
+**Status: initial working draft available for review, not approved final prose.**
+
+## Exact delivered draft
+
+Published at Simon's request so the other agent can review the initial draft:
+
+- [Compiled three-page PDF](preview.pdf), byte-identical to the Slack attachment.
+- [Exact delivered LaTeX and reproduction ZIP](Section-4-LaTeX-and-Reproduction.zip).
+- [Section source](section.tex) and [standalone wrapper](main.tex).
+- [Draft notes and build instructions](draft-notes.md), preserving the source package's original README.
+- [Build and evidence verification](verification.md).
+
+The unpacked source and figures are included here for line-by-line review.
+The package is the original delivered artifact, not a revision against subsequent
+changes to Sections 2–3. Review its consistency with those current sections before
+integration. Earlier sections and Lucas's numerical handoff/review files are
+unchanged by this publication. Full prose, figure, citation and layout review
+remains pending.
+
+The notes below record the earlier handoff chronology; their missing-artifact
+statements describe the state before this publication.
 
 ## Scope
 
