@@ -1,0 +1,46 @@
+% AI-assisted initial working draft for team review, not final project conclusions.
+% Synthesizes Sections 1--6; no new experiments or external results are introduced.
+\section{Conclusion}
+\label{sec:conclusion}
+
+Section 6 establishes what the square example can tell us about both
+elastic deformation and the numerical work needed to compute it. Under
+rightward traction, the clamped square extends and contracts sideways.
+Its mean right-edge horizontal displacement approaches about $0.494$ mm
+on the tested meshes, with decreasing changes under refinement. This
+supports a less mesh-dependent displacement prediction, but does not yet
+answer how different geometries or support arrangements change the
+response. Those comparisons remain proposed in Section 5.
+
+For the supported symmetric positive-definite system, conjugate gradients
+is a practical starting choice among the tested iterative methods. It
+reaches the required residual with much less work than Gauss--Seidel in
+the recorded square benchmark. Diagonal preconditioning reduces the CG
+iteration count slightly, but does not improve the measured time, so it
+is not an automatic improvement. Ordinary Jacobi diverges, while damped
+Jacobi and steepest descent fail to reach the target within the iteration
+budget. These findings support checking convergence and total cost rather
+than selecting a method by simplicity or iteration count alone. The
+untimed sparse-LU solution remains a useful same-mesh reference, not a
+measured performance competitor.
+
+The validation checks answer different questions. Prescribed displacements,
+force and moment balance, and agreement with the direct reference support
+the discrete solution. Refinement tests its dependence on the mesh; the
+separate exact affine test checks a different, roller-supported case.
+Neither establishes the continuum error of the clamped square. Moreover,
+conditioning worsens as the mesh is refined even while the measured
+displacements settle. The load-perturbation tests show that sensitivity
+also depends on how the load changes: the condition number describes
+possible amplification, not the response to every perturbation.
+
+The present conclusions are therefore limited to the tested square and
+the small-deformation, plane-stress model. The next step is to agree and
+execute Section 5's geometry, load-location and support comparisons,
+preserving the physical loading and support regions under refinement.
+Each needs checked reference solutions before physical interpretation or
+solver recommendations can be extended. Permission to use the team's
+assembly routine must also be resolved, and physical validity near sharp
+corners needs further assessment. Completing these checks would allow
+the report to answer its original geometry-and-support question beyond
+one controlled example.
