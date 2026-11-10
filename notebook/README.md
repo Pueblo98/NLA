@@ -41,7 +41,7 @@ Tested with Python 3.12 using two setups: NumPy 1.26 / SciPy 1.13 / Matplotlib 3
 | `results/manifest.json` | environment, specification source, definitions, thresholds, outcome counts |
 | `figures/*.png` | all figures |
 
-Timings depend on the machine. Iteration counts, residuals and displacements do not.
+Timings depend on the machine. Displacements and acceptance outcomes agree across both tested setups. Iteration counts can differ by ±1 between library versions because of rounding (for example, CG on the rectangle takes 427 iterations with SciPy 1.13 and 426 with SciPy 1.18). The committed outputs come from the NumPy 1.26 / SciPy 1.13 run.
 
 ## Editing
 
