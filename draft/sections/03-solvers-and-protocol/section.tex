@@ -111,13 +111,13 @@ the direct reference through
  \frac{\lVert x-x_{\mathrm{ref}}\rVert_2}{\lVert x_{\mathrm{ref}}\rVert_2}.
  \label{eq:solvers-reference-error}
 \end{equation}
-For a zero reference we use the absolute difference. We check the
-reference's residual: it is a numerical solution, not an exact answer. Conditioning, introduced in Section 2, explains why a small force
-imbalance need not imply an equally small displacement error. Numerical
-stability is assessed through residuals, reference agreement, termination
-behaviour and the response to a specified small load perturbation at fixed
-$A$. Each perturbation test records its magnitude and direction; one test
-does not establish worst-case sensitivity.
+We check the reference's residual: it is a numerical solution, not an
+exact answer. Conditioning, introduced in Section 2, explains why a small
+force imbalance need not imply an equally small displacement error.
+Residuals, reference agreement and termination behaviour provide practical
+checks on solver reliability. A separate load-perturbation experiment
+probes sensitivity at fixed $A$. Each perturbation test records its
+magnitude and direction; one test does not establish worst-case sensitivity.
 
 These checks address the solution of one mesh's equations, not the error
 introduced by approximating a continuous body with triangles. To investigate

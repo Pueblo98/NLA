@@ -11,4 +11,8 @@ Hermes drafted this module against base d67eb5f and incorporated the implementat
 - Section 1 was reread after drafting. Section 2 was read in full before drafting and its support/conditioning ending was reread afterwards. The opening continues that argument without repeating the mechanics derivation. Earlier section files remain unchanged.
 - Protocol checked against solvers/progress_benchmark.py: eight iterative methods, zero guess, strict independently recomputed residual target, 20,000-step budget, full GMRES, diagonal PCG, damping 0.5, minimum of three setup-inclusive calls, untimed sparse-LU reference.
 - No FEM experiment or timing benchmark was rerun for this document. Numerical-result validation is not implied by successful compilation.
-- The final report's course-template pagination and team paragraph-level review remain pending.
+- The final report's course-template pagination and final team approval remain pending.
+
+## Follow-up to Lucas's paragraph review
+
+Applied both edits from notes/section3-review-81cbef4/suggested-edits.patch: removed the unimplemented zero-reference fallback claim and separated input-load sensitivity from practical solver-reliability checks. Rebuilt with Tectonic 0.17.0 (exit 0) and rendered/visually checked all three revised pages. The PDF remains two prose pages plus references, with the same cosmetic bibliography underfull-box warning and no missing characters, undefined references or overfull boxes. No solver code or numerical results were changed or rerun.
