@@ -11,7 +11,7 @@
 - [preview.pdf](preview.pdf): previously compiled and checked exact-source preview. It is not the combined final report.
 - [build.sh](build.sh) and [make_triangulation.py](make_triangulation.py): existing build/figure tools.
 
-The scope is [Section 1 of the roadmap](../../ROADMAP.md#1-building-the-model-existing-introduction). Read [WRITING_RULES.md](../../WRITING_RULES.md); the shared rules Simon will provide are still pending. Detailed mechanics belong in Section 2, not in another rewrite of this opening.
+The scope is [Section 1 of the roadmap](../../ROADMAP.md#1-building-the-model-existing-introduction). Follow [WRITING_RULES.md](../../WRITING_RULES.md), the consolidated shared guide. Detailed mechanics belong in Section 2, not in another rewrite of this opening.
 
 ## Rebuild after an authorised edit
 

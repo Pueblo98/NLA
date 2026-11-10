@@ -6,7 +6,7 @@
 
 Use [the Section 7 roadmap entry](../../ROADMAP.md#7-conclusion) as the source of truth for this section's purpose, required contents, boundaries and expected output. Do not duplicate or silently redefine that scope here.
 
-Read [the shared writing-rules entry point](../../WRITING_RULES.md); the team's new rules are still pending. Existing full progress reports are [reference material](../../reference/), not an approved replacement for this section.
+Follow [the shared writing rules](../../WRITING_RULES.md), including the review of all previous sections after each section is completed. Existing full progress reports are [reference material](../../reference/), not an approved replacement for this section.
 
 ## Files to add when this section is requested
 
@@ -21,4 +21,4 @@ Do not create these as empty report stubs or claim the section is completed. Rec
 
 - Owner: not assigned here.
 - Draft/review: not started in this workspace.
-- Next action: open the individual section thread and confirm the writing rules and required inputs.
+- Next action: open the individual section thread and apply the shared writing rules and confirm the required inputs.

@@ -6,7 +6,7 @@ This is the entry point for the team's section-by-section draft. This reorganisa
 
 - [ROADMAP.md](ROADMAP.md): each section's purpose, scope, boundaries, expected output and assignment coverage.
 - [ROADMAP.pdf](ROADMAP.pdf): rendered copy of the same roadmap.
-- [WRITING_RULES.md](WRITING_RULES.md): common writing-rules entry point, **pending the rules Simon will provide**. Do not treat the older proposal as an approved replacement.
+- [WRITING_RULES.md](WRITING_RULES.md): single shared guide for style, mathematical rigor, length and review after each section; consolidated at Lucas's request.
 
 ## Working folders
 
@@ -22,7 +22,7 @@ This is the entry point for the team's section-by-section draft. This reorganisa
 
 ## How each section thread works
 
-1. Link the roadmap entry and the section folder, then check the status of the writing rules. This organisational task does not authorise drafting the other sections.
+1. Link the roadmap entry and the section folder, then read the shared writing rules. This organisational task does not authorise drafting the other sections.
 2. Work on only the requested section. Keep its report body in `section.tex` without a preamble; when drafting is requested, add a standalone `main.tex`, bibliography and figures as needed.
 3. Compile and inspect that section before updating its `preview.pdf`. Keep source and preview synchronised. Do not call a section final without the team's review.
 4. Record decisions or blockers in that folder's README. Update the roadmap only for an agreed structural change, not for routine prose edits.
