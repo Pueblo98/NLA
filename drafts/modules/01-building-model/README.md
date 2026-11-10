@@ -3,6 +3,48 @@
 Lucas's Codex, 10 November 2026. AI-assisted working draft for team review;
 not an approved final section.
 
+## Latest request: opening punctuation and triangulation picture
+
+Lucas asked to revise the first comma and add a picture on 10 November.
+The opening sentence now reads: "We study how the geometry of a
+two-dimensional elastic object and its supports affect its response to
+applied forces." It has no comma. The rest remains connected prose with
+the same three equations.
+
+`figures/triangulation.pdf` is a vector figure included by `section.tex`;
+`figures/triangulation.png` is a matching image for quick sharing. It shows
+the same illustrative L-shaped region before and after triangulation.
+The mesh fills the region, shares nodes and highlights a filled triangle.
+The caption explains that displacement is approximated throughout each
+triangle. The outline is an illustration, not a project geometry decision.
+
+Regenerate using `python3 make_triangulation.py` with NumPy, SciPy and
+Matplotlib installed. With this checkout's existing local dependencies,
+run from the repository root:
+
+```sh
+PYTHONPATH=.build-deps MPLCONFIGDIR=.mplconfig python3 drafts/modules/01-building-model/make_triangulation.py
+```
+
+This diagram uses SciPy Delaunay on an aligned point set followed by a
+domain filter; it is not a general constrained meshing implementation.
+Checks passed for 29 nodes, 36 positive-area triangles, total area 4.5,
+no triangle crossing the concave cutout, and edge incidence of one or two.
+The figure PDF was rendered and visually checked: all labels are readable
+and no content is clipped. The picture is original to this project.
+
+The preview now loads `graphicx`. When integrating the section, retain
+that package and copy the `figures` directory alongside the main document,
+or adjust the image path. Keep the figure caption, label and text reference.
+
+A fresh full LaTeX build still exits with code 101 because Tectonic's TeX
+resource bundle is missing and cannot be downloaded in this environment.
+The figure PDF is verified, but the updated section's pagination and
+references remain unverified. Hermes: compile this exact source with
+`sh build.sh`, check figure placement and attach the updated module PDF.
+The previous build of `8a8e7d7` was reported by Hermes to fit one body page
+plus references; it predates this picture and does not verify this layout.
+
 ## Current revision
 
 Lucas's latest instruction supersedes the earlier requests for bullet points.
@@ -85,20 +127,9 @@ uses A4 paper, 11 pt text and 25 mm margins, with references on a separate
 page. Include `section.tex` once in the combined course template and merge
 the bibliography entries; do not shrink its fonts, margins or spacing.
 
-A fresh build of this prose revision was attempted on 10 November 2026.
-It failed with exit code 101 because the bundled Tectonic compiler could not
-open or download its missing TeX resource bundle. The local ignored
-`compile.log` records the error. No PDF was produced for this revision;
-page count, visual layout and resolved reference numbers remain unverified.
-Hermes's earlier PDF builds correspond to the superseded source.
-
-Static checks confirmed exactly three numbered equations, matching equation
-labels and references, no list environments, no em dashes, and no remaining
-uses of the three removed labels in repository LaTeX files. Citation keys,
-environment pairing, brace pairing and shell syntax were also checked.
-These checks do not establish that LaTeX compilation succeeds.
-
-Hermes: compile this exact revised source using `sh build.sh`, check that
-paragraphs and equations fit comfortably within the half-to-one-page opening
-target, and attach the PDF. Keep the three numbered physical-to-matrix
-balances; do not restore bullet points or squeeze the template spacing.
+The latest build result and figure checks are recorded above. Source checks
+also confirmed three numbered equations, unique labels, matching equation
+and figure references, no list environments, a comma-free opening sentence,
+the `graphicx` dependency and the existence of the included PDF. These source
+checks do not verify rendered section layout. Preserve normal template
+spacing even if the added figure increases the section's length.

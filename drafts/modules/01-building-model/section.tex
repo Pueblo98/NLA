@@ -1,10 +1,10 @@
 % AI-assisted working draft for team review, not an approved final section.
-% Requires amsmath. Merge references.bib into the report bibliography.
+% Requires amsmath and graphicx. Merge references.bib into the report bibliography.
 \section{Building the model}
 \label{sec:building-model}
 
-We study how geometry, loads and supports affect the deformation of
-two-dimensional elastic objects. Our unknown is the displacement
+We study how the geometry of a two-dimensional elastic object and its
+supports affect its response to applied forces. Our unknown is the displacement
 $\mathbf{u}(x,y)$, which tells us how far each point moves horizontally and
 vertically. Differences in movement between nearby points describe local
 stretching and shearing, called strain. The material resists these changes
@@ -27,7 +27,8 @@ on displacement, Eq.~\eqref{eq:model-field-balance} gives equations for
 $\mathbf{u}$. We also specify where forces act on the boundary and which
 movements the supports prevent.
 
-To make this a finite problem, we divide the region into filled triangles,
+To make this a finite problem, we divide the region into filled triangles
+as shown in Fig.~\ref{fig:model-triangulation},
 following its boundary and leaving any holes empty~\cite{shewchuk-triangle}.
 Their vertices are the mesh nodes, each with two unknown displacement
 components. Inside each triangle, displacement varies linearly between
@@ -35,6 +36,16 @@ its three vertex values. Adjacent triangles share these values, so their
 displacements agree along the common edge. This represents movement
 throughout the solid; the triangle edges are not physical bars. Smaller
 triangles allow us to capture more variation in the deformation.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/triangulation.pdf}
+ \caption{Triangulation of an illustrative region. The filled triangles
+ cover the same solid area and share nodes along their edges. Displacement
+ is approximated throughout each triangle using its three vertex values.
+ The outline is an example, not a selected project geometry.}
+ \label{fig:model-triangulation}
+\end{figure}
 
 The finite element method applies Eq.~\eqref{eq:model-field-balance}
 by balancing internal and external work, meaning forces acting through
