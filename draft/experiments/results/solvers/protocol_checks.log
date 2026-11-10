@@ -1,0 +1,4 @@
+PASS known_answer_checks (all methods: Jacobi, Damped Jacobi, Gauss-Seidel, SD, CG, GMRES (full), MINRES, PCG (diagonal))
+PASS 3x3 SPD: Jacobi stopped by guard after 57; damped Jacobi target after 126
+PASS eigsh vs eigvalsh on 4x4-cell plate (n=40): kappa 4.350935e+02 vs 4.350935e+02; rho_J 1.890982 vs 1.890982
+environment: {"python": "3.13.18", "numpy": "2.5.3", "scipy": "1.18.1", "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39", "machine": "x86_64"}

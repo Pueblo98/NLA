@@ -1,0 +1,49 @@
+{
+  "environment": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39",
+    "machine": "x86_64"
+  },
+  "protocol": {
+    "tolerance": 1e-08,
+    "iteration_cap": 20000,
+    "methods": [
+      "Jacobi",
+      "Damped Jacobi",
+      "Gauss-Seidel",
+      "SD",
+      "CG",
+      "GMRES (full)",
+      "MINRES",
+      "PCG (diagonal)"
+    ],
+    "x0": "zero",
+    "divergence_guard": 10000000000.0,
+    "damped_jacobi_omega": 0.5,
+    "gmres_restart": "n (full)",
+    "timing": "best of 3, perf_counter",
+    "eigen_tolerance": 1e-10
+  },
+  "checks": {
+    "known_answer_checks": "pass",
+    "spd_3x3": {
+      "jacobi_status": "divergence_guard",
+      "jacobi_iterations": 57,
+      "damped_status": "target",
+      "damped_iterations": 126,
+      "lambda_max_S": 2.5,
+      "omega_upper": 0.8
+    },
+    "eig_estimator": {
+      "unknowns": 40,
+      "lambda_min_dense": 34396003.60507042,
+      "lambda_min_sparse": 34396003.60507386,
+      "lambda_max_dense": 14965478936.465374,
+      "lambda_max_sparse": 14965478936.46539,
+      "rho_J_dense": 1.8909823126307082,
+      "rho_J_sparse": 1.8909823126307086
+    }
+  }
+}
