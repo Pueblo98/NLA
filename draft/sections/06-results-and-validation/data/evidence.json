@@ -1,0 +1,503 @@
+{
+  "environment": {
+    "python": "3.14.4",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+    "thread_variables": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "code_sha256": {
+    "generate_evidence.py": "0c34a616492fd2ed203f8fdeca42ae84276f17d1956f63143cd5d2faf949c38b",
+    "test_evidence.py": "9e3f595999c371991c4aebf367db82b44d252c02cad8f25a3904fab374d803bb",
+    "requirements.txt": "e86ed5806bf69b661cf4948289e57c593bf9a3d8b2d89f5aaac88a97faac7337",
+    "reproduction/plate.py": "258d8f715146b4b5e75629847abb952628fba4dd4c382d5ae47b2c2bb4e9e924",
+    "reproduction/elasticity.py": "af9081afebf12bcca8826c38c70e943453ad74443b3edc867ca14d163639ff93",
+    "reproduction/system_tools.py": "ba7dbd957f06420e1b42f1f6d8ee0bf1d2fad173f41de8162fd0b9110bcbfb42"
+  },
+  "section4_copies_byte_identical": {
+    "plate.py": true,
+    "elasticity.py": true,
+    "system_tools.py": true
+  },
+  "unchanged_section4_timing_source_sha256": {
+    "results.json": "8101faca0a6e41ce27f4ef1a344b6d738d3548d6cb08a63c7300051af8ca512c",
+    "solver_comparison.csv": "c6687be4cfc090e971a5b58b8f5c50cca83a19faf8dca68abce54dad9791a50c"
+  },
+  "definitions": {
+    "scope": "Structured unit-square force_driven clamp, P1/CST plane stress; no Section 5 object families or new timing benchmarks.",
+    "physical_inputs": "Lx=Ly=1 m; E=200e9 Pa; nu=0.3; t=0.01 m; p=100e6 Pa; q=t*p=1e6 N/m; bl-tr diagonals.",
+    "solver": "scipy.sparse.linalg.splu(A.tocsc()); n20 reuses one factorization for baseline and both perturbation solves.",
+    "residual": "True reduced residual r=b-Ax; relative residual ||r||_2/||b||_2. Full free residual also recorded separately.",
+    "reactions": "R_c=(Kd-f)_c; R_free=0. Total force and moment use f+R, not unmasked Kd-f.",
+    "equilibrium": "Fscale=sum_i ||f_i||_2; Lchar=||max(nodes)-min(nodes)||_2. ||sum(f+R)||_2/Fscale; |sum(x Fy-y Fx)|/(Fscale Lchar). Moments about (0,0); changed cases use changed full f.",
+    "symmetry": "||A-A.T||_F/||A||_F.",
+    "spectrum": "eigsh k=1, which=SA and LA, tol=1e-11, maxiter=100000. v0_i=sin(i)+0.3 cos(2i), i=1..N, normalized. Positive Ritz values and ||Av-lambda v||_2/(|lambda| ||v||_2)<1e-7 required; estimates, not certified spectral enclosures.",
+    "observables": "mean_ux is exact P1 right-edge trace integral / edge length. Midpoint ux,uy at (1,0.5) are linearly interpolated on the boundary, including odd n=5.",
+    "uncertainty": "eta_w=||w_free||_2 ||b-Ax||_2/lambda_min_est in m. Algebraic uncertainty ESTIMATES, NOT certified bounds; no discretization/model-error bound.",
+    "refinement": "Successive ABSOLUTE observable differences in m, including near-zero midpoint uy. No continuum solution or observed-order claim.",
+    "scaling": "P=diag(A); S=P^(-1/2) A P^(-1/2); estimated kappa_2=lambda_max/lambda_min for A and S.",
+    "jacobi": "rho(I-P^-1 A)=max(|1-lambda_min(S)|,|1-lambda_max(S)|). Damped omega=0.5, matching Sections 3 and 4; rho=max(|1-omega*lambda_min(S)|,|1-omega*lambda_max(S)|). Spectral calculation only, not a new iterative benchmark.",
+    "perturbations": "Proportional delta_f=.001 f; redistribution delta_q_x=C(2y/Ly-1), delta_q_y=0, exact consistent linear-edge integration and C chosen so ||delta_b||_2/||b||_2=.001. Same A. Redistribution adds zero net force but nonzero moment.",
+    "change_norm": "||x_changed-x||_2/||x||_2 uses the FREE nodal-displacement Euclidean norm, NOT a spatial continuum norm. Amplification divides by ||delta_b||_2/||b||_2. These two directions are not a worst-case sensitivity claim.",
+    "superposition": "||x_changed-x-delta_x||_2/||delta_x||_2; delta_x is separately solved with the same LU.",
+    "roller": "Separate n=4 force_driven(support=roller): ux=p*x/E, uy=-nu*p*y/E. Relative full-nodal Euclidean error; not an exact solution for the clamp."
+  },
+  "refinement": [
+    {
+      "n": 5,
+      "params": {
+        "Lx": 1.0,
+        "Ly": 1.0,
+        "nx": 5,
+        "ny": 5,
+        "E": 200000000000.0,
+        "nu": 0.3,
+        "t": 0.01,
+        "p": 100000000.0,
+        "diagonal": "bl-tr",
+        "support": "clamp"
+      },
+      "nodes": 36,
+      "triangles": 50,
+      "unknowns": 60,
+      "residual_norm_N": 1.069683026576982e-09,
+      "relative_residual": 2.5212670727091134e-15,
+      "relative_symmetry_defect": 1.8206592517501343e-17,
+      "spectrum": {
+        "lambda_min": 23495627.461920843,
+        "lambda_max": 15791414264.017553,
+        "condition_estimate": 672.1001296777692,
+        "absolute_eigenpair_defects": [
+          0.00010375112693858977,
+          5.4092087439788625e-06
+        ],
+        "relative_eigenpair_defects": [
+          4.41576319282123e-12,
+          3.4254112098777187e-16
+        ]
+      },
+      "observables": {
+        "mean_ux": {
+          "value_m": 0.000491351509651597,
+          "algebraic_uncertainty_estimate_m": 1.9315426830935058e-17,
+          "successive_absolute_difference_m": null
+        },
+        "midpoint_ux": {
+          "value_m": 0.0004892020047616819,
+          "algebraic_uncertainty_estimate_m": 3.2192378051558426e-17,
+          "successive_absolute_difference_m": null
+        },
+        "midpoint_uy": {
+          "value_m": 1.0709833725521908e-05,
+          "algebraic_uncertainty_estimate_m": 3.2192378051558426e-17,
+          "successive_absolute_difference_m": null
+        }
+      },
+      "validation": {
+        "force_scale_N": 1000000.0,
+        "characteristic_length_m": 1.4142135623730951,
+        "applied_force_N": [
+          1000000.0,
+          0.0
+        ],
+        "applied_moment_Nm": -500000.0,
+        "reaction_force_N": [
+          -1000000.0000000006,
+          -2.9831426218152046e-10
+        ],
+        "reaction_moment_Nm": 500000.00000000035,
+        "force_imbalance_N": [
+          -6.548361852765083e-10,
+          -2.9831426218152046e-10
+        ],
+        "moment_imbalance_Nm": 3.92901711165905e-10,
+        "normalized_force_imbalance": 7.19584483273781e-16,
+        "normalized_moment_imbalance": 2.7782346430520964e-16,
+        "maximum_support_displacement_m": 0.0,
+        "free_full_residual_norm_N": 1.069683026576982e-09
+      }
+    },
+    {
+      "n": 10,
+      "params": {
+        "Lx": 1.0,
+        "Ly": 1.0,
+        "nx": 10,
+        "ny": 10,
+        "E": 200000000000.0,
+        "nu": 0.3,
+        "t": 0.01,
+        "p": 100000000.0,
+        "diagonal": "bl-tr",
+        "support": "clamp"
+      },
+      "nodes": 121,
+      "triangles": 200,
+      "unknowns": 220,
+      "residual_norm_N": 2.9529826771079258e-09,
+      "relative_residual": 9.580740929099428e-15,
+      "relative_symmetry_defect": 2.644076306254014e-17,
+      "spectrum": {
+        "lambda_min": 6914251.98998261,
+        "lambda_max": 17074578013.488276,
+        "condition_estimate": 2469.4758071048,
+        "absolute_eigenpair_defects": [
+          5.066529591628888e-05,
+          0.0031534906263602585
+        ],
+        "relative_eigenpair_defects": [
+          7.327661182972928e-12,
+          1.8468922768510693e-13
+        ]
+      },
+      "observables": {
+        "mean_ux": {
+          "value_m": 0.0004928773323175509,
+          "algebraic_uncertainty_estimate_m": 1.3163685523511487e-16,
+          "successive_absolute_difference_m": 1.5258226659539643e-06
+        },
+        "midpoint_ux": {
+          "value_m": 0.0004908102935078857,
+          "algebraic_uncertainty_estimate_m": 4.2708635458849586e-16,
+          "successive_absolute_difference_m": 1.6082887462037614e-06
+        },
+        "midpoint_uy": {
+          "value_m": 3.7689618970989457e-06,
+          "algebraic_uncertainty_estimate_m": 4.2708635458849586e-16,
+          "successive_absolute_difference_m": 6.9408718284229614e-06
+        }
+      },
+      "validation": {
+        "force_scale_N": 1000000.0,
+        "characteristic_length_m": 1.4142135623730951,
+        "applied_force_N": [
+          1000000.0,
+          0.0
+        ],
+        "applied_moment_Nm": -500000.0,
+        "reaction_force_N": [
+          -1000000.000000001,
+          6.693881005048752e-10
+        ],
+        "reaction_moment_Nm": 500000.00000000105,
+        "force_imbalance_N": [
+          -1.1641532182693481e-09,
+          6.693881005048752e-10
+        ],
+        "moment_imbalance_Nm": 1.0841176845133305e-09,
+        "normalized_force_imbalance": 1.34288240166606e-15,
+        "normalized_moment_imbalance": 7.66586966323634e-16,
+        "maximum_support_displacement_m": 0.0,
+        "free_full_residual_norm_N": 2.9529826771079258e-09
+      }
+    },
+    {
+      "n": 20,
+      "params": {
+        "Lx": 1.0,
+        "Ly": 1.0,
+        "nx": 20,
+        "ny": 20,
+        "E": 200000000000.0,
+        "nu": 0.3,
+        "t": 0.01,
+        "p": 100000000.0,
+        "diagonal": "bl-tr",
+        "support": "clamp"
+      },
+      "nodes": 441,
+      "triangles": 800,
+      "unknowns": 840,
+      "residual_norm_N": 8.464802954738323e-09,
+      "relative_residual": 3.8338007936838075e-14,
+      "relative_symmetry_defect": 3.3280171644571426e-17,
+      "spectrum": {
+        "lambda_min": 1916521.0022537825,
+        "lambda_max": 17447894024.936405,
+        "condition_estimate": 9103.9409452952,
+        "absolute_eigenpair_defects": [
+          8.627223579059403e-06,
+          0.026188889868099682
+        ],
+        "relative_eigenpair_defects": [
+          4.501502237081672e-12,
+          1.5009771282809653e-12
+        ]
+      },
+      "observables": {
+        "mean_ux": {
+          "value_m": 0.0004934973591777322,
+          "algebraic_uncertainty_estimate_m": 9.751930110460483e-16,
+          "successive_absolute_difference_m": 6.200268601812926e-07
+        },
+        "midpoint_ux": {
+          "value_m": 0.0004915989892039066,
+          "algebraic_uncertainty_estimate_m": 4.41675460106303e-15,
+          "successive_absolute_difference_m": 7.886956960209126e-07
+        },
+        "midpoint_uy": {
+          "value_m": 1.255097594535793e-06,
+          "algebraic_uncertainty_estimate_m": 4.41675460106303e-15,
+          "successive_absolute_difference_m": 2.5138643025631525e-06
+        }
+      },
+      "validation": {
+        "force_scale_N": 1000000.0,
+        "characteristic_length_m": 1.4142135623730951,
+        "applied_force_N": [
+          1000000.0,
+          0.0
+        ],
+        "applied_moment_Nm": -500000.0,
+        "reaction_force_N": [
+          -1000000.0000000014,
+          -3.27054294757545e-09
+        ],
+        "reaction_moment_Nm": 500000.0000000017,
+        "force_imbalance_N": [
+          -1.4151737559586763e-09,
+          -3.27054294757545e-09
+        ],
+        "moment_imbalance_Nm": 1.69893610291183e-09,
+        "normalized_force_imbalance": 3.5635891923017306e-15,
+        "normalized_moment_imbalance": 1.201329239171601e-15,
+        "maximum_support_displacement_m": 0.0,
+        "free_full_residual_norm_N": 8.464802954738323e-09
+      }
+    },
+    {
+      "n": 40,
+      "params": {
+        "Lx": 1.0,
+        "Ly": 1.0,
+        "nx": 40,
+        "ny": 40,
+        "E": 200000000000.0,
+        "nu": 0.3,
+        "t": 0.01,
+        "p": 100000000.0,
+        "diagonal": "bl-tr",
+        "support": "clamp"
+      },
+      "nodes": 1681,
+      "triangles": 3200,
+      "unknowns": 3280,
+      "residual_norm_N": 1.8990666970251347e-08,
+      "relative_residual": 1.2086530751631117e-13,
+      "relative_symmetry_defect": 3.246347581010287e-17,
+      "spectrum": {
+        "lambda_min": 507931.7120657056,
+        "lambda_max": 17547851553.030792,
+        "condition_estimate": 34547.658939556066,
+        "absolute_eigenpair_defects": [
+          9.801798140466741e-06,
+          0.03478989434609392
+        ],
+        "relative_eigenpair_defects": [
+          1.929747229328102e-11,
+          1.9825728660261637e-12
+        ]
+      },
+      "observables": {
+        "mean_ux": {
+          "value_m": 0.0004937444453854163,
+          "algebraic_uncertainty_estimate_m": 5.8745343289826775e-15,
+          "successive_absolute_difference_m": 2.470862076840979e-07
+        },
+        "midpoint_ux": {
+          "value_m": 0.0004918999090234805,
+          "algebraic_uncertainty_estimate_m": 3.738822861250043e-14,
+          "successive_absolute_difference_m": 3.0091981957386816e-07
+        },
+        "midpoint_uy": {
+          "value_m": 4.184448079892366e-07,
+          "algebraic_uncertainty_estimate_m": 3.738822861250043e-14,
+          "successive_absolute_difference_m": 8.366527865465565e-07
+        }
+      },
+      "validation": {
+        "force_scale_N": 1000000.0,
+        "characteristic_length_m": 1.4142135623730951,
+        "applied_force_N": [
+          1000000.0,
+          0.0
+        ],
+        "applied_moment_Nm": -500000.0,
+        "reaction_force_N": [
+          -999999.9999999795,
+          -3.137938620056957e-08
+        ],
+        "reaction_moment_Nm": 499999.999999966,
+        "force_imbalance_N": [
+          2.0467268768697977e-08,
+          -3.137938620056957e-08
+        ],
+        "moment_imbalance_Nm": -3.400782588869333e-08,
+        "normalized_force_imbalance": 3.74643159443038e-14,
+        "normalized_moment_imbalance": 2.404716429930648e-14,
+        "maximum_support_displacement_m": 0.0,
+        "free_full_residual_norm_N": 1.8990666970251347e-08
+      }
+    }
+  ],
+  "diagonal_scaling_n20": {
+    "original_spectrum": {
+      "lambda_min": 1916521.0022537825,
+      "lambda_max": 17447894024.936405,
+      "condition_estimate": 9103.9409452952,
+      "absolute_eigenpair_defects": [
+        8.627223579059403e-06,
+        0.026188889868099682
+      ],
+      "relative_eigenpair_defects": [
+        4.501502237081672e-12,
+        1.5009771282809653e-12
+      ]
+    },
+    "scaled_spectrum": {
+      "lambda_min": 0.0003686667207178658,
+      "lambda_max": 2.9600502426261666,
+      "condition_estimate": 8029.068197049013,
+      "absolute_eigenpair_defects": [
+        2.6499871934614905e-15,
+        1.3660831298723385e-12
+      ],
+      "relative_eigenpair_defects": [
+        7.18802930815522e-12,
+        4.615067373519796e-13
+      ]
+    },
+    "jacobi_spectral_radius": 1.9600502426261666,
+    "damping_omega": 0.5,
+    "damped_jacobi_spectral_radius": 0.999815666639641
+  },
+  "perturbations_n20": [
+    {
+      "name": "proportional",
+      "relative_rhs_change": 0.001,
+      "relative_displacement_change": 0.0010000000000003678,
+      "amplification": 1.0000000000003677,
+      "superposition_mismatch_norm_m": 3.2260552056808838e-18,
+      "superposition_mismatch_relative_to_delta_x": 5.303287326882373e-13,
+      "changed_residual_norm_N": 7.98537026737806e-09,
+      "changed_relative_residual": 3.6130474976596475e-14,
+      "increment_residual_norm_N": 7.896809056702919e-12,
+      "increment_relative_residual": 3.576550215171906e-14,
+      "added_force_N": [
+        1000.0,
+        0.0
+      ],
+      "added_moment_Nm": -500.0,
+      "line_load_amplitude_N_per_m": null,
+      "validation": {
+        "force_scale_N": 1001000.0,
+        "characteristic_length_m": 1.4142135623730951,
+        "applied_force_N": [
+          1001000.0,
+          0.0
+        ],
+        "applied_moment_Nm": -500500.0,
+        "reaction_force_N": [
+          -1001000.0000000021,
+          -3.285094862803817e-09
+        ],
+        "reaction_moment_Nm": 500500.0000000021,
+        "force_imbalance_N": [
+          -1.95359461940825e-09,
+          -3.285094862803817e-09
+        ],
+        "moment_imbalance_Nm": 2.0627339836210012e-09,
+        "normalized_force_imbalance": 3.8182728033748076e-15,
+        "normalized_moment_imbalance": 1.45711607153082e-15,
+        "maximum_support_displacement_m": 0.0,
+        "free_full_residual_norm_N": 7.98537026737806e-09
+      }
+    },
+    {
+      "name": "linear_redistribution",
+      "relative_rhs_change": 0.001,
+      "relative_displacement_change": 0.0017662082510032154,
+      "amplification": 1.7662082510032153,
+      "superposition_mismatch_norm_m": 3.1048643434324145e-18,
+      "superposition_mismatch_relative_to_delta_x": 2.889841896131633e-13,
+      "changed_residual_norm_N": 7.44448733419932e-09,
+      "changed_relative_residual": 3.3716871299545426e-14,
+      "increment_residual_norm_N": 1.1496961417018737e-11,
+      "increment_relative_residual": 5.207098149974729e-14,
+      "added_force_N": [
+        0.0,
+        0.0
+      ],
+      "added_moment_Nm": -296.36113988166716,
+      "line_load_amplitude_N_per_m": 1778.166839290003,
+      "validation": {
+        "force_scale_N": 1000000.0,
+        "characteristic_length_m": 1.4142135623730951,
+        "applied_force_N": [
+          999999.9999999998,
+          0.0
+        ],
+        "applied_moment_Nm": -500296.36113988166,
+        "reaction_force_N": [
+          -1000000.0000000016,
+          -3.259629011154175e-09
+        ],
+        "reaction_moment_Nm": 500296.3611398836,
+        "force_imbalance_N": [
+          -1.6880221664905548e-09,
+          -3.259629011154175e-09
+        ],
+        "moment_imbalance_Nm": 1.8808350432664156e-09,
+        "normalized_force_imbalance": 3.670776501630331e-15,
+        "normalized_moment_imbalance": 1.3299512133869759e-15,
+        "maximum_support_displacement_m": 0.0,
+        "free_full_residual_norm_N": 7.44448733419932e-09
+      }
+    }
+  ],
+  "roller_exact_check": {
+    "n": 4,
+    "params": {
+      "Lx": 1.0,
+      "Ly": 1.0,
+      "nx": 4,
+      "ny": 4,
+      "E": 200000000000.0,
+      "nu": 0.3,
+      "t": 0.01,
+      "p": 100000000.0,
+      "diagonal": "bl-tr",
+      "support": "roller"
+    },
+    "relative_nodal_error": 2.1186878680611954e-15,
+    "validation": {
+      "force_scale_N": 1000000.0,
+      "characteristic_length_m": 1.4142135623730951,
+      "applied_force_N": [
+        1000000.0,
+        0.0
+      ],
+      "applied_moment_Nm": -500000.0,
+      "reaction_force_N": [
+        -999999.9999999998,
+        -2.9103830456733704e-10
+      ],
+      "reaction_moment_Nm": 499999.9999999997,
+      "force_imbalance_N": [
+        1.1641532182693481e-10,
+        -2.9103830456733704e-10
+      ],
+      "moment_imbalance_Nm": -3.346940502524376e-10,
+      "normalized_force_imbalance": 3.134578470568233e-16,
+      "normalized_moment_imbalance": 2.366644325562897e-16,
+      "maximum_support_displacement_m": 0.0,
+      "free_full_residual_norm_N": 1.1565797775991736e-09
+    },
+    "note": "Separate affine roller patch test; not the clamped refinement benchmark."
+  }
+}

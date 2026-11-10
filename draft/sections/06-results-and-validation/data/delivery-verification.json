@@ -1,0 +1,12 @@
+{
+  "numerical_artifacts_checked": true,
+  "frozen_sources_byte_identical": true,
+  "damping_weight_matches_section3": 0.5,
+  "minimum_mesh_difference_over_summed_uncertainty_estimates": 7198180.610110517,
+  "pages": 2,
+  "paper": "A4, 11 pt article, 25 mm margins",
+  "horizontal_margin_checks_pass": true,
+  "compiler_warnings": false,
+  "pdf_sha256": "ff6a68ecd17c0122a49927ab4d366de89d4d8bbcbebe8e5f5381f767b2159adc",
+  "section_sha256": "8dce0ec7845119fe3b966e1948f9af5d205836967ae1628978a917bb0afa69ef"
+}

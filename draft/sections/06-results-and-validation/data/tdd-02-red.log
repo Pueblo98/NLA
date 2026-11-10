@@ -1,0 +1,26 @@
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_affine_boundary_observables_nonuniform_and_odd_n[heights0] ________
+
+heights = [0.0, 0.1, 0.4, 0.8, 1.0]
+
+    @pytest.mark.parametrize('heights', [[0., .1, .4, .8, 1.], np.linspace(0., 1., 6)])
+    def test_affine_boundary_observables_nonuniform_and_odd_n(heights):
+>       from generate_evidence import observable_weights
+E       ImportError: cannot import name 'observable_weights' from 'generate_evidence' (/home/kleon/school/nla-section6-draft/draft/sections/06-results-and-validation/generate_evidence.py)
+
+test_evidence.py:20: ImportError
+_______ test_affine_boundary_observables_nonuniform_and_odd_n[heights1] ________
+
+heights = array([0. , 0.2, 0.4, 0.6, 0.8, 1. ])
+
+    @pytest.mark.parametrize('heights', [[0., .1, .4, .8, 1.], np.linspace(0., 1., 6)])
+    def test_affine_boundary_observables_nonuniform_and_odd_n(heights):
+>       from generate_evidence import observable_weights
+E       ImportError: cannot import name 'observable_weights' from 'generate_evidence' (/home/kleon/school/nla-section6-draft/draft/sections/06-results-and-validation/generate_evidence.py)
+
+test_evidence.py:20: ImportError
+=========================== short test summary info ============================
+FAILED test_evidence.py::test_affine_boundary_observables_nonuniform_and_odd_n[heights0]
+FAILED test_evidence.py::test_affine_boundary_observables_nonuniform_and_odd_n[heights1]
+2 failed, 1 passed in 0.11s

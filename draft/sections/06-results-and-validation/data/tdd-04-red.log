@@ -1,0 +1,14 @@
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+_______________________ test_square_evidence_end_to_end ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-kleon/pytest-32/test_square_evidence_end_to_en0')
+
+    def test_square_evidence_end_to_end(tmp_path):
+>       from generate_evidence import run_evidence
+E       ImportError: cannot import name 'run_evidence' from 'generate_evidence' (/home/kleon/school/nla-section6-draft/draft/sections/06-results-and-validation/generate_evidence.py)
+
+test_evidence.py:49: ImportError
+=========================== short test summary info ============================
+FAILED test_evidence.py::test_square_evidence_end_to_end - ImportError: canno...
+1 failed, 4 passed in 0.16s

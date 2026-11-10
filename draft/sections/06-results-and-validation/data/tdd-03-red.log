@@ -1,0 +1,12 @@
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+___________________ test_reactions_do_not_mask_free_residual ___________________
+
+    def test_reactions_do_not_mask_free_residual():
+>       from generate_evidence import equilibrium
+E       ImportError: cannot import name 'equilibrium' from 'generate_evidence' (/home/kleon/school/nla-section6-draft/draft/sections/06-results-and-validation/generate_evidence.py)
+
+test_evidence.py:33: ImportError
+=========================== short test summary info ============================
+FAILED test_evidence.py::test_reactions_do_not_mask_free_residual - ImportErr...
+1 failed, 3 passed in 0.06s

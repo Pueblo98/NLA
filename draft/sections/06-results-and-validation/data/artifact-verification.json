@@ -1,0 +1,30 @@
+{
+  "code_hashes_match": true,
+  "independently_recomputed_relative_eigenpair_defects": {
+    "5": [
+      4.415763192821231e-12,
+      3.425411209877718e-16
+    ],
+    "10": [
+      7.327661182972926e-12,
+      1.8468922768510703e-13
+    ],
+    "20": [
+      4.5015022370816686e-12,
+      1.5009771282809668e-12
+    ],
+    "40": [
+      1.9297472293281008e-11,
+      1.9825728660261633e-12
+    ],
+    "scaled20": [
+      7.188029308155209e-12,
+      4.615067373519799e-13
+    ]
+  },
+  "figure_single_page_labels_and_rasterization_pass": true,
+  "maximum_relative_residual": 1.2086530751631117e-13,
+  "maximum_force_imbalance": 3.74643159443038e-14,
+  "maximum_moment_imbalance": 2.404716429930648e-14,
+  "n20_relative_difference_from_section4_saved_LU": 0.0
+}
