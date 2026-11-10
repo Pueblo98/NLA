@@ -1,0 +1,30 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\pagestyle{plain}
+% Preview only: stand-ins for labels of Sections 2--5, numbered as in the
+% combined report (equations, figures and tables are numbered through the
+% whole report there). Remove these lines when merged.
+\makeatletter
+\newcommand{\stublabel}[2]{\protected@edef\@currentlabel{#2}\label{#1}}
+\makeatother
+\begin{document}
+\stublabel{eq:mechanics-reactions}{7}%
+\stublabel{eq:solvers-jacobi-radius}{10}%
+\stublabel{eq:solvers-cg-bound}{11}%
+\stublabel{eq:solvers-perturbation}{13}%
+\stublabel{sec:square}{4}%
+\stublabel{fig:objects-meshes}{4}%
+\stublabel{tab:objects-register}{2}%
+\setcounter{section}{5}
+\setcounter{equation}{13}
+\setcounter{figure}{4}
+\setcounter{table}{2}
+\input{section.tex}
+\clearpage
+\bibliographystyle{amsplain}
+\bibliography{references}
+\end{document}

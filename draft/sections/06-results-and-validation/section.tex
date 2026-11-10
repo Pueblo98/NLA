@@ -1,0 +1,140 @@
+% AI-assisted working draft for team review, not an approved final section.
+% Requires amsmath, graphicx and booktabs. Merge references.bib into the report bibliography.
+\section{Results, validation and discussion}
+\label{sec:results}
+
+We now report the comparisons of Table~\ref{tab:objects-register};
+displacements refer to the points marked in Fig.~\ref{fig:objects-meshes}.
+
+\paragraph{Physical response.}
+Under the square's load, the loaded face of the plate with a hole
+(Fig.~\ref{fig:results-deformed}) moves $0.676$~mm instead of $0.492$~mm: removing material makes the plate softer. The load
+must flow around the hole, so stress gathers at its top and bottom. The
+largest element stress $\sigma_{xx}$ there rises from $2.80p$ to $3.68p$
+over the four meshes and has not yet settled.
+At the inner corner of the bracket the displacement settles ($0.124$,
+$0.127$, $0.128$, $0.128$~mm), but the largest stress in the adjacent
+triangles keeps growing (119, 138, 154, 178~MPa). This is expected, since the
+exact stress at an inward-pointing corner is infinite~\cite{williams-corners}.
+
+\begin{figure}[htb]
+ \centering
+ \includegraphics[width=\linewidth]{figures/results_deformed.pdf}
+ \caption{Deformed objects (second mesh level) coloured by element von Mises
+ stress; dashed: original outline. Displacements are amplified 100 times
+ (\textsf{H}, \textsf{L}) and 5 times (\textsf{B}).}
+ \label{fig:results-deformed}
+\end{figure}
+
+The same 0.5~MN applied to
+the upper arm of the bracket moves the loaded face $0.304$ instead of
+$0.472$~mm and halves the corner stress (71 instead of 138~MPa), but the
+peak stress moves to the clamp and reaches 332~MPa. The beam is far more
+flexible in bending than in stretching: its tip moves $50.8$~mm under a
+50~kN transverse load but only $2.00$~mm under a 500~kN axial load.
+A roller and pin instead of the clamp on \textsf{H} raise the displacement
+by only 0.9\% but $\kappa_2(A)$ by 38\%: fewer held components make the
+softest mode softer.
+
+Displacements scale exactly with the load ($p=25$ to 250~MPa) and with
+$1/E$ ($E=70$~GPa), while stresses and $\kappa_2(A)$ are unchanged, since $E$
+only scales $A$. Poisson's ratio changes the shape of
+$D$: raising $\nu$ from 0 to 0.45 lowers the displacement by 1.7\% but
+raises $\kappa_2(A)$ by 37\% and the CG iterations from 278 to 332.
+
+\paragraph{Mesh refinement and discretization error.}
+Under refinement the matched-point displacements settle. For the square the
+change between levels falls from $4.3\times10^{-4}$ to
+$5.0\times10^{-5}$~mm, and at the loaded-face midpoint the finest irregular and structured meshes
+agree to $2\times10^{-4}$ (relative). Near the hole, where stress varies rapidly,
+convergence is slower (changes from $2.3\times10^{-2}$ to
+$2.2\times10^{-3}$~mm). The beam's tip
+deflection, $48.3$, $50.8$, $51.3$ and $51.5$~mm, approaches the beam-theory
+value of $51.2$~mm, or $51.8$~mm with shear
+deformation~\cite{timoshenko-goodier}, from below: linear triangles are too
+stiff in bending~\cite{cook-fea}. The finest mesh is $0.7\%$ below the
+estimate with shear. These changes, at least $10^{-4}$ relative, measure the discretization
+error. The algebraic error of every accepted CG solution against sparse LU
+is at most $1.0\times10^{-9}$, so the mesh, not the solver tolerance,
+limits the accuracy.
+
+\paragraph{Conditioning and solver performance.}
+Figure~\ref{fig:results-scaling}a shows that $\kappa_2(A)$ grows in
+proportion to $N$ for every object, with fitted log--log slopes 0.98--1.02.
+This is the growth like $h^{-2}$ expected for finite element stiffness
+matrices, since $N\propto h^{-2}$ in two
+dimensions~\cite{elman-silvester-wathen}. By
+Eq.~\eqref{eq:solvers-cg-bound}, CG iterations should then grow like
+$\sqrt{\kappa_2}\propto N^{1/2}$; the measured slopes are 0.50--0.52
+(Fig.~\ref{fig:results-scaling}b). Shape changes the constant, not the rate.
+The beam's $\kappa_2$ is about 260 times the square's at similar $N$:
+bending a slender beam takes little energy, so its smallest eigenvalue is
+290 times smaller. Yet CG needs only 1.8 times as many iterations, not
+$\sqrt{260}\approx16$ times: only four beam eigenvalues lie below the
+square's smallest, and CG removes a few isolated eigenvalues in a few extra
+steps~\cite{shewchuk-cg}.
+
+\begin{figure}[htb]
+ \centering
+ \includegraphics[width=0.8\linewidth]{figures/results_scaling.pdf}
+ \caption{(a) $\kappa_2(A)$ and (b) CG iterations against $N$, with fitted
+ log--log slopes; the structured square is that of Section~\ref{sec:square}.}
+ \label{fig:results-scaling}
+\end{figure}
+
+\begin{table}[htb]
+ \centering
+ \caption{Solvers on the second mesh level: iterations / best time in ms.
+ *: $\eta<10^{-8}$ not met.}
+ \label{tab:results-solvers}
+ \footnotesize
+ \begin{tabular}{@{}lrrrr@{}}
+ \toprule
+ & \textsf{S}, $N=1484$ & \textsf{H}, $N=1414$ & \textsf{L}, $N=1132$ & \textsf{B}, $N=2020$ \\
+ \midrule
+ $\kappa_2(A)$ & $1.43\times10^4$ & $1.60\times10^4$ & $1.27\times10^4$ & $3.75\times10^6$ \\
+ \midrule
+ Sparse LU & 4.6 & 4.6 & 2.9 & 5.0 \\
+ CG & 292 / 10.8 & 306 / 11.1 & 271 / 6.9 & 534 / 24.0 \\
+ Diagonal PCG & 264 / 10.6 & 281 / 12.2 & 246 / 9.5 & 493 / 20.9 \\
+ MINRES & 285 / 26.0 & 302 / 26.7 & 268 / 20.5 & 541* / 50.5 \\
+ Gauss--Seidel & 20{,}000* / 11{,}700 & 20{,}000* / 11{,}700 & 20{,}000* / 10{,}600 & 20{,}000* / 14{,}800 \\
+ \bottomrule
+ \end{tabular}
+\end{table}
+
+In Table~\ref{tab:results-solvers}, diagonal PCG saves only 4--12\% of the CG iterations and no time: all triangles have similar
+size and the material is uniform, so the diagonal of $A$ varies little and
+scaling by it lowers $\kappa_2$ by only 12--31\%. Jacobi diverges on every
+mesh, as $\rho_J$ of Eq.~\eqref{eq:solvers-jacobi-radius} is 1.09--1.44.
+Gauss--Seidel reaches the target only on the coarsest meshes of
+\textsf{S}, \textsf{H} and \textsf{L}; on the beam it is still at
+$\eta\approx0.2$ after 20{,}000 sweeps. Sparse LU is the fastest method on
+every system, including the largest ($N=7776$: 31~ms against 162~ms for CG).
+
+MINRES fails the test on all four beam meshes (final $\eta$ from
+$1.6\times10^{-8}$ to $1.5\times10^{-6}$), yet differs from LU by at most
+$6\times10^{-11}$. In floating point, the residual of a very
+ill-conditioned system can stall at a level that grows with $\kappa_2$ times
+the machine precision, and the internal residual estimate of MINRES can
+drift from the true one~\cite{sleijpen-minres-rounding}. MINRES thus stopped
+above the target: a failure under our protocol, though the answer is
+accurate.
+
+\paragraph{Validation and sensitivity.}
+Prescribed displacements are exactly zero in every case. Applied loads and
+the reactions of Eq.~\eqref{eq:mechanics-reactions} balance in force and
+moment to a relative error below $5\times10^{-14}$ for the plates and
+$3\times10^{-10}$ for the worse-conditioned beam. Every accepted iterative
+solution agrees with LU to $1.4\times10^{-7}$ or better. Held only horizontally, \textsf{H} can slide vertically:
+then $\lambda_{\min}(A)/\lambda_{\max}(A)\approx10^{-16}$ and Cholesky
+fails, whereas every supported case has $\lambda_{\min}>0$. A
+random load perturbation of relative size $10^{-6}$ on the $20\times20$ structured square ($\kappa_2=9104$) changed the
+displacement by $4.5\times10^{-7}$, far inside the bound $9.1\times10^{-3}$
+of Eq.~\eqref{eq:solvers-perturbation}.
+
+\paragraph{Limitations.} We tested only diagonal preconditioning, not incomplete
+Cholesky or multigrid. Element stresses are constant per triangle, so peaks
+depend on the mesh. The beam (up to 540~MPa) and the 250~MPa case exceed
+the yield stress of steel, which the linear model ignores. Timings come from
+one machine and implementation; only ratios and trends are meaningful.

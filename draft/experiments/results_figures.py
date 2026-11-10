@@ -7,7 +7,9 @@ Reads only finished outputs:
 and re-solves one level-2 mesh of H, L and B with sparse LU (a few seconds) for the
 deformed-shape plot, using the unchanged case definitions of objects.py.
 Writes draft/sections/06-results-and-validation/figures/results_{deformed,scaling}.{pdf,png}
-and prints the fitted log-log slopes and the plotted extrema.
+and draft/experiments/results/results/extra.json (fitted log-log slopes, deformed-plot
+extrema, and the ten smallest eigenvalues of A for S and B at level 2, a cheap check of
+how many soft modes the beam has).
 """
 from pathlib import Path
 import csv
@@ -45,11 +47,13 @@ def save(fig, name):
 
 
 # ------------------------------------------------------------ deformed shapes
+EXTRA = {}
+
+
 def deformed():
     cases = {c["name"]: c for c in O.build_cases()}
-    spec = [("H-base-L2", "H: plate with hole", 100), ("L-base-L2", "L: bracket", 100),
-            ("B-base-L2", "B: beam", 5)]
-    fig, axes = plt.subplots(1, 3, figsize=(6.3, 1.85),
+    spec = [("H-base-L2", "H", 100), ("L-base-L2", "L", 100), ("B-base-L2", "B", 5)]
+    fig, axes = plt.subplots(1, 3, figsize=(6.3, 1.3),
                              gridspec_kw=dict(width_ratios=[1, 1, 2.6], wspace=0.08))
     vmax = 400.0
     for ax, (name, title, amp) in zip(axes, spec):
@@ -69,10 +73,13 @@ def deformed():
         ax.autoscale_view()
         ax.axis("off")
         ax.set_title(f"{title} (×{amp})", fontsize=8, color=INK, pad=2)
+        EXTRA.setdefault("deformed_level2", {})[name] = dict(
+            amplification=amp, max_abs_component_mm=float(1e3 * np.abs(d).max()),
+            max_von_mises_MPa=float(vm.max() / 1e6))
         print(f"{name}: max |u| = {1e3 * np.abs(d.reshape(-1, 2)).max():.3f} mm (component), "
               f"max VM = {vm.max() / 1e6:.0f} MPa, amp {amp}")
-    cb = fig.colorbar(pc, ax=axes, fraction=0.025, pad=0.01, extend="max")
-    cb.set_label("von Mises stress (MPa)", fontsize=7)
+    cb = fig.colorbar(pc, ax=axes, fraction=0.025, pad=0.01, shrink=0.8, extend="max")
+    cb.ax.set_title("MPa", fontsize=7, color=INK, pad=3)
     cb.ax.tick_params(labelsize=7)
     save(fig, "results_deformed")
 
@@ -96,7 +103,8 @@ def scaling():
     ref = json.loads((RES / "square" / "refinement.json").read_text())["meshes"]
     data["grid"] = (np.array([r["unknowns"] for r in ref]), np.array([r["kappa2"] for r in ref]),
                     np.array([r["cg_iterations"] for r in ref]))
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.35), gridspec_kw=dict(wspace=0.32))
+    fig, axes = plt.subplots(1, 2, figsize=(5.4, 1.55), gridspec_kw=dict(wspace=0.42))
+    slopes = {}
     for key, label, col, mk in SERIES:
         N, k, it = data[key]
         sk, si = slope(N, k), slope(N, it)
@@ -104,6 +112,20 @@ def scaling():
         for ax, y, s in ((axes[0], k, sk), (axes[1], it, si)):
             ax.loglog(N, y, color=col, marker=mk, ms=4.5, lw=1.5, mfc=col, mec="white", mew=0.6,
                       label=f"{label}, slope {s:.2f}")
+            if key in ("grid", "B"):
+                ax.annotate(f"{s:.2f}", (N[-1], y[-1]), xytext=(5, -3) if key == "grid" else (-6, 3),
+                            textcoords="offset points", fontsize=6.5, color=INK,
+                            va="top" if key == "grid" else "bottom",
+                            ha="left" if key == "grid" else "right")
+        slopes[key] = (sk, si)
+        EXTRA.setdefault("loglog_slopes_vs_N", {})[key] = dict(kappa2=round(sk, 3), cg=round(si, 3))
+        if key == "B":   # one label for the three overlapping plate objects
+            for ax, j, (N0, y0), off, ha in (
+                    (axes[0], 0, (data["H"][0][-1], data["H"][1][-1]), (-8, 10), "right"),
+                    (axes[1], 1, (data["H"][0][-1], data["H"][2][-1]), (14, -48), "center")):
+                v = [slopes[o][j] for o in "SHL"]
+                ax.annotate(f"S, H, L: {min(v):.2f}\u2013{max(v):.2f}", (N0, y0), xytext=off,
+                            textcoords="offset points", fontsize=6.5, color=INK, ha=ha)
     axes[0].set_ylabel(r"condition number $\kappa_2(A)$")
     axes[1].set_ylabel("CG iterations to $\\eta<10^{-8}$")
     for ax, t in zip(axes, ("(a)", "(b)")):
@@ -113,10 +135,31 @@ def scaling():
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
         ax.text(0.02, 0.98, t, transform=ax.transAxes, va="top", fontsize=8, color=INK)
-        ax.legend(fontsize=6, frameon=False, loc="lower right", handlelength=1.6)
+    h, lab = axes[0].get_legend_handles_labels()
+    fig.legend(h, [x.split(",")[0] for x in lab], loc="upper center", ncol=5, frameon=False,
+               fontsize=7, bbox_to_anchor=(0.5, 1.11), handlelength=2)
     save(fig, "results_scaling")
 
 
+def smallest_eigs():
+    from scipy.sparse.linalg import eigsh
+    cases = {c["name"]: c for c in O.build_cases()}
+    out = {}
+    for name in ("S-base-L2", "B-base-L2"):
+        A = O.build_system(cases[name], {}, {})[4]
+        w = eigsh(A.tocsc(), k=10, sigma=0, which="LM", return_eigenvectors=False)
+        out[name] = sorted(float(x) for x in w)
+    EXTRA["smallest_eigs_level2_N_per_m"] = out
+    print("ten smallest eigenvalues:", {k: [f"{x:.3g}" for x in v] for k, v in out.items()})
+
+
 if __name__ == "__main__":
+    import platform
+    import scipy
     deformed()
     scaling()
+    smallest_eigs()
+    EXTRA["environment"] = dict(python=platform.python_version(), numpy=np.__version__,
+                                scipy=scipy.__version__, platform=platform.platform())
+    (RES / "results").mkdir(parents=True, exist_ok=True)
+    (RES / "results" / "extra.json").write_text(json.dumps(EXTRA, indent=1))
