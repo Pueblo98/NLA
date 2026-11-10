@@ -10,15 +10,17 @@ This is the entry point for the team's section-by-section draft. This reorganisa
 
 ## Working folders
 
-| Section | Folder | Starting state |
+| Section | Folder | State (10 Nov 2026) |
 | --- | --- | --- |
-| 1. Building the model / introduction | [01-introduction](sections/01-introduction/) | Existing introduction, LaTeX sources, figure, bibliography and exact-source compiled preview. No rewrite. |
-| 2. Displacement, forces and matrix construction | [02-mechanics-and-matrix](sections/02-mechanics-and-matrix/) | LaTeX review draft and simplification note; Hermes reports a compiled, inspected PDF in Slack. Repository preview pending. |
-| 3. Numerical methods and comparison protocol | [03-solvers-and-protocol](sections/03-solvers-and-protocol/) | Section workspace only; no new prose. |
-| 4. Simple square demonstration | [04-square-example](sections/04-square-example/) | Section workspace only; no new prose. |
-| 5. Objects and experimental design | [05-objects-and-experiments](sections/05-objects-and-experiments/) | Section workspace only; no new prose. |
-| 6. Results, validation and discussion | [06-results-and-validation](sections/06-results-and-validation/) | Section workspace only; no new prose. |
-| 7. Conclusion | [07-conclusion](sections/07-conclusion/) | Section workspace only; no new prose. |
+| 1. Building the model / introduction | [01-introduction](sections/01-introduction/) | Existing introduction; one objectives sentence added and figure resized. |
+| 2. Displacement, forces and matrix construction | [02-mechanics-and-matrix](sections/02-mechanics-and-matrix/) | Simplified draft with compiled preview. |
+| 3. Numerical methods and comparison protocol | [03-solvers-and-protocol](sections/03-solvers-and-protocol/) | Draft with compiled preview; protocol implementation details in its README. |
+| 4. Simple square demonstration | [04-square-example](sections/04-square-example/) | Draft from fresh runs (`experiments/square.py`). |
+| 5. Objects and experimental design | [05-objects-and-experiments](sections/05-objects-and-experiments/) | Draft; experiments in `experiments/objects.py`. |
+| 6. Results, validation and discussion | [06-results-and-validation](sections/06-results-and-validation/) | Draft from fresh results; figures from `experiments/results_figures.py`. |
+| 7. Conclusion | [07-conclusion](sections/07-conclusion/) | Draft. |
+
+All sections are drafts for team review, written for third-year applied mathematics students. The combined preview is built by `python3 draft/combined/build.py` into `draft/combined/draft-report.pdf` (10 pages in the 11 pt / 25 mm preview, including title and references). It is not the final course template. Experiment scripts and fresh outputs are in [experiments/](experiments/).
 
 ## How each section thread works
 

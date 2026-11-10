@@ -19,7 +19,7 @@ $pL/E=0.5$~mm, so we expect the right edge to move by about this amount.
 
 \begin{figure}[htb]
  \centering
- \includegraphics[width=\linewidth]{figures/square_setup.pdf}
+ \includegraphics[width=0.92\linewidth]{figures/square_setup.pdf}
  \caption{(a) Geometry, supports and load. (b) The $2\times2$-cell mesh:
  clamped nodes (squares), free nodes (dots) with their unknowns
  $x_1,\dots,x_{12}$, and the nodal forces forming $b$. (c) Original outline
@@ -36,13 +36,11 @@ $b=f_F$. Each half of the right edge carries $0.5$~MN, shared equally by its
 two end nodes, so the right-edge nodes receive $0.25$, $0.5$ and $0.25$~MN
 in the $x$-direction and all other entries of $b$ are zero.
 
-The $12\times12$ matrix $A$ is exactly symmetric, and 86 of its 144 entries
-are nonzero. The zeros couple nodes that share no triangle, such as nodes 1
-and 7. Every entry is an integer multiple of $Et/(40(1-\nu^2))\approx
-5.49\times10^7$~N/m; the full matrix is in the repository file
-\url{draft/experiments/results/square/small_A_integer.csv}. Its
+The $12\times12$ matrix $A$ is exactly symmetric, with 86 of its 144
+entries nonzero; the zeros couple nodes that share no triangle. Its
 eigenvalues range from $1.07\times10^8$ to $1.03\times10^{10}$~N/m, so
-$\kappa_2(A)=95.8$ and the system is well conditioned.
+$\kappa_2(A)=95.8$ and the system is well conditioned. The full matrix is
+in the repository.
 
 Pivoted $PA=LU$, the explicit inverse and Cholesky all give relative
 residuals $\eta$ (Eq.~\eqref{eq:solvers-residual}) below $10^{-15}$, at
@@ -83,7 +81,7 @@ Fig.~\ref{fig:square-residuals} compare all methods on this system.
 
 \begin{figure}[htb]
  \centering
- \includegraphics[width=0.72\linewidth]{figures/square_residuals.pdf}
+ \includegraphics[width=0.62\linewidth]{figures/square_residuals.pdf}
  \caption{Relative residual $\eta(x_k)$ over the first 300 iterations on the
  $840$-unknown system, with the target $10^{-8}$ dashed. The Krylov
  methods reach it in 226--242 iterations; the other methods have barely
@@ -113,11 +111,10 @@ method.
 
 \subsection{Deformation and validation}
 Figure~\ref{fig:square-setup}c shows the $20\times20$ solution. The right
-edge moves between $0.492$ and $0.497$~mm, close to the expected $0.5$~mm. Near the
-loaded end the top and bottom edges move inwards by about $0.08$~mm each,
-matching the free lateral contraction $\nu pL/E=0.15$~mm of the whole
-width. The clamp prevents this contraction at $x=0$, which gives the
-tapered shape.
+edge moves $0.492$--$0.497$~mm, close to the expected $0.5$~mm, and the
+plate narrows by about $0.16$~mm near the loaded end, matching the free
+lateral contraction $\nu pL/E=0.15$~mm; the clamp prevents this contraction
+at $x=0$, giving the tapered shape.
 
 The solution passes four checks. All 42 prescribed components are exactly
 zero. The reactions of Eq.~\eqref{eq:mechanics-reactions} balance the

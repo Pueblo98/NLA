@@ -1,6 +1,6 @@
 # Section 1: Existing introduction / building the model
 
-**Starting state: the existing introduction from the introduction thread, copied without rewriting its prose or equations.** This reorganisation does not reopen its review or claim that the whole report is final.
+**Starting state: the existing introduction from the introduction thread.** On 10 November 2026 the whole-report recheck added one sentence stating the solver objective (requested by the roadmap) and reduced the figure width to fit the 10-page limit; the source hashes in `organization-verification.json` therefore predate this edit. This reorganisation does not reopen its review or claim that the whole report is final.
 
 ## Editable files
 

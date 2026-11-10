@@ -64,10 +64,8 @@ only if its recomputed relative residual satisfies
 Reaching the cap of 20{,}000 iterations, or $\eta>10^{10}$ for ordinary
 Jacobi, counts as failure. Accuracy is the relative error
 $\|\hat x-x_{\mathrm{ref}}\|_2/\|x_{\mathrm{ref}}\|_2$ against the sparse
-LU solution $x_{\mathrm{ref}}$ of the same system~\cite{scipy-splu}. Times
-are the best of three runs, excluding assembly and diagnostics. Extreme
-eigenvalues, for $\kappa_2(A)$ and $\rho_J$, come from dense or, for large
-systems, sparse eigensolvers~\cite{scipy-eigsh}.
+LU solution $x_{\mathrm{ref}}$ of the same system. Times are the best of
+three runs, excluding assembly and diagnostics.
 
 Since $\hat x$ solves exactly the system with load perturbed by its
 residual, the standard bound~\cite{trefethen-bau}
@@ -81,12 +79,8 @@ limits its relative error to $\kappa_2(A)\,\eta$. This
 displacements, does not shrink with the tolerance; we estimate it by
 comparing meshes at matched physical points.
 
-Later sections also check that $d_C$ equals the prescribed values,
-that applied loads and the reactions of Eq.~\eqref{eq:mechanics-reactions}
-have zero resultant force and moment, and that the response to a random
-load perturbation obeys Eq.~\eqref{eq:solvers-perturbation}. A patch
-test pulls a plate held only by rollers (left edge fixed horizontally,
-corner at the origin vertically) with uniform traction $p$. Its exact
-solution $u_x=px/E$, $u_y=-\nu py/E$ is linear, so linear triangles must
-reproduce it to rounding on any mesh, verifying assembly, loading and
-reduction.
+We also check that supports hold, that loads and the reactions of
+Eq.~\eqref{eq:mechanics-reactions} balance in force and moment, and a
+\emph{patch test}: a plate on rollers pulled by a uniform traction $p$ has
+the exact linear solution $u_x=px/E$, $u_y=-\nu py/E$, which linear
+triangles must reproduce to rounding on any mesh.

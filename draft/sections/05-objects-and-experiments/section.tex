@@ -24,7 +24,7 @@ linear triangles represent poorly on coarse meshes~\cite{cook-fea}.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[width=0.85\linewidth]{figures/objects_meshes.pdf}
+ \includegraphics[width=0.66\linewidth]{figures/objects_meshes.pdf}
  \caption{The four objects on their coarsest meshes. Hatching: clamped
  edge. Blue arrows: baseline load. Dashed orange arrows: alternative load on
  \textsf{L}. Orange triangle: pin used with a roller support on
@@ -37,8 +37,7 @@ We mesh each object with Triangle~\cite{shewchuk-triangle}. Its triangles
 follow the boundary, leave the hole empty and have no angle below
 $30^\circ$. Four levels, with mesh size $h$ from $0.1$ to $0.025$ (beam:
 $0.125$ to $0.031$), give $N\approx300$ to $7800$ unknowns. The comparison
-points are nodes on every level, and we check that triangle areas are
-positive and add up to the area of the region.
+points are nodes on every level.
 
 Material and thickness are those of Section~\ref{sec:square}. Every object
 is clamped on $x=0$, which stops both translations and the rotation, so $A$
@@ -50,14 +49,11 @@ $PL_B^3/(3EI)=51.2$~mm, with length $L_B=4$, $I=tW_B^3/12$ and depth
 $W_B=0.5$~\cite{timoshenko-goodier}. Loads act on the same boundary pieces on
 every mesh, so each level carries the same total force.
 
-Table~\ref{tab:objects-register} lists the comparisons. Several have known
-answers and so test the code: scaling the load scales the displacement but
-not the iteration counts; scaling $E$ multiplies $A$ by a constant, leaving
-$\kappa_2(A)$ unchanged; moving the load on \textsf{L}, or turning it on
-\textsf{B}, changes $b$ but not $A$. Changing $\nu$ or the supports changes
-$A$ itself. Under refinement, changes at the comparison points estimate the
-discretization error, while $\kappa_2$ and iteration counts show how solver
-cost grows with $N$.
+Table~\ref{tab:objects-register} lists the comparisons. Load size, load
+position and $E$ change only $b$ or scale $A$, so their effect is known in
+advance and tests the code; $\nu$ and the supports change $A$ itself. Under
+refinement, changes at the comparison points estimate the discretization
+error, while $\kappa_2$ and iteration counts show how solver cost grows with $N$.
 
 \begin{table}[htbp]
  \centering
@@ -84,6 +80,5 @@ cost grows with $N$.
 \end{table}
 
 Every system is solved by sparse LU, CG, diagonal PCG, MINRES and
-Gauss--Seidel under the rules of Section~\ref{sec:solvers}, and the second
-level of each object by all methods. As in Section~\ref{sec:square}, loads
-and support reactions must balance in force and moment.
+Gauss--Seidel under the rules of Section~\ref{sec:solvers}, and checked as
+in Section~\ref{sec:square}.

@@ -31,7 +31,12 @@ inputs = "\n".join("\\input{../sections/%s/section.tex}" % s.parent.name for s i
 \usepackage{booktabs}
 \usepackage{url}
 \graphicspath{%s}
-\title{Elastic Deformation of Two-Dimensional Objects\\\large Combined working draft (sections drafted so far)}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\title{Elastic Deformation of Two-Dimensional Objects\\\large Combined working draft}
 \author{Group 02}
 \date{\today}
 \begin{document}

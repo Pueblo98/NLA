@@ -3,34 +3,24 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We asked how geometry, supports and loads shape the deformation of a
-two-dimensional elastic object. A hole makes the plate softer, and holes and
-inner corners concentrate stress; moving the load on the bracket moves the
-stress peak. Holding fewer displacement components barely changes the
-displacement but raises $\kappa_2(A)$. Slender bending is the hardest case:
-linear triangles are too stiff in bending, and even the finest beam mesh
-deflects $0.7\%$ less than beam theory with shear predicts.
+Geometry and supports change both the deformation and the linear system. A
+hole makes the plate softer, holes and inner corners concentrate stress, and
+moving the load moves the stress peak. Slender bending is the hardest case:
+linear triangles are too stiff, and the finest beam mesh is $0.7\%$ short of
+beam theory.
 
-Since $A$ is sparse, symmetric and positive definite, sparse direct
-factorization and CG both apply, and the CG bound predicts iterations
-growing like $\sqrt{\kappa_2(A)}$. We measured $\kappa_2(A)$ growing like $N$ and CG
-iterations like $N^{1/2}$ for every object; shape changes the constant, and
-the beam is by far the worst conditioned. CG is the best iterative method.
-Diagonal preconditioning saves few iterations and no time, Jacobi diverges
-and Gauss--Seidel is impractically slow. On the beam MINRES stalls above the
-residual target although its solution is accurate. At these sizes sparse LU
-is the fastest method on every system.
+Since $A$ is sparse and symmetric positive definite, sparse LU and CG
+both apply. We measured $\kappa_2(A)$ growing like $N$ and CG iterations
+like $N^{1/2}$, as the CG bound predicts, for every object; shape changes
+only the constant, and the beam is by far the worst conditioned. CG is the
+best iterative method, diagonal preconditioning gains little, Jacobi
+diverges and Gauss--Seidel is impractically slow. At these sizes sparse LU
+is fastest.
 
-Under refinement the displacements settle, but peak stresses do not: at the
-inner corner the peak keeps growing (119 to 178~MPa), as the infinite exact
-corner stress predicts. The algebraic error of the accepted CG solutions,
-at most $10^{-9}$, is far below the mesh changes, so the mesh limits the
-accuracy. The solutions satisfy the supports exactly and balance force and
-moment, a load perturbation stays within the condition-number bound, and
-removing the vertical support makes $A$ numerically singular, as expected. The main limitations, detailed in
-Section~\ref{sec:results}, are that only diagonal preconditioning was
-tested, constant element stresses make peaks mesh dependent, and the linear
-model ignores yielding. Natural next steps are incomplete Cholesky or
-multigrid preconditioners, larger or three-dimensional problems in which
-iterative methods may overtake sparse LU, and better stress recovery or
-higher-order elements.
+Under refinement the displacements settle but peak stresses do not, and the
+algebraic error of CG ($\le10^{-9}$) is far below the mesh changes, so the
+mesh limits accuracy; supports, force and moment balance and the
+perturbation bound all check out. Beyond the limitations of
+Section~\ref{sec:results}, natural next steps are stronger
+preconditioners (incomplete Cholesky, multigrid), larger or 3D problems
+where iterative methods may overtake sparse LU, and higher-order elements.

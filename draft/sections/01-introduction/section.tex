@@ -11,6 +11,8 @@ stretching and shearing, called strain. The material resists these changes
 through internal forces per unit area, called stress. We assume small
 deformations and a linear relation between strain and stress, leaving the
 material choice to the individual cases~\cite{logg-langtangen-elasticity}.
+Computing this response leads to a large sparse linear system, so we also
+ask which solvers suit it and how their cost grows as the mesh is refined.
 
 We look for the shape after the object has settled under the load. Forces
 must then balance in both directions throughout the material:
@@ -39,7 +41,7 @@ triangles allow us to capture more variation in the deformation.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[width=\linewidth]{figures/triangulation.pdf}
+ \includegraphics[width=0.62\linewidth]{figures/triangulation.pdf}
  \caption{Triangulation of an illustrative region. The filled triangles
  cover the same solid area and share nodes along their edges. Displacement
  is approximated throughout each triangle using its three vertex values.

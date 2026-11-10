@@ -11,8 +11,8 @@ We model a thin sheet of constant thickness $t>0$, made of one material
 with the same properties everywhere and in every direction. Loads act in
 its plane and its faces are free, so we use \emph{plane stress}: stresses
 through the thickness are neglected. Loading is static, and strains and rotations are
-small enough for a linear model; bending and permanent deformation are
-excluded.
+small enough for a linear model; out-of-plane bending and permanent
+deformation are excluded.
 
 The material resists stretching and changes of angle. For displacement
 $\mathbf{u}=(u_x,u_y)^T$, these changes form the strain vector
@@ -87,8 +87,7 @@ free rows of $Kd=f+r$ and moving known terms to the right gives
  =\underbrace{f_F-K_{FC}d_C}_b.
  \label{eq:mechanics-reduction}
 \end{equation}
-The subscripts select rows and columns, respectively. This recovers
-$Ax=b$ from Section 1; fixed supports have $d_C=0$ and $b=f_F$.
+This recovers $Ax=b$ from Section~\ref{sec:building-model}; fixed supports have $d_C=0$ and $b=f_F$.
 After solving, the forces exerted by supports, called reactions, are
 \begin{equation}
  r_C=K_{CF}d_F+K_{CC}d_C-f_C,
