@@ -1,0 +1,185 @@
+% AI-assisted working draft for team review, not an approved final section.
+% Requires amsmath, graphicx and booktabs. Merge references.bib into the report bibliography.
+\section{Additional objects and experimental design}
+\label{sec:objects}
+
+The square of Section~\ref{sec:square} is stretched almost uniformly, has
+a closed-form check and uses a structured mesh. Typical parts instead have
+openings, corners and slender members, and can be supported in different
+ways. These features raise questions the square cannot answer: how shape
+concentrates deformation and stress, whether geometry and supports change
+the conditioning of $A$ and hence solver cost, and whether conclusions
+from structured meshes carry over to general triangulations. We therefore
+introduce four objects and specify comparisons that each change one factor
+while fixing the rest. Section~\ref{sec:results} reports their outcomes.
+
+\subsection{Objects and meshes}
+Table~\ref{tab:objects-objects} and Fig.~\ref{fig:objects-meshes}
+define the objects; all four are selected experiments, not illustrations.
+The square \textsf{S} repeats Section~\ref{sec:square} with a different mesh
+generator, so that differences from the structured results reflect the
+mesh alone. The plate \textsf{H} adds a central circular hole, the classical
+source of stress concentration: in a wide plate under uniaxial tension,
+the stress at the edge of a small hole reaches three times the applied
+value~\cite{timoshenko-goodier}. The hole also makes the region multiply
+connected. The L-bracket \textsf{L} has a re-entrant corner, where the boundary
+turns through $270^\circ$ and the continuum stress is
+unbounded~\cite{williams-corners}; displacements should converge under
+refinement there, but local stresses cannot. Its two arms have free end
+faces, so the load can be moved without changing $A$. The beam \textsf{B} is
+slender and bends under a tip load. Beam theory then gives an independent
+estimate of its deflection, while linear triangles are known to be too
+stiff in bending on coarse meshes~\cite{cook-fea}.
+
+\begin{table}[htbp]
+ \centering
+ \caption{Objects: ordered counter-clockwise outer vertices, openings,
+ supports and loads. Every object is clamped ($u_x=u_y=0$) on its edge
+ $x=0$. $N$ is the number of unknowns on mesh levels 1--4.}
+ \label{tab:objects-objects}
+ \footnotesize
+ \begin{tabular}{@{}llllr@{}}
+ \toprule
+ Object & Outer boundary (m) & Opening & Baseline load & $N$, levels 1--4 \\
+ \midrule
+ \textsf{S} square & $(0,0),(1,0),(1,1),(0,1)$ & -- & $(p,0)$ on $x=1$ & NS \\
+ \textsf{H} hole plate & as \textsf{S} & disc, centre $(0.5,0.5)$, $R=0.15$ & $(p,0)$ on $x=1$ & NH \\
+ \textsf{L} bracket & $(0,0),(1,0),(1,0.5),(0.5,0.5),(0.5,1),(0,1)$ & -- & $(p,0)$ on $x=1$ & NL \\
+ \textsf{B} beam & $(0,0),(4,0),(4,0.5),(0,0.5)$ & -- & $(0,-\tau)$ on $x=4$ & NB \\
+ \bottomrule
+ \end{tabular}
+\end{table}
+
+Each boundary is an ordered vertex list whose segments carry a label:
+clamped, loaded or free. We split every segment into equal pieces of
+length at most $h$ and pass the result to Triangle~\cite{shewchuk-triangle}
+through its Python interface~\cite{rufat-triangle} with switches
+\texttt{p} (keep the segments), \texttt{q30} (no angle below $30^\circ$)
+and \texttt{a} (area at most $\sqrt3h^2/4$, an equilateral triangle of
+side $h$). This constrained Delaunay mesh keeps every boundary segment as
+a union of triangle edges, and subsegments inherit the labels. The hole is
+a regular polygon with $4\lceil 2\pi R/(4h)\rceil$ vertices on the circle
+plus a seed point at its centre, from which Triangle removes all
+triangles. The points where we compare displacements, marked in
+Fig.~\ref{fig:objects-meshes}, are input vertices and hence nodes on every
+level. Four levels use $h=0.1$, $0.05$, $1/30$ and $0.025$~m for \textsf{S}, \textsf{H}
+and \textsf{L}, and $h=0.125$, $0.0625$, $1/24$ and $0.03125$~m for \textsf{B}, i.e.\ 4
+to 16 elements through its depth.
+
+We check every mesh before use: all triangles have positive area in
+counter-clockwise order and no angle below $30^\circ$; their areas sum to
+the polygon area up to rounding; the edges used by only one triangle are
+exactly the boundary subsegments; no triangle centroid lies in the hole;
+and the mesh is connected with Euler characteristic
+$n_{\mathrm{nodes}}-n_{\mathrm{edges}}+n_{\mathrm{triangles}}=1$ minus the
+number of holes. All meshes below pass. The polygonal hole is slightly
+larger than the disc; this geometric difference vanishes as $h\to0$ and is
+part of the discretization error, not a meshing fault.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{figures/objects_meshes.pdf}
+ \caption{The four objects on their coarsest meshes (level~1). Hatched
+ lines: clamped edges. Solid blue arrows: baseline traction. Dashed orange
+ arrows: alternative load location on the bracket. Orange triangle: pin of
+ the roller variant of the hole plate. Circles: matched points where
+ displacements are compared across levels; cross: re-entrant corner.}
+ \label{fig:objects-meshes}
+\end{figure}
+
+\subsection{Material, loads and supports}
+The baseline matches Section~\ref{sec:square}: plane stress, $E=200$~GPa,
+$\nu=0.3$, $t=0.01$~m, no body forces, and the left edge clamped. The
+square, plate and bracket carry the uniform normal traction $p=100$~MPa on
+their right end face, with resultant $pt\ell$ for face length $\ell$:
+$10^6$~N for \textsf{S} and \textsf{H}, $5\times10^5$~N for \textsf{L}. The beam carries the
+downward shear traction $\tau=10$~MPa on its tip, giving $P=\tau tW_B=5\times10^4$~N
+for depth $W_B=0.5$~m; the smaller load keeps its bending strains of order $10^{-3}$.
+For length $L_B=4$~m, beam theory predicts the tip deflection~\cite{timoshenko-goodier}
+\begin{equation}
+ \delta\approx\frac{PL_B^3}{3EI}+\frac{PL_B}{\kappa_sGtW_B},\qquad
+ I=\frac{tW_B^3}{12},\quad G=\frac{E}{2(1+\nu)},\quad\kappa_s=\frac56,
+ \label{eq:objects-beam}
+\end{equation}
+where the first (Euler--Bernoulli) term is 51.20~mm and the shear
+correction adds 0.62~mm. The clamp in our model also stops the root
+section from warping, which beam theory ignores.
+
+Loads enter as consistent nodal forces, $\ell_eq/2$ per endpoint of each
+loaded edge of length $\ell_e$ (Section~\ref{sec:mechanics-matrix}).
+Because loads and clamps are tied to labelled segments, every mesh level
+carries the same resultant on the same face and is held on the same edge:
+the physical problem is fixed under refinement. A clamped edge prevents
+both translations and the rotation, so each $A$ should be positive
+definite. We confirm this for every reduced system: the smallest
+eigenvalue from shift-invert \texttt{eigsh} is positive, and dense Cholesky
+succeeds up to 3000 unknowns. As a negative control, restraining only
+$u_x$ on the left edge leaves a free vertical translation; this check must
+then detect a singular $A$.
+
+\subsection{Case register}
+Table~\ref{tab:objects-register} lists the comparisons. Each changes one
+factor and states what is held fixed.
+
+\begin{table}[htbp]
+ \centering
+ \caption{Case register. Level 2 is $h=0.05$~m (\textsf{B}: $0.0625$~m).
+ $u_P$: displacement at a matched point.}
+ \label{tab:objects-register}
+ \footnotesize
+ \begin{tabular}{@{}p{0.13\linewidth}p{0.25\linewidth}p{0.2\linewidth}p{0.17\linewidth}p{0.17\linewidth}@{}}
+ \toprule
+ Study & Question & Changed factor & Fixed & Measured response \\
+ \midrule
+ Geometry & How do a hole and a corner change deformation and $A$? & \textsf{S}, \textsf{H}, \textsf{L} & material, $p$, clamp, $h$ & $u_P$, max $|\mathbf u|$, $\kappa_2$, iterations \\
+ Refinement & Do responses settle, and how fast do $\kappa_2$ and cost grow? & $h$, levels 1--4 & object, load, supports & $u_P$, peak stress, $\kappa_2$, $\rho_J$, iterations vs $N$ \\
+ Mesh type & Do structured-mesh results carry over? & square grid ($n=10$--$40$) vs \textsf{S} & square problem & $u_P$, $\kappa_2$, CG/PCG iterations \\
+ Load magnitude & Is the response linear? & $p=25,100,250$~MPa (\textsf{H}) & $A$ & $u_P/p$, iterations \\
+ Load location & What does moving the load change? & face $x=1$ vs $y=1$ (\textsf{L}) & $A$, resultant & loaded-face $u_P$, iterations \\
+ Supports & How does the clamp shape the response and $A$? & clamp vs roller $u_x=0$ + pin $u_y=0$ at $(0,0.5)$ (\textsf{H}) & load, mesh & $u_P$, $\kappa_2$, iterations \\
+ Material & How do $E$ and $\nu$ enter? & $\nu=0,0.3,0.45$; $E=70,200$~GPa (\textsf{H}) & geometry, load & $u_P$, $\kappa_2$, iterations \\
+ Bending & Do linear triangles capture bending? & $h$, levels 1--4 (\textsf{B}) & beam, $P$ & tip $u_y$ vs Eq.~\eqref{eq:objects-beam}, $\kappa_2$ \\
+ \bottomrule
+ \end{tabular}
+\end{table}
+
+The geometry study holds support, traction and mesh rule fixed, so
+differences in displacement and $\kappa_2$ come from shape alone; the
+bracket's resultant is half that of the square, which we account for when
+comparing displacements. The refinement study tests whether matched-point
+displacements settle, which estimates discretization error, and whether
+$\kappa_2$ grows like $h^{-2}$ and CG iterations like $\sqrt{\kappa_2}$, as
+Section~\ref{sec:solvers} predicts for quasi-uniform meshes. Peak element
+stresses at the hole edge and at the re-entrant corner show where local
+quantities converge and where they cannot. The mesh-type study compares
+\textsf{S} with Section~\ref{sec:square}'s grids at $n=10$, 20, 30 and 40 cells
+per side. On unstructured meshes the diagonal of $A$ varies with element
+shape, which Section~\ref{sec:solvers} identifies as the condition for
+diagonal preconditioning to help.
+
+The remaining studies are designed so that the expected effect is known
+in part. Scaling the load scales $b$ only, so $x$ must scale with it and,
+since $\eta$ is scale invariant, iteration counts should not change. The
+two bracket loads have equal resultants and share $A$, so any difference
+in iterations reflects the right-hand side alone. The roller and pin
+remove rigid motion with fewer constraints and let the left edge contract
+freely; this changes $A$ itself. Changing $E$ multiplies $D$, and hence
+$A$, by a constant: $x$ scales as $1/E$ while $\kappa_2$ and every
+iteration count stay fixed in exact arithmetic, which tests the
+implementation. Changing $\nu$ alters the ratios of entries in $D$ and
+can change the spectrum. Finally, the beam tip deflection is compared
+with Eq.~\eqref{eq:objects-beam}, and an axial variant with traction
+$(p,0)$ on the same level-2 mesh, sharing its $A$, is compared with the
+bar estimate $pL_B/E=2$~mm.
+
+Every reduced system is solved by sparse LU, CG, diagonal PCG, MINRES and
+Gauss--Seidel under the protocol of Section~\ref{sec:solvers}; the
+level-2 baseline of each object also receives all eight iterative methods.
+We record iterations, $\eta$, error against LU, times, $\kappa_2$,
+$\rho_J$, stored nonzeros and $N$. Because a Gauss--Seidel run takes up to
+about 20~s here, it is timed once, without a separate history run, except
+on levels 1--2 of the baseline cases. Each solution is validated by the
+force and moment balance of applied loads and reactions
+(Eq.~\eqref{eq:mechanics-reactions}) and by the prescribed values $d_C=0$.
+The script \texttt{draft/experiments/objects.py} generates all meshes,
+systems and outputs.
