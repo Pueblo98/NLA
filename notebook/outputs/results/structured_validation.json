@@ -1,0 +1,18 @@
+{
+  "small_2x2": {
+    "unknowns": 12,
+    "kappa_2": 95.7992170364182
+  },
+  "net_force_N": [
+    -9.1313268058002e-10,
+    -2.914021024480462e-09
+  ],
+  "net_moment_Nm": 5.969923222437501e-09,
+  "roller_relative_error": 7.891500960343916e-16,
+  "perturbation": {
+    "relative_load": 1e-06,
+    "relative_displacement": 4.512469535472443e-07,
+    "seed": 2026
+  },
+  "jacobi_spectral_radius": 1.960050242626163
+}
