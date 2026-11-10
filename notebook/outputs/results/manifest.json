@@ -1,0 +1,74 @@
+{
+  "specification_source": "Pueblo98/NLA draft/sections/05-objects-and-experiments/cases.json @ 2b23fd5 (merged PR #7)",
+  "specification_status_field": "PROPOSED, NOT APPROVED OR EXECUTED",
+  "environment": {
+    "python": "3.12.2",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.2",
+    "triangle": "20250106",
+    "platform": "macOS-14.8.9-arm64-arm-64bit"
+  },
+  "material": {
+    "E_Pa": 200000000000.0,
+    "nu": 0.3,
+    "thickness_m": 0.01,
+    "model": "plane stress"
+  },
+  "observables": {
+    "mean_right_ux": "integral of u_x over the whole right edge / its length (exact for the piecewise-linear trace), metres",
+    "mid_ux": "u_x at the right-edge midpoint (x_r, 0.5), metres",
+    "mid_uy": "u_y at the right-edge midpoint (x_r, 0.5), metres"
+  },
+  "condition_number": "kappa_2 = lambda_max / lambda_min of the supported (free-free), unscaled stiffness matrix A; lambda_max by ARPACK (largest algebraic), lambda_min by ARPACK shift-invert at 0",
+  "algebraic_estimate": "||w_free||_2 ||b - A x_ref||_2 / lambda_min_est; an estimate, not a certified bound; a successive difference <= the sum of both meshes' estimates is 'unresolved'",
+  "solver_protocol": {
+    "tolerance": 1e-08,
+    "iteration_cap": 20000,
+    "x0": "zero",
+    "timing": "best of 3 runs; machine dependent"
+  },
+  "acceptance_thresholds": {
+    "status": "Proposed execution criteria, not implemented or passed tests; not derived from Section 4 observed imbalances.",
+    "symmetry": {
+      "metric": "||A-A^T||_F / ||A||_F",
+      "threshold": 1e-12,
+      "guard": "Require finite positive denominator."
+    },
+    "positive_definiteness": {
+      "structural": "Check positive thickness, admissible material, nondegenerate conforming triangles, edge-connected solid and constraints removing all three planar rigid motions. This supplies the structural SPD argument.",
+      "small_systems": "For at most 2000 free components, additionally require successful dense Cholesky of the supported matrix after symmetry check.",
+      "large_systems": "Compute smallest algebraic eigenpair with eigsh(which=SA). Require reported convergence, normalized eigenpair defect <= 1e-8, and lambda_est > 10*||A v-lambda_est v||_2/||v||_2. This is a diagnostic supporting the structural argument, not a certified proof of lambda_min.",
+      "defect": "||A v-lambda_est v||_2 / (||A||_inf ||v||_2)",
+      "failure": "Failed/nonconverged diagnostics mean unverified; do not silently treat them as passed or automatically equate eigensolver failure with indefiniteness."
+    },
+    "reference_residual": {
+      "metric": "||b-A x_ref||_2 / ||b||_2",
+      "threshold_strict": 1e-08,
+      "guard": "All proposed cases have nonzero b; use original unrounded arrays."
+    },
+    "supports": {
+      "metric": "max absolute prescribed displacement discrepancy, metres",
+      "threshold_m": 1e-12,
+      "scope": "All prescribed components, which are zero in these cases."
+    },
+    "force_balance": {
+      "metric": "||sum_i(f_i+r_i)||_2 / sum_i ||f_i||_2",
+      "threshold": 1e-08,
+      "reaction_scope": "r is nonzero only at constrained components; include all original applied loads, including those at constrained components."
+    },
+    "moment_balance": {
+      "origin_m": [
+        0,
+        0
+      ],
+      "metric": "|sum_i [x_i*(f_yi+r_yi)-y_i*(f_xi+r_xi)]| / (L_char * sum_i ||f_i||_2)",
+      "L_char": "Bounding-box diagonal in metres of the undeformed object.",
+      "threshold": 1e-08,
+      "guard": "Do not normalize by the net applied moment, which can vanish. Force scale must be positive."
+    },
+    "outcome": "Record each check separately. Do not admit a failed or unverified reference into physical/refinement plots as validated. Solver failure records still belong in solver comparisons."
+  },
+  "cases_total": 36,
+  "cases_passing_all_checks": 36
+}
