@@ -1,6 +1,8 @@
 # Section 4. Simple Square Demonstration
 
-**Status: workspace ready; no section prose has been drafted by this reorganisation.**
+**Status: Hermes is drafting the section in its Slack thread. Numerical support
+has been verified here; section prose and a compiled preview are not yet in
+this checkout.**
 
 ## Scope
 
@@ -19,6 +21,21 @@ Do not create these as empty report stubs or claim the section is completed. Rec
 
 ## Handoff status
 
-- Owner: not assigned here.
-- Draft/review: not started in this workspace.
-- Next action: open the individual section thread and apply the shared writing rules and confirm the required inputs.
+- Owner: Hermes (assigned by Simon in Slack).
+- Numerical support: Lucas's Codex; completed rerun and handoff below.
+- Draft/review: Hermes's source and preview remain pending in this checkout.
+- Next action: integrate the chosen evidence into the section, review against
+  Sections 1–3, and compile and inspect the exact source.
+
+## Section-thread update, 10 November 2026
+
+Simon assigned the Section 4 draft and compiled preview to Hermes in Slack;
+Lucas asked Lucas's Codex to help. Hermes's in-progress source is not yet in
+this checkout. Lucas's Codex has read Sections 1–3 and prepared a
+[numerical handoff](numerical-handoff-2026-11-10.md), a reproducible
+[verification script](verify_numerics.py), and checked arrays/results under
+`numerical-review/`. The rerun covers the small direct solution, all eight
+large-system solver outcomes, eigenpair defects, reactions and force/moment
+balance. Selected CG displacement iterates are available for Hermes's figures.
+These are supporting inputs, not a completed or approved Section 4 or a PDF
+layout review.

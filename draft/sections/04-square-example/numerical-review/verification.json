@@ -1,0 +1,246 @@
+{
+  "environment": {
+    "python": "3.13.16",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "platform": "macOS-26.6-arm64-arm-64bit-Mach-O"
+  },
+  "small": {
+    "nodes": 9,
+    "triangles": 8,
+    "unknowns": 12,
+    "free_global_dofs": [
+      2,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10,
+      11,
+      14,
+      15,
+      16,
+      17
+    ],
+    "x_mm": [
+      0.2613487090848565,
+      0.07605838944340726,
+      0.5111947407569198,
+      0.104528496079261,
+      0.23162918646457145,
+      0.007486929393545602,
+      0.4821527517601595,
+      0.029374527751324625,
+      0.22445070937530706,
+      -0.054134248520948475,
+      0.4677999010670284,
+      -0.046086712472919414
+    ],
+    "lu_row_permutation_relative_defect": 8.368083622967661e-17,
+    "validation": {
+      "relative_residual": 6.61475309466201e-16,
+      "applied_force_N": [
+        1000000.0,
+        0.0
+      ],
+      "support_force_N": [
+        -1000000.0,
+        -1.7462298274040222e-10
+      ],
+      "force_imbalance_N": [
+        1.1641532182693481e-10,
+        -1.7462298274040222e-10
+      ],
+      "applied_moment_about_origin_Nm": -500000.0,
+      "support_moment_about_origin_Nm": 499999.99999999994,
+      "moment_imbalance_about_origin_Nm": -5.820766091346741e-11,
+      "maximum_support_error_m": 0.0,
+      "right_edge_ux_mm_bottom_to_top": [
+        0.5111947407569198,
+        0.4821527517601595,
+        0.4677999010670284
+      ]
+    }
+  },
+  "large": {
+    "nodes": 441,
+    "triangles": 800,
+    "unknowns": 840,
+    "stored_nnz": 11112,
+    "relative_symmetry_defect": 3.328017164457138e-17,
+    "extreme_eigenpairs_A": [
+      {
+        "eigenvalue": 1916521.0022536027,
+        "relative_eigenpair_residual": 9.396281637983942e-12
+      },
+      {
+        "eigenvalue": 17447894024.93639,
+        "relative_eigenpair_residual": 3.4446371057570683e-13
+      }
+    ],
+    "extreme_eigenpairs_diagonally_scaled_A": [
+      {
+        "eigenvalue": 0.000368666720717888,
+        "relative_eigenpair_residual": 7.433543339031611e-12
+      },
+      {
+        "eigenvalue": 2.9600502426261595,
+        "relative_eigenpair_residual": 5.513018618937197e-13
+      }
+    ],
+    "condition_estimate": 9103.940945296046,
+    "jacobi_spectral_radius": 1.9600502426261595,
+    "damped_jacobi_spectral_radius_omega_half": 0.999815666639641,
+    "jacobi_weight_upper_bound": 0.6756642070458906,
+    "validation": {
+      "relative_residual": 3.377081647704961e-14,
+      "applied_force_N": [
+        1000000.0,
+        0.0
+      ],
+      "support_force_N": [
+        -1000000.000000001,
+        -1.6443664208054543e-09
+      ],
+      "force_imbalance_N": [
+        -1.204170985147357e-09,
+        -1.6443664208054543e-09
+      ],
+      "applied_moment_about_origin_Nm": -500000.0,
+      "support_moment_about_origin_Nm": 500000.0000000034,
+      "moment_imbalance_about_origin_Nm": 3.3396645449101925e-09,
+      "maximum_support_error_m": 0.0,
+      "right_edge_ux_mm_bottom_to_top": [
+        0.496683176571387,
+        0.4961587685890752,
+        0.4955815065829734,
+        0.49494823100847174,
+        0.4942824339408514,
+        0.4936200803781095,
+        0.49300051258693345,
+        0.4924609193256551,
+        0.49203293792198377,
+        0.4917405775817168,
+        0.49159898920390604,
+        0.4916137962951791,
+        0.4917808284253324,
+        0.492086203115538,
+        0.4925068039140781,
+        0.49301131420245864,
+        0.4935621016764639,
+        0.49411843427830593,
+        0.4946418186177829,
+        0.49510496508885443,
+        0.4955087450705637
+      ]
+    },
+    "solvers": [
+      {
+        "method": "Jacobi",
+        "iterations": 49,
+        "status": "divergence_guard",
+        "accepted": false,
+        "relative_residual": 13242379570.656487,
+        "relative_reference_error": 33780965.64416548,
+        "stored_benchmark_iterations": 49
+      },
+      {
+        "method": "Damped Jacobi",
+        "iterations": 20000,
+        "status": "iteration_limit",
+        "accepted": false,
+        "relative_residual": 4.757935226341186e-06,
+        "relative_reference_error": 8.726718511190786e-05,
+        "stored_benchmark_iterations": 20000
+      },
+      {
+        "method": "Gauss-Seidel",
+        "iterations": 19136,
+        "status": "target",
+        "accepted": true,
+        "relative_residual": 9.996300254056796e-09,
+        "relative_reference_error": 1.7398524645678332e-07,
+        "stored_benchmark_iterations": 19136
+      },
+      {
+        "method": "SD",
+        "iterations": 20000,
+        "status": "iteration_limit",
+        "accepted": false,
+        "relative_residual": 3.08143697734764e-06,
+        "relative_reference_error": 4.2213053086403245e-05,
+        "stored_benchmark_iterations": 20000
+      },
+      {
+        "method": "CG",
+        "iterations": 242,
+        "status": "native_info=0",
+        "accepted": true,
+        "relative_residual": 9.405271653468407e-09,
+        "relative_reference_error": 9.768750756641956e-10,
+        "stored_benchmark_iterations": 242
+      },
+      {
+        "method": "GMRES (full)",
+        "iterations": 228,
+        "status": "native_info=0",
+        "accepted": true,
+        "relative_residual": 9.476100063866582e-09,
+        "relative_reference_error": 5.9652711138211015e-09,
+        "stored_benchmark_iterations": 228
+      },
+      {
+        "method": "MINRES",
+        "iterations": 236,
+        "status": "callback_target",
+        "accepted": true,
+        "relative_residual": 9.44512152171695e-09,
+        "relative_reference_error": 5.938248420504384e-09,
+        "stored_benchmark_iterations": 236
+      },
+      {
+        "method": "PCG (diagonal)",
+        "iterations": 226,
+        "status": "native_info=0",
+        "accepted": true,
+        "relative_residual": 8.011875657944732e-09,
+        "relative_reference_error": 4.807116951417104e-10,
+        "stored_benchmark_iterations": 226
+      }
+    ],
+    "cg_snapshots": [
+      {
+        "iteration": 0,
+        "relative_residual": 1.0,
+        "relative_reference_error": 1.0
+      },
+      {
+        "iteration": 5,
+        "relative_residual": 1.1689566090277899,
+        "relative_reference_error": 0.9368843417333471
+      },
+      {
+        "iteration": 25,
+        "relative_residual": 1.2026022400815362,
+        "relative_reference_error": 0.20093129193017045
+      },
+      {
+        "iteration": 100,
+        "relative_residual": 0.000864464161077714,
+        "relative_reference_error": 0.0022788255052103253
+      },
+      {
+        "iteration": 242,
+        "relative_residual": 9.405271653468407e-09,
+        "relative_reference_error": 9.768750756641956e-10
+      }
+    ]
+  },
+  "limits": [
+    "Reuses the team's FEM; this is not an independent FEM implementation.",
+    "No timings measured here; historical timing data remain unchanged.",
+    "Intermediate CG fields approximate static equilibrium and are not physical time steps.",
+    "No continuum-error or mesh-convergence claim follows from these checks."
+  ]
+}
