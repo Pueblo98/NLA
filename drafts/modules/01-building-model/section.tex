@@ -1,0 +1,49 @@
+% Proposed opening for team review, following Simon's scope correction.
+% AI-assisted draft. Keep the required disclosure in the assembled report.
+\section{Building the model}
+
+When forces act on an elastic object, different parts of it move by
+different amounts, changing its shape. How much it deforms depends on its
+geometry, the material and where forces and supports are placed. Our aim
+is to describe this response for several two-dimensional objects using
+the same mathematical framework. The particular shapes and loading cases
+will be introduced later.
+
+We describe movement within the plane by a displacement field
+$\mathbf{u}(x,y)=(u_x(x,y),u_y(x,y))$. A point initially at $(x,y)$ moves
+to $(x+u_x,y+u_y)$, so these two components tell us how far it moves
+horizontally and vertically. Moving the whole object by the same amount
+does not stretch it. Stretching and changes in angle arise when neighbouring
+points move relative to one another; these changes are measured by strain.
+The material responds with internal forces, described by stress, which is
+force per unit area within the object.
+
+We use small-strain linear elasticity, assuming that displacement
+gradients are small and that stress depends linearly on strain. We also
+consider static equilibrium: the object is at rest, so the internal forces,
+applied loads and forces from the supports must balance. Supports prescribe
+some displacement components and prevent the object from moving or
+rotating freely as a whole. Their reaction forces are determined as part
+of the solution.
+
+The displacement field contains infinitely many unknown values. To obtain
+a finite problem, we divide the object's region into triangles and
+approximate displacement inside each triangle by linear interpolation of
+its values at the three vertices, called nodes. Each node therefore has
+two displacement components. Combining the triangles' contributions gives
+a stiffness matrix $K$, which describes how nodal displacements produce
+internal forces, and a vector $f$ of applied nodal loads. The matrix is
+sparse because nodes interact directly only when they share a triangle.
+
+After separating the prescribed displacement components from the unknown
+ones, force balance at the free components becomes
+\[
+  Ax=b.
+\]
+Here $x$ contains the unknown displacements, $A$ is the corresponding
+part of $K$, and $b$ contains the applied loads together with any
+contributions from prescribed displacements. With suitable supports and
+a stable elastic material, this reduced matrix is symmetric positive
+definite. The deformation problem has therefore become a linear algebra
+problem. We will study how changing geometry, mesh resolution, loads and
+supports affects both the deformation and the numerical solution.
