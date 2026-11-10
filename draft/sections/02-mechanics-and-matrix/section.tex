@@ -1,0 +1,168 @@
+% AI-assisted working draft for team review, not an approved final section.
+% Requires amsmath. Merge references.bib into the final report bibliography.
+\section{Displacement, forces and matrix construction}
+\label{sec:mechanics-matrix}
+
+The preceding section introduced the nodal equilibrium system. We now
+derive its entries from the displacement approximation and explain which
+supports make the unknown displacements uniquely determined.
+
+\subsection{Material response and force balance}
+Our working baseline is a thin, homogeneous, isotropic sheet of constant
+thickness $t>0$, loaded within its plane. We use plane stress, meaning
+$\sigma_{zz}=\sigma_{xz}=\sigma_{yz}=0$, with free sheet faces. This
+assumption permits thickness contraction; it does not prescribe zero
+out-of-plane strain. We assume static loading, small displacement
+gradients (including small rotations) and linear elastic behaviour.
+The model excludes bending, plasticity and large rotations.
+
+For displacement $\mathbf{u}=(u_x,u_y)^T$, stretching and changes of angle
+give the dimensionless strain vector
+\begin{equation}
+ \varepsilon(\mathbf{u})=
+ \begin{bmatrix}
+ \partial u_x/\partial x\\
+ \partial u_y/\partial y\\
+ \partial u_x/\partial y+\partial u_y/\partial x
+ \end{bmatrix},\qquad
+ \sigma=D\varepsilon,\qquad
+ D=\frac{E}{1-\nu^2}
+ \begin{bmatrix}1&\nu&0\\\nu&1&0\\0&0&(1-\nu)/2\end{bmatrix}.
+ \label{eq:mechanics-material}
+\end{equation}
+Here $\sigma=(\sigma_{xx},\sigma_{yy},\sigma_{xy})^T$, $E>0$ is Young's
+modulus and $-1<\nu<1/2$ is Poisson's ratio for the underlying isotropic
+material. The third strain component is engineering shear, twice the
+tensor shear strain; this accounts for the shear entry of $D$~\cite{bleyer-plane-stress}.
+Coordinates, displacements and thickness are in metres; stress and $E$
+are in pascals. Numerical material values belong to each case specification.
+
+To turn local force balance into nodal equations, multiply it by an
+arbitrary virtual displacement $\mathbf{w}$ that vanishes in prescribed
+components, integrate over the solid region $\Omega$ and integrate the
+stress derivatives by parts. Internal and external work then satisfy
+\begin{equation}
+ \int_\Omega t\,\varepsilon(\mathbf{w})^TD\varepsilon(\mathbf{u})\,dA
+ =\int_\Omega t\,\mathbf{w}^T\mathbf{g}\,dA
+ +\int_{\Gamma_T}t\,\mathbf{w}^T\bar\tau\,ds.
+ \label{eq:mechanics-work}
+\end{equation}
+Here $\mathbf{g}$ is body force per unit volume (N/m$^3$), $\Gamma_T$
+is the boundary with prescribed traction, and $\bar\tau$ is that traction
+(Pa), with horizontal and vertical components. It equals the stress tensor
+times the outward unit normal. Unloaded boundary components have zero
+traction~\cite{bleyer-plane-stress}.
+
+\subsection{Triangle contributions and sparse assembly}
+For general objects, the meshing specification uses ordered outer and hole
+boundaries with constrained Delaunay triangulation through Python's
+\texttt{triangle} interface to Triangle~\cite{shewchuk-triangle}.
+The current rectangular benchmarks instead use a structured mesh split
+into triangles. Both require positive-area triangles, matching shared
+edges and empty holes. With $n$ nodes, the displacement vector is
+$d=(u_{x,0},u_{y,0},\ldots,u_{x,n-1},u_{y,n-1})^T$.
+
+On triangle $T_e$, let $(x_i,y_i)$, $i=1,2,3$, be its counterclockwise
+vertices and $S_e>0$ its area. Linear shape functions interpolate
+displacement as $\mathbf{u}_h=\sum_{i=1}^3N_i\mathbf{u}_i$,
+where $N_i$ equals one at vertex $i$ and zero at the other two.
+Writing $a_i=x_jy_k-x_ky_j$, $\beta_i=y_j-y_k$ and
+$\eta_i=x_k-x_j$ for cyclic $(i,j,k)$ gives
+$N_i=(a_i+\beta_i x+\eta_i y)/(2S_e)$. Therefore
+\begin{equation}
+ \varepsilon(\mathbf{u}_h)=B_ed_e,\qquad
+ B_e=\frac{1}{2S_e}
+ \begin{bmatrix}
+ \beta_1&0&\beta_2&0&\beta_3&0\\
+ 0&\eta_1&0&\eta_2&0&\eta_3\\
+ \eta_1&\beta_1&\eta_2&\beta_2&\eta_3&\beta_3
+ \end{bmatrix},
+ \label{eq:mechanics-B}
+\end{equation}
+where $d_e=(u_{x,1},u_{y,1},u_{x,2},u_{y,2},u_{x,3},u_{y,3})^T$
+contains this triangle's nodal values. Thus strain is constant within each
+triangle. Substituting the same interpolation for $\mathbf{u}$ and
+$\mathbf{w}$ in Eq.~\eqref{eq:mechanics-work} gives
+\begin{equation}
+ K_e=\int_{T_e}tB_e^TDB_e\,dA=tS_eB_e^TDB_e,\qquad
+ K=\sum_e P_e^TK_eP_e,
+ \label{eq:mechanics-assembly}
+\end{equation}
+where $P_e$ selects the six entries $d_e=P_ed$ from $d$.
+This is the constant-strain triangle construction~\cite{alberta-triangles}.
+Each $6\times6$ contribution is added at its global node indices;
+duplicate entries are summed and stored in compressed sparse row format.
+Nodes without a common element do not couple directly, explaining sparsity.
+The current implementation is \texttt{fem/elasticity.py}, function
+\texttt{assemble}.\footnote{This is the team's implementation. The
+course-provided assembly routine has not yet been located in this checkout;
+permission to use the alternative remains unconfirmed.}
+
+Loads follow from the right-hand side of Eq.~\eqref{eq:mechanics-work}.
+For a constant boundary traction, write the line load $q=t\bar\tau$
+(N/m). An edge of length $\ell$ contributes $\ell q/2$ to each endpoint's
+two force components~\cite{alberta-triangles}. Body loads are integrated
+with the same shape functions. The assembled vector $f$ has units N
+and $K$ has units N/m; thickness is included once in each construction.
+Refinement must preserve the physical loaded boundary and its traction.
+
+\subsection{Supports, reduced system and reactions}
+Let $C$ contain prescribed displacement components and $F$ its complement.
+A node can be fixed in one direction while remaining free in the other.
+Reordering $Kd=f+r$, with support forces zero on $F$, gives
+\begin{equation}
+ \begin{bmatrix}K_{FF}&K_{FC}\\K_{CF}&K_{CC}\end{bmatrix}
+ \begin{bmatrix}d_F\\d_C\end{bmatrix}
+ =\begin{bmatrix}f_F\\f_C+r_C\end{bmatrix},\qquad
+ \underbrace{K_{FF}}_{A}\underbrace{d_F}_{x}
+ =\underbrace{f_F-K_{FC}d_C}_{b}.
+ \label{eq:mechanics-reduction}
+\end{equation}
+The first subscript of each block selects rows and the second selects
+columns. Thus $A=K_{FF}$, $x=d_F$ and $b=f_F-K_{FC}d_C$ explicitly
+identify the matrix, unknown and right-hand side of $Ax=b$. For fixed
+supports $d_C=0$. After reconstructing $d$, the constrained rows recover
+\begin{equation}
+ r_C=K_{CF}d_F+K_{CC}d_C-f_C.
+ \label{eq:mechanics-reactions}
+\end{equation}
+Keep the original $K$ and $f$, including loads applied at constrained
+components. Their deletion would give incorrect reactions. Applied
+forces plus reactions should balance both total force and moment;
+$(Kd-f)_F$ measures the remaining free-equation imbalance.
+
+\subsection{Matrix properties and sensitivity}
+Equation~\eqref{eq:mechanics-assembly} makes $K$ symmetric. Its quadratic
+form is
+\begin{equation}
+ d^TKd=\sum_e tS_e(B_ed_e)^TD(B_ed_e)\geq0,
+ \label{eq:mechanics-energy}
+\end{equation}
+since $D$ is positive definite. Before supports, translations
+$\mathbf{u}=(1,0)^T,(0,1)^T$ and infinitesimal rotation
+$\mathbf{u}=(-y,x)^T$ have zero strain, so $K$ is singular.
+For a conforming nondegenerate mesh on each connected solid component,
+with no hinges joined only at a node, these are the only zero-energy
+motions. Supports must remove all three on every component; merely
+prescribing three arbitrary components need not suffice. Then any
+nonzero free variation extended by zero on $C$ has positive energy,
+so $A=K_{FF}$ is symmetric positive definite.
+
+For this supported matrix, the 2-norm condition number is
+\begin{equation}
+ \kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)},\qquad
+ \frac{\|\delta x\|_2}{\|x\|_2}
+ \leq\kappa_2(A)\frac{\|\delta b\|_2}{\|b\|_2}.
+ \label{eq:mechanics-conditioning}
+\end{equation}
+The eigenvalues $\lambda_{\min}$ and $\lambda_{\max}$ are positive;
+the bound follows from $A\delta x=\delta b$ for fixed $A$ and nonzero
+$b$. It bounds possible load sensitivity, rather than predicting every
+perturbation's effect. We will use dense symmetric eigenvalues for small
+systems and sparse extreme-eigenvalue estimates for larger ones
+(\texttt{eigsh})~\cite{scipy-eigsh}, checking convergence and eigenpair
+residuals and recording tolerances with the results. Geometry, mesh quality,
+refinement and supports can affect conditioning. Small linear-system
+residuals alone do not establish an accurate continuum approximation.
+These properties provide the basis for the solver choices and comparison
+protocol in the next section.
