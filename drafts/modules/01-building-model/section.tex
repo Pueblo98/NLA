@@ -1,49 +1,85 @@
-% Proposed opening for team review, following Simon's scope correction.
-% AI-assisted draft. Keep the required disclosure in the assembled report.
+% AI-assisted working draft for team review, not an approved final section.
+% Requires amsmath. Merge references.bib into the report bibliography.
 \section{Building the model}
+\label{sec:building-model}
 
-When forces act on an elastic object, different parts of it move by
-different amounts, changing its shape. How much it deforms depends on its
-geometry, the material and where forces and supports are placed. Our aim
-is to describe this response for several two-dimensional objects using
-the same mathematical framework. The particular shapes and loading cases
-will be introduced later.
+We study how geometry, loads and supports affect deformation across
+different two-dimensional elastic objects. The modelling task is to connect
+the forces acting on an object to the displacement of points throughout it.
 
-We describe movement within the plane by a displacement field
-$\mathbf{u}(x,y)=(u_x(x,y),u_y(x,y))$. A point initially at $(x,y)$ moves
-to $(x+u_x,y+u_y)$, so these two components tell us how far it moves
-horizontally and vertically. Moving the whole object by the same amount
-does not stretch it. Stretching and changes in angle arise when neighbouring
-points move relative to one another; these changes are measured by strain.
-The material responds with internal forces, described by stress, which is
-force per unit area within the object.
+\begin{itemize}
+\item \textbf{From displacement to internal forces.}
+The field $\mathbf{u}=(u_x,u_y)$ describes horizontal and vertical movement.
+A uniform translation stretches nothing; relative movement between nearby
+points produces strain. For small displacement gradients, stretching and
+changes in angle are measured by
+\begin{equation}
+ \boldsymbol{\varepsilon}(\mathbf{u})=
+ \begin{pmatrix}
+  \partial u_x/\partial x\\
+  \partial u_y/\partial y\\
+  \partial u_x/\partial y+\partial u_y/\partial x
+ \end{pmatrix},\qquad
+ \mathbf{s}=D\boldsymbol{\varepsilon},\quad
+ \mathbf{s}=(\sigma_{xx},\sigma_{yy},\sigma_{xy})^T.
+ \label{eq:model-strain-stress}
+\end{equation}
+Stress describes internal force per unit area. The matrix $D$ gives the
+linear elastic material response; its parameters and two-dimensional
+assumptions will be specified for each case~\cite{logg-langtangen-elasticity}.
 
-We use small-strain linear elasticity, assuming that displacement
-gradients are small and that stress depends linearly on strain. We also
-consider static equilibrium: the object is at rest, so the internal forces,
-applied loads and forces from the supports must balance. Supports prescribe
-some displacement components and prevent the object from moving or
-rotating freely as a whole. Their reaction forces are determined as part
-of the solution.
+\item \textbf{Force balance determines the displacement field.}
+At rest, internal forces balance the body force $\mathbf{g}$ per unit
+volume in both directions:
+\begin{equation}
+ \frac{\partial\sigma_{xx}}{\partial x}
+ +\frac{\partial\sigma_{xy}}{\partial y}+g_x=0,\qquad
+ \frac{\partial\sigma_{xy}}{\partial x}
+ +\frac{\partial\sigma_{yy}}{\partial y}+g_y=0.
+ \label{eq:model-field-balance}
+\end{equation}
+Together with~\eqref{eq:model-strain-stress}, these are equations for
+$\mathbf{u}$. Supports prescribe selected displacement components;
+elsewhere boundary forces are specified, including zero force on free edges.
 
-The displacement field contains infinitely many unknown values. To obtain
-a finite problem, we divide the object's region into triangles and
-approximate displacement inside each triangle by linear interpolation of
-its values at the three vertices, called nodes. Each node therefore has
-two displacement components. Combining the triangles' contributions gives
-a stiffness matrix $K$, which describes how nodal displacements produce
-internal forces, and a vector $f$ of applied nodal loads. The matrix is
-sparse because nodes interact directly only when they share a triangle.
+\item \textbf{Triangles represent the whole region.}
+Starting from boundary segments, we add nodes and fill the interior with
+nonoverlapping triangles, respecting any holes~\cite{shewchuk-triangle}.
+The edges partition a filled region: material occupies each triangle's
+interior. We approximate displacement there using its three vertex values:
+\begin{equation}
+ \mathbf{u}_h|_{T_e}(x,y)=\sum_{a=1}^{3}N_a(x,y)\mathbf{d}_a.
+ \label{eq:model-interpolation}
+\end{equation}
+The linear weights $N_a$ sum to one. Adjacent triangles share vertex values,
+so displacement matches along their common edge. Refinement adds smaller
+triangles to represent more variation within the object.
 
-After separating the prescribed displacement components from the unknown
-ones, force balance at the free components becomes
-\[
-  Ax=b.
-\]
-Here $x$ contains the unknown displacements, $A$ is the corresponding
-part of $K$, and $b$ contains the applied loads together with any
-contributions from prescribed displacements. With suitable supports and
-a stable elastic material, this reduced matrix is symmetric positive
-definite. The deformation problem has therefore become a linear algebra
-problem. We will study how changing geometry, mesh resolution, loads and
-supports affects both the deformation and the numerical solution.
+\item \textbf{Integrated equilibrium gives nodal equations.}
+Each triangle has six displacement components. Equation~\eqref{eq:model-interpolation}
+makes strain constant inside it. Integrating~\eqref{eq:model-field-balance}
+against the interpolation functions and integrating by parts gives
+\begin{equation}
+ K_e=t|T_e|B_e^TD_eB_e,
+ \label{eq:model-element-stiffness}
+\end{equation}
+where $B_e$ maps vertex displacements to strain, $t$ is uniform thickness,
+$D_e$ is constant within the element and $|T_e|$ is its area. Adding contributions at shared nodes gives
+\begin{equation}
+ Kd=f+r,
+ \label{eq:model-full-balance}
+\end{equation}
+with nodal displacements $d$, applied loads $f$ and support reactions $r$.
+Only nodes sharing a triangle couple directly, so $K$ is sparse.
+
+\item \textbf{Supports leave the system we solve.}
+Split components into free ($F$) and prescribed ($C$). Since $r_F=0$,
+the free rows of~\eqref{eq:model-full-balance} give
+\begin{equation}
+ Ax=b,\qquad A=K_{FF},\quad x=d_F,\quad b=f_F-K_{FC}d_C.
+ \label{eq:model-reduced-system}
+\end{equation}
+For a stable elastic material and a valid mesh, $A$ is symmetric positive
+definite once supports remove rigid translations and rotation on every
+connected component. This is the matrix problem our solvers will address.
+\end{itemize}

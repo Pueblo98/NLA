@@ -1,0 +1,7 @@
+.build-cache/
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
