@@ -1,13 +1,14 @@
 {
   "specification_source": "Pueblo98/NLA draft/sections/05-objects-and-experiments/cases.json @ 2b23fd5 (merged PR #7)",
   "specification_status_field": "PROPOSED, NOT APPROVED OR EXECUTED",
+  "specification_extension": "object D (half disc, radius 0.5 m, clamped diameter, load per unit height on the curved side) is added in Part 7; it is not in cases.json",
   "environment": {
-    "python": "3.12.2",
+    "python": "3.12.0",
     "numpy": "2.5.5",
     "scipy": "1.18.1",
     "matplotlib": "3.11.2",
     "triangle": "20250106",
-    "platform": "macOS-14.8.9-arm64-arm-64bit"
+    "platform": "macOS-27.2.1-arm64-arm-64bit"
   },
   "material": {
     "E_Pa": 200000000000.0,
@@ -20,9 +21,9 @@
     "note": "Triangle output can differ across platforms; the saved meshes are the ones behind every Part 7 number"
   },
   "observables": {
-    "mean_right_ux": "integral of u_x over the whole right edge / its length (exact for the piecewise-linear trace), metres",
-    "mid_ux": "u_x at the right-edge midpoint (x_r, 0.5), metres",
-    "mid_uy": "u_y at the right-edge midpoint (x_r, 0.5), metres"
+    "mean_right_ux": "integral of u_x over the whole loaded right side with respect to height / its height (the length average on a straight edge; exact for the piecewise-linear trace), metres",
+    "mid_ux": "u_x at the right-side midpoint (x_r, 0.5), metres",
+    "mid_uy": "u_y at the right-side midpoint (x_r, 0.5), metres"
   },
   "condition_number": "kappa_2 = lambda_max / lambda_min of the supported (free-free), unscaled stiffness matrix A; ARPACK which='LA' and which='SA'; reported only when both eigenpairs converged with defect <= 1e-8",
   "algebraic_estimate": "||w_free||_2 ||b - A x_ref||_2 / lambda_min_est; an estimate, not a certified bound; a successive difference <= the sum of both meshes' estimates is 'unresolved'",
@@ -87,11 +88,11 @@
     "outcome": "Record each check separately. Do not admit a failed or unverified reference into physical/refinement plots as validated. Solver failure records still belong in solver comparisons."
   },
   "outcomes": {
-    "cases_total": 36,
-    "cases_passing_all_checks": 36,
+    "cases_total": 48,
+    "cases_passing_all_checks": 48,
     "cases_with_unverified_check": 0,
-    "distinct_systems": 27,
-    "solver_runs_accepted": 116,
-    "solver_runs_total": 216
+    "distinct_systems": 36,
+    "solver_runs_accepted": 175,
+    "solver_runs_total": 288
   }
 }
