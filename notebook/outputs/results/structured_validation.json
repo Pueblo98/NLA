@@ -4,15 +4,20 @@
     "kappa_2": 95.79921703641827
   },
   "net_force_N": [
-    -1.204170985147357e-09,
-    -1.6443664208054543e-09
+    5.275069270282984e-10,
+    -2.368324203416705e-09
   ],
-  "net_moment_Nm": 3.3396645449101925e-09,
-  "roller_relative_error": 2.4991270950658854e-15,
-  "perturbation": {
-    "relative_load": 1e-06,
-    "relative_displacement": 4.51246954134587e-07,
-    "seed": 2026
+  "net_moment_Nm": 1.8408172763884068e-09,
+  "roller_relative_error": 3.96928799844391e-15,
+  "load_sensitivity": {
+    "relative_load_change": 0.001,
+    "amplification_G": {
+      "scaled load": 1.0000000000000002,
+      "redistributed load": 1.7662082510031578
+    },
+    "kappa_2": 9103.94094529072
   },
-  "jacobi_spectral_radius": 1.9600502426261603
+  "jacobi_spectral_radius": 1.96005024262616,
+  "damped_jacobi_spectral_radius": 0.999815666639641,
+  "kappa_2_diagonally_scaled": 8029.068197046662
 }
