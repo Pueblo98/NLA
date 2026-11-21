@@ -1,25 +1,22 @@
-% AI-assisted initial working draft for team review, not final project findings.
 % Requires amsmath, amssymb and booktabs; data/refinement_rows.tex is generated evidence.
 \section{Results, validation and discussion}
 \label{sec:results-validation}
 
-Section 5 proposed comparisons across objects, loads and supports.
-Those experiments are not yet available, so we first examine what the
-completed square example establishes. We use Section 4's recorded solver
-results and new square-only refinement and load-sensitivity checks,
-reusing the same implementation~\cite{nla-square-code}. These results
-do not represent the proposed additional objects.
+We first interpret Section 4's solver results and supplemental structured-square
+refinement and load-sensitivity checks~\cite{nla-square-code}. We then compare
+Section 5's objects, loads and supports using the separate committed
+notebook results from PR~11 (\texttt{0546539}).
 
 \subsection{Deformation under mesh refinement}
 We keep Section 4's material, full left clamp and uniform right-edge
 traction fixed. Table~\ref{tab:results-refinement} compares structured
 meshes with $n$ cells per side, retaining the same diagonal in every
-cell. These are separate from Section 5's proposed Triangle meshes.
+cell. These are separate from Section 5's Triangle meshes.
 Each physical measurement uses a checked sparse-LU solution.
 
 \begin{table}[htbp]
  \centering
- \caption{New square-only refinement results from
+ \caption{Supplemental structured-square refinement results from
  \texttt{generate\_evidence.py}. Here $\bar u_x$ is the right-edge
  horizontal displacement averaged by edge length; $u_x^m,u_y^m$ are
  the components at the fixed midpoint $(1,0.5)$ m. Displacements are
@@ -43,9 +40,8 @@ reduced mesh dependence of these displacements, not a known continuum error.
 Section 4's recorded timings show why iteration count alone is not a
 speed ranking. Diagonal PCG used 226 steps against CG's 242, but their
 minimum setup-inclusive times were 4.99 and 4.31 ms, respectively.
-Full GMRES used 228 steps yet took 146 ms. These imported measurements
-follow Section 3's protocol; no solver timings were repeated here, and
-small differences are not evidence of a general ranking.
+Full GMRES used 228 steps yet took 146 ms. These measurements follow Section 3's protocol; small timing
+differences do not establish a general ranking.
 
 Meanwhile, conditioning worsens under refinement despite the settling
 displacements. At $n=20$, symmetric diagonal scaling
@@ -86,24 +82,77 @@ not what every load direction produces. Neither test searches for the worst case
 The Euclidean norm here compares free nodal components on one fixed mesh,
 not displacement fields on different meshes.
 
+\subsection{Other objects, loads and supports}
+Table~\ref{tab:results-objects} uses the middle mesh-area limit
+($0.00125$ m$^2$). All 36 reference cases pass the acceptance checks;
+an independent replay using the archived meshes reproduces these outcomes.
+
+\begin{table}[htbp]
+ \centering
+ \caption{Objects under the baseline clamp and traction, middle mesh.
+ $\bar u_x$ is the mean right-edge horizontal displacement and $u_x^m$
+ the horizontal displacement at the right-edge midpoint, both in mm.
+ CG and PCG give iterations to a true relative residual below $10^{-8}$.
+ Source: PR~11 committed macOS result snapshot.}
+ \label{tab:results-objects}
+ \begin{tabular}{lrrrrrr}
+ \toprule
+ Object & Free unknowns & $\bar u_x$ & $u_x^m$ & $\kappa_2(A)$ & CG & PCG\\
+ \midrule
+ Square & 1282 & 0.4936 & 0.4918 & $1.12\times10^{4}$ & 268 & 245\\
+ Rectangle $2\times1$ & 2532 & 0.9936 & 0.9937 & $1.01\times10^{5}$ & 427 & 395\\
+ Square with opening & 1246 & 0.5560 & 0.5883 & $1.30\times10^{4}$ & 283 & 256\\
+ \bottomrule
+ \end{tabular}
+\end{table}
+
+Doubling the length approximately doubles the mean extension (a factor
+of $2.01$). The estimated condition number
+grows about nine times and CG needs 427 instead of 268 iterations.
+The opening removes 4\% of the material but increases the mean extension
+by 13\% and the midpoint extension by 20\%; the estimated condition
+number rises by 16\%.
+
+Under refinement, the mean extension of the square and the rectangle
+changes by less than 0.04\% at the last step, but that of the perforated
+square changes by 0.66\%. Its mean displacement remains more mesh dependent,
+without establishing the cause or continuum convergence.
+All 18 successive observable differences
+exceed the summed algebraic uncertainty estimates from both meshes,
+which are not certified bounds.
+
+Reported displacements scale with load magnitude within numerical
+precision. Moving the same force between equal-length right-edge patches
+changes the mean extension little for the square and rectangle, but not
+for the perforated square ($0.5358$ mm at either end versus $0.5844$ mm
+at the middle). Lower and upper patches give opposite in-plane vertical
+midpoint movements, approximately $\pm1.07$ mm on the square and
+$\pm4.42$ mm on the rectangle.
+Clamping only the central half of the left edge increases the
+mean extension by 22\% (square), 11\% (rectangle) and 25\% (perforated
+square), and multiplies $\kappa_2(A)$ by 2.4 to 3.0.
+
+CG, PCG, MINRES and GMRES reached the target on all 27 distinct systems.
+Jacobi diverged and damped Jacobi exhausted the 20,000-iteration budget
+on all of them. Gauss--Seidel and steepest descent each reached the target
+only on the coarsest square and perforated-square systems, giving 112
+accepted method/system pairs out of 216. PCG used fewer iterations than
+CG throughout, but was slower in 26 of 27 recorded comparisons;
+its sole advantage was about 0.5\% on the finest rectangle, not a
+general speed advantage.
+
 \subsection{Validation and remaining limits}
-Across the four refinement references, prescribed displacements are
+Across the four structured-square references, prescribed displacements are
 exactly zero and true relative residuals are below $1.3\times10^{-13}$.
 Normalized force and moment imbalances are below $4\times10^{-14}$,
 counting reactions only at constrained components. Force imbalance is
 normalized by the sum of applied nodal
 force magnitudes; moment imbalance about the origin uses that force scale
-times the square's diagonal length. The companion data retain each
-check separately. The separate roller-supported affine test gives a
+times the square's diagonal length.  The separate roller-supported affine test gives a
 relative nodal displacement error of $2.12\times10^{-15}$ against its
 exact field; it does not provide an exact answer for the clamped benchmark.
 
 The evidence therefore separates algebraic solution accuracy, mesh
-dependence and verification against a known solution. It does not yet
-establish continuum accuracy or physical validity near clamp corners.
-The rectangle, perforated square, load-patch and shortened-clamp studies
-remain unexecuted, and no material or thickness comparison is claimed.
-Their interpretation requires checked reference solutions and preserved
-physical loads, not merely similar-looking deformation plots. The
-assembly-routine permission noted in Section 2 and final case selection
-also remain unresolved.
+dependence and verification against a known solution. It does not establish
+continuum accuracy, corner-stress convergence or real-material validity.
+No material or thickness comparison is made.

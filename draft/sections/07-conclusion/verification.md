@@ -1,38 +1,23 @@
-# Section 7 build and review verification
+# Section 7 verification
 
-## Source scope
+## Current correction and source scope
 
-- Source basis: `origin/main` at `b138327cb949b5bc63ed10233fec12e37200c9a4`.
-- Read the canonical writing rules, roadmap and complete Sections 1–6 before drafting. After drafting, reread the unchanged earlier content and checked Section 6's closing paragraphs against Section 7's opening.
-- A fresh remote fetch before publication returned the same main revision.
-- `git diff --exit-code b138327 --` for the writing rules, roadmap and all six predecessor folders returned success with no changes.
-- Section 7 synthesizes previously recorded evidence; no numerical experiment or timing was rerun. This verification is not a new physical-validation claim.
+Reused the existing PR 12 conclusion at `637911fcd82a8cd4a3f2bd87763c9ac568447e59`, rather than creating a competing conclusion. Read the canonical writing rules, roadmap and Sections 1–6, including the revised Section 6 bridge and limitations. Earlier sections remain unchanged by this task.
 
-## Actual build
+The source basis is now Section 4's original measurements, Section 6's preserved structured-square supplement and the **committed PR 11 macOS results at `05465395c6615e0b35b9579689c336bdc709252b`**. The latter were read from `/home/kleon/school/nla-pr11-update/notebook/outputs/results/`, not a newly generated Linux mesh snapshot. Section 6's [verification ledger](../06-results-and-validation/verification.md) supplies exact CSV fields, values, hashes and recount procedure. This conclusion introduces no new experiments.
 
-Command from the module folder:
+## Claim-to-evidence review
 
-```sh
-TECTONIC_BIN=/home/kleon/school/nla-section3-tools/tectonic sh build.sh
-```
+- **Physical response:** the three geometry rows in `objects_cases.csv` support positive mean extension, rectangle/square ratio **2.0128826014**, opening/square mean increase **12.6278416193%** and half-clamp increases **11.173754566–25.223049426%**. The conclusion no longer attributes the opening's effect to a demonstrated stress-path mechanism.
+- **Refinement:** the structured-square means and Triangle square means are about **0.494 mm** with shrinking successive mean changes. The perforated-square final mean change is **0.6620608408%**, versus **0.0338947190%/0.0157166578%** for square/rectangle. This is residual mesh dependence, not measured continuum error, a convergence rate or evidence of corner causation.
+- **Load location:** square and rectangle mean extensions vary little between equal-length patches. The opening's lower/middle/upper means are **0.5357793193/0.5844313258/0.5358399959 mm**. Removed the claim that location never changes mean extension. Vertical deflection is explicitly in-plane; no out-of-plane plate-bending result is claimed.
+- **Solver acceptance:** four Krylov methods each succeed on **27/27** distinct systems. Ordinary Jacobi diverges and damped Jacobi reaches the cap on **27/27**. Gauss–Seidel **and steepest descent** each succeed on the two coarsest square/opening systems, not on all objects or all coarse meshes. Thus **108 + 2 + 2 = 112** accepted method/system pairs out of **216**. Deduplication must parse the numeric `system_key` tuple before counting; raw string keys overcount.
+- **PCG cost:** fewer iterations on all 27 systems, but slower in **26/27** best-of-three comparisons. Finest rectangle: PCG **0.0916805830 s**, CG **0.0921728330 s**, about **0.5%** advantage. Corrected the universal “does not improve time” claim. These tiny differences are not a general performance ranking. Original Section 4 timings remain separate.
+- **Validation and sensitivity:** use the existing Section 6 support, balance, same-mesh reference and separate roller-test evidence. Fixed-matrix perturbation amplifications **1.0000000000/1.7662082510** are structured-square results, not cross-object tests. The 36 physical-reference passes were also reproduced by the independent Linux replay recorded in the Section 6 ledger; displayed timings remain the committed macOS measurements.
+- **Recommendations:** CG is scoped to the tested supported SPD systems. Stronger preconditioners and local-refinement/stress studies are proposed next steps, not proven necessary or sufficient remedies. No material/thickness comparison or trusted corner-stress prediction is claimed.
 
-Tectonic version: **0.17.0**. Build exit status: **0**. The absolute compiler path describes this machine only; `build.sh` also discovers an installed Tectonic or falls back to pdfLaTeX.
+## Checks performed and limits
 
-- Preview: **1 page**, A4, 11 pt article with 25 mm margins.
-- Page dimensions reported by PyMuPDF: 595.2800 × 841.8900 PDF points.
-- Extracted text contains the Section 7 heading and all four conclusion paragraphs.
-- Compiler log: no warnings, missing characters, undefined references, overfull boxes or underfull boxes.
-- Text-span check: no left/right margin violations, allowing 2 PDF points of tolerance.
-- Rendered and visually inspected the exact preview. Heading, four paragraphs and footer are readable; no clipping or overlap was observed. No font or margin reduction was used to obtain one page.
+The prose audit used CSV counting, numerical comparisons and read-back of stored evidence. The revised conclusion was then compiled successfully with Tectonic 0.17.0 through the unchanged build script: one A4 page, 11 pt, 25 mm margins. PDF text and layout were inspected, with no unresolved references or text outside the page. This does not certify the final combined report's layout or page limit; numerical replay and failure-injection findings are recorded separately in the Section 6 verification ledger.
 
-SHA-256 of the delivered `preview.pdf`:
-
-```text
-6baf979a5030eb34ea2ed0bdb374a25a26fc87e6a3d2edb6e86d7f6ac7ec559f
-```
-
-## Portable build check
-
-Copied only `main.tex`, `section.tex` and `build.sh` into a fresh temporary directory and ran the build there with the same installed compiler. The build succeeded. Its page count, extracted text and rendered page pixels matched the delivered preview. No sibling section sources, bibliography file, Python package or numerical data are needed to compile Section 7.
-
-The final course `clean,onecolumn` template and assembled report's ten-page limit have not been checked by this standalone build. Team review, factual updates following new Section 6 results, member contributions and the final AI-use disclosure remain open as described in the README.
+The existing `main.tex`/`build.sh` remain the compile entry points. `section.tex` remains preamble-free and introduces no bibliography keys. Delivery is on `docs/pr11-results-update`, based on main `7f8c940`, without changing the notebook or Sections 1–5. Team approval, assembly-routine permission, final physical-model assessment, contribution statements and AI-use disclosure remain open.

@@ -1,30 +1,27 @@
 # Section 7: Conclusion
 
-**Status: initial working draft for team review, not final project conclusions.**
-Hermes is the drafter for Simon's request. The scope is the [Section 7 roadmap](../../ROADMAP.md#7-conclusion); the only writing guide is [WRITING_RULES.md](../../WRITING_RULES.md). Sections 1–6 are unchanged.
+**Status: corrected PR 12 working draft; standalone PDF built and inspected; team review pending.** The scope is the [Section 7 roadmap](../../ROADMAP.md#7-conclusion), following [WRITING_RULES.md](../../WRITING_RULES.md). This correction changes Sections 6/7 only, not Sections 1–5.
 
 ## Source and evidence
 
-This conclusion synthesizes the current committed Sections 1–6 at main revision `b138327cb949b5bc63ed10233fec12e37200c9a4`. It introduces no experiments and does not rerun the existing numerical studies. Its physical findings, solver recommendation and validation limits are restricted to the square evidence presented in Sections 4 and 6. Section 5's additional-object and load/support comparisons remain proposed in those report sources. Unmerged notebook work is not silently promoted into report findings. See [review-notes.md](review-notes.md) for the claim-to-source ledger and continuity review.
+The conclusion synthesizes the revised Section 6, with the original Section 4 measurements and structured-square supplement kept separate from imported object results. The additional-object/load/support evidence is the **PR 11 macOS snapshot `05465395c6615e0b35b9579689c336bdc709252b`**, audited at `/home/kleon/school/nla-pr11-update/notebook/outputs/results/`. It is distinct from a newly generated Linux mesh snapshot, and the canonical timing snapshot is retained. A separate Linux replay using the archived meshes reproduced all reference and solver acceptance outcomes; see the Section 6 verification ledger.
+
+[verification.md](verification.md) maps the corrected claims to the audited data and supersedes historical scope/build statements in [review-notes.md](review-notes.md). In particular, load-location invariance is not generalized to the perforated square, PCG's timing result includes its one slight advantage, and the two accepted steepest-descent runs are retained alongside the two Gauss–Seidel successes. Physical-reference passes remain attributed to the export.
 
 ## Files and build
 
-- `section.tex`: preamble-free body for inclusion in the eventual report.
-- `main.tex`: standalone preview wrapper, numbered as Section 7.
-- `build.sh`: portable Tectonic or pdfLaTeX build.
-- `preview.pdf`: compiled preview synchronized with the source.
-- `verification.md`: actual build and PDF inspection results.
+- `section.tex`: preamble-free body for inclusion in the report.
+- `main.tex`, `build.sh`: standalone preview wrapper and portable build.
+- `preview.pdf`: rebuilt from the revised source and visually inspected, one standalone A4 page.
+- `verification.md`: current source/data audit and explicit build boundary.
 
-Run `sh build.sh` from this directory. Set `TECTONIC_BIN=/path/to/tectonic` only if the compiler is not on PATH. For Overleaf, upload this directory's source and select `main.tex`. The preview uses A4, 11 pt and 25 mm margins with the `geometry` package. It is not the required final course template and does not certify the assembled report's ten-page limit.
-
-The body only synthesizes findings and definitions already attributed in earlier sections, so it needs no new bibliography entries, equations or figures. Existing Section 4/6 citations must remain in the assembled paper; its common bibliography must use `amsplain`. Section-number references follow the fixed roadmap and must be checked if the report is reordered.
+Run `sh build.sh` from this directory, with optional `TECTONIC_BIN=/path/to/tectonic`. For Overleaf, upload the source and select `main.tex`. The wrapper uses A4, 11 pt and 25 mm margins. It does not certify the final `clean,onecolumn` layout or the assembled ten-page limit. The conclusion introduces no figures, equations or bibliography entries; retain earlier sections' citations and the report's `amsplain` bibliography.
 
 ## Outstanding review and integration
 
-- Revise the conclusion when Section 6 incorporates the additional-object, load-location and support studies. Do not infer those outcomes from notebook availability alone.
-- Reconcile any newer Slack-only Section 2 revision with the committed text before final assembly; this task reviews the accessible repository version.
-- Resolve assembly-routine permission, final case selection and the physical model's validity, particularly near sharp corners.
-- Recheck the CG recommendation across approved cases. The present timings concern one square and do not rank direct LU against iterative methods.
-- Keep the conclusion concise during integration and verify it in the required `clean,onecolumn` template.
+- Keep the canonical macOS timing snapshot separate from the independently replayed Linux verification.
+- Verify final combined-report layout and page-count compliance; standalone previews do not establish those.
+- Resolve assembly-routine permission, final team approval, small-strain validity and outstanding local-refinement/stress questions.
+- Preserve the tested-system scope of the solver recommendation. Untimed LU is not a performance competitor, and stronger preconditioning is a proposed extension.
 
-This initial prose, source preparation and build verification are AI-assisted work by Hermes. This is not human team approval. Confirm individual member contributions and the required report-level AI-use disclosure before submission.
+This prose correction and evidence audit are AI-assisted work, not human team approval. Confirm member contributions and the required report-level AI-use disclosure before submission.

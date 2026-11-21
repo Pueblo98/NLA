@@ -1,0 +1,37 @@
+{
+  "commit": "05465395c6615e0b35b9579689c336bdc709252b",
+  "cases": 36,
+  "accepted_references": 36,
+  "solver_records": 288,
+  "unique_systems": 27,
+  "accepted_unique_solver_runs": 112,
+  "unique_solver_runs": 216,
+  "meshes_verified": {
+    "S_a0.005.npz": "ef4d1b82d2d8400b87c6b3cecd16770356e3c57b4eeb5fd5379578124bf749a6",
+    "S_a0.00125.npz": "d4d8952ce7948996594bddf56e96b5aa871fc8403346df685bdb59be64f8a2b5",
+    "S_a0.0003125.npz": "13e31ee6f0c0f507ffa10466e0ad463c4a481b9bfd41c2bbf6f21d31606226ef",
+    "R_a0.005.npz": "f21bac9ef063ad128ba9ef7ec0f09e3d952fa95a75ccb234261a32f5821da4e7",
+    "R_a0.00125.npz": "9d21d1ff161cce64b57b35491823747951d0170d34fb4d86f56b35273fad833d",
+    "R_a0.0003125.npz": "8b9a0ffeb091b11ce8d615d944a45a48e389eb8cb80af71f3ce838e09371e208",
+    "H_a0.005.npz": "e9400bf0f7fe8574570f78c1be175aa718abf15fe8713a07f47eeb0094369f33",
+    "H_a0.00125.npz": "b7715bf3cbe85188b060bf16ff13b9e4856923af62c77d20e10a0be9b50cf80e",
+    "H_a0.0003125.npz": "cdeccfecbc43c72a7c9946b2afda6599bcb138c09d10e9d94ebe46ce226f6e1f"
+  },
+  "resolved_differences": 18,
+  "accepted_by_method": {
+    "CG": 27,
+    "Damped Jacobi": 0,
+    "GMRES (full)": 27,
+    "Gauss-Seidel": 2,
+    "Jacobi": 0,
+    "MINRES": 27,
+    "PCG (diagonal)": 27,
+    "SD": 2
+  },
+  "replay": {
+    "max_mean_displacement_difference_m": 5.898059818321144e-17,
+    "max_iteration_difference": 2,
+    "solver_acceptance_changes": [],
+    "physical_reference_acceptance_matches": true
+  }
+}
